@@ -13,7 +13,7 @@ type Category struct {
 	Name string `gorm:"index"`
 	Slug string `gorm:"index"`
 	Description string
-	post_count int
+	PostCount int `json:"post_count"`
 }
 
 func (c *Category) BeforeCreate(tx *gorm.DB) (err error) {

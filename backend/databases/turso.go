@@ -28,6 +28,7 @@ func TursoConnecter() *gorm.DB {
 	// run migrations manually for all of the models
 	migrations := db.AutoMigrate(
 		&models.Users{},
+		&models.Category{},
 	)
 	if migrations != nil {
 		fmt.Println("Error while doing migrations!", err)
