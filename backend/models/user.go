@@ -12,13 +12,13 @@ type Users struct {
 	ID string `json:"id" gorm:"primaryKey"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	Username string
+	Username string `gorm:"index"`
 	Password []byte `json"-"` // field is excluded from JSON encoding to prevent it from being exposed.
-	FullName string `json:"full_name"`
+	FullName string `json:"full_name" gorm:"index"`
 	Avatar string
 	Bio string 
 	Role string // options: creator, member, admin
-	Email string
+	Email string `gorm:"index"`
 }
 
 // Hook to auto add a id to all new created users.
