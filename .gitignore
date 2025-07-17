@@ -1,4 +1,5 @@
 backend/.env
-backend/tmp/
+backend/tmp
 notes
 .DS_Store
+/tmp/
