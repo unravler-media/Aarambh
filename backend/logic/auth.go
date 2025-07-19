@@ -10,6 +10,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+
+	"github.com/go-playground/validator/v10"
 )
 
 func LoginHandler(c *fiber.Ctx) error {
@@ -87,11 +89,30 @@ func RegisterHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	// take input from the post request
+	// take input from the post request and put it into data var
 	var data = models.Users{}
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"response": "Invalid Information Provided.",
+		})
+	}
+
+	// valdiate the request body
+	validation, ok := c.Locals("validator").(*validator.Validate)
+	if !ok {
+		return c.Status(fiber.StatusFailedDependency).JSON(fiber.Map{
+			"response": "Failed to load validation",
+		})
+	}
+	
+	// do the validation of user instance
+	if err := validation.Struct(&data); err != nil {
+		errors_list := make(map[string]string)
+		for _, err := range err.(validator.ValidationErrors) {
+			errors_list[err.Field()] = fmt.Sprintf("Validation failed on tag '%s'", err.Tag())
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": errors_list,
 		})
 	}
 
