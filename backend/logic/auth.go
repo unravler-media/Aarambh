@@ -88,7 +88,7 @@ func RegisterHandler(c *fiber.Ctx) error {
 	}
 
 	// take input from the post request
-	var data = make(map[string]string)
+	var data = models.Users{}
 	if err := c.BodyParser(&data); err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"response": "Invalid Information Provided.",
@@ -96,14 +96,14 @@ func RegisterHandler(c *fiber.Ctx) error {
 	}
 
 	var user models.Users
-	if err := db.Where("username = ?", data["username"]).First(&user).Error; err != nil {
+	if err := db.Where("username = ?", &data.Username).First(&user).Error; err != nil {
 		c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
 			"response": "User with that email already exists.",
 		})
 	}
 
 	// User does not already exist. Now Hash the password.
-	password_hash, err := bcrypt.GenerateFromPassword([]byte(data["password"]), bcrypt.DefaultCost)
+	password_hash, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"response": "Failed to hash password",
@@ -112,8 +112,8 @@ func RegisterHandler(c *fiber.Ctx) error {
 
 	// Now we can create the user object
 	newUser := models.Users{
-		FullName: data["full_name"],
-		Username: data["username"],
+		FullName: data.FullName,
+		Username: data.Username,
 		Password: password_hash,
 	}
 
