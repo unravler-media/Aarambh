@@ -2,4 +2,4 @@ backend/.env
 backend/tmp
 notes
 .DS_Store
-/tmp/
+tmp/
