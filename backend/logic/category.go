@@ -82,7 +82,31 @@ func CreateCategory(c *fiber.Ctx) error {
 
 func FetchCategory(c *fiber.Ctx) error {
 	// Fetch a Category
-	return nil
+	db, ok := c.Locals("db").(*gorm.DB)
+	if !ok {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "DB Fucked.",
+		})
+	}
+	var categories []models.Category
+	var category models.Category
+	query_lookup := db.Model(&category).Find(&categories)
+	if query_lookup.Error != nil {
+		fmt.Println("Error while Fetching Categories: ", query_lookup.Error)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Something went wrong while Fetching Categories",
+		})
+	}
+
+	if query_lookup.RowsAffected < 1 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"response": "No Categories Found.",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"response": categories,
+	})
 }
 
 func UpdateCategory(c *fiber.Ctx) error {
