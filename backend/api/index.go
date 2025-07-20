@@ -1,18 +1,18 @@
-package integrations
+package handler
 
 import (
  "github.com/gofiber/fiber/v2/middleware/adaptor"
  "github.com/gofiber/fiber/v2"
  "net/http"
 
-	"fmt"
+	// "fmt"
 	"github.com/go-playground/validator/v10"
 	gojson "github.com/goccy/go-json"
 	
 	"backend/databases"
 	"backend/routes"
 
-	"github.com/joho/godotenv"
+// 	"github.com/joho/godotenv"
 
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
@@ -23,19 +23,16 @@ import (
 
 // Handler is the main entry point of the application. Think of it like the main() method
 func Handler(w http.ResponseWriter, r *http.Request) {
- // This is needed to set the proper request path in `*fiber.Ctx`
- r.RequestURI = r.URL.String()
-
- handler().ServeHTTP(w, r)
+	// This is needed to set the proper request path in `*fiber.Ctx`
+	r.RequestURI = r.URL.String()
+	handler().ServeHTTP(w, r)
 }
 
 
 // building the fiber application
 func handler() http.HandlerFunc {
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Something went wrong while importing ENV Variables.")
-	}
+	// ignore this shit in vercel?
+	// godotenv.Load()
 
 	database := databases.TursoConnecter()
 	app := fiber.New(

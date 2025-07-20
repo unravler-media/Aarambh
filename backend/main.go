@@ -27,7 +27,7 @@ func main() {
 			AppName:      "Project Aarambh",
 			JSONEncoder:  gojson.Marshal,
 			JSONDecoder:  gojson.Unmarshal,
-		},
+	},
 	)
 
 	// CORS middleware 
@@ -38,7 +38,7 @@ func main() {
 	// adding validator globally to reuse globally
 	var validate *validator.Validate
 	validate = validator.New(validator.WithRequiredStructEnabled())
-
+	
 	app.Use(func(c *fiber.Ctx) error {
 		c.Locals("validator", validate)
 		return c.Next()
