@@ -87,10 +87,19 @@ func FetchCategory(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"response": "DB Fucked.",
 		})
+	}	
+	category_id := c.Query("category_id")
+
+	type result struct {
+		ID string
+		Name string
+		Slug string
+		Description string
 	}
-	var categories []models.Category
-	var category models.Category
-	query_lookup := db.Model(&category).Find(&categories)
+
+	var categorySingle result
+	query_lookup := db.Debug().Model(&models.Category{}).Select("id", "name", "slug", "description").Where("id = ?", category_id).First(&categorySingle)
+
 	if query_lookup.Error != nil {
 		fmt.Println("Error while Fetching Categories: ", query_lookup.Error)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -105,16 +114,84 @@ func FetchCategory(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-		"response": categories,
+		"response": categorySingle,
 	})
 }
 
 func UpdateCategory(c *fiber.Ctx) error {
-	// Update a Category 
-	return nil 
+	// Update a Category
+	db, ok := c.Locals("db").(*gorm.DB)
+	if !ok {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "DB Fucked",
+		})
+	}
+
+	category_id := c.Query("category_id")
+	fmt.Println(category_id)
+	var category models.Category
+	query := db.Find(&category, "id == ?", category_id)
+	if query.Error != nil {
+		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
+			"response": "Cannot Query for this Category",
+		})
+	}
+
+	if query.RowsAffected < 1 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"response": "Category Not Found.",
+		})
+	}
+
+	if err := c.BodyParser(&category); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Invalid Information Provided.",
+		})	
+	}
+
+	save_query := db.Save(&category)
+	if save_query.Error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"responnse": "Error while updating category",
+		})
+	}
+
+	response := make(map[string]string)
+	response["id"] = category.ID
+	response["updated_at"] = category.UpdatedAt.String()
+	response["slug"] = category.Slug
+	response["description"] = category.Description
+
+	return c.JSON(fiber.Map{
+		"response": response,
+	})
 }
 
 func DeleteCategory(c *fiber.Ctx) error {
 	// Delete a Category 
-	return nil
+	db, ok := c.Locals("db").(*gorm.DB)
+	if !ok {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "DB Fucked",
+		})
+	}
+
+	category_id := c.Query("category_id")
+	var category models.Category
+	query := db.Delete(&category, "id = ?", category_id)
+	if query.Error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": query.Error,
+		})
+	}
+
+	if query.RowsAffected < 1 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"response": "No Category Exist.",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"response": "Category Deleted Succesfully.",
+	})
 }

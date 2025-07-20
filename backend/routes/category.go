@@ -9,7 +9,7 @@ func CategoryRoutes(router fiber.Router) {
 	router.Get("get/", logic.FetchCategory)
 
 	router.Post("create/", middlewares.Protect(), logic.CreateCategory)
-	router.Put("edit", middlewares.Protect(), logic.UpdateCategory)
+	router.Put("edit/", middlewares.Protect(), logic.UpdateCategory)
 
 	router.Delete("delete/", middlewares.Protect(), logic.DeleteCategory)
 }
