@@ -12,7 +12,6 @@ import (
 
 func TursoConnecter() *gorm.DB {
 	api_host := os.Getenv("turso_api")
-	fmt.Println(api_host)
 	db, err := gorm.Open(sqlite.New(
 		sqlite.Config{
 			DriverName: "libsql",
@@ -20,21 +19,23 @@ func TursoConnecter() *gorm.DB {
 		},
 	), &gorm.Config{})
 	if err != nil {
-		fmt.Println("unable to connecat to db!")
+		fmt.Println("[!] Unable to Connect to DB!")
 		return db
 	}
-	fmt.Println("Connected to DB!")
+	fmt.Println("[*] Connection Established to Database.")
 
 	// run migrations manually for all of the models
 	migrations := db.AutoMigrate(
 		&models.Users{},
 		&models.Category{},
 	)
+
 	if migrations != nil {
-		fmt.Println("Error while doing migrations!", err)
+		fmt.Println("[!] Error while doing migrations!", err)
 		return db
 	}
-		return db
+	fmt.Println("[*] Succesfully Ran Migrations.")	
+	return db
 }
 
 func InjectDatabase(session *gorm.DB) fiber.Handler {
