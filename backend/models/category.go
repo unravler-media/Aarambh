@@ -13,7 +13,8 @@ type Category struct {
 	Name string `gorm:"index"`
 	Slug string `gorm:"index"`
 	Description string
-	PostCount int `json:"post_count"`
+	UserID string
+	User Users `json:"user"gorm:"foreignKey:UserID"`
 }
 
 func (c *Category) BeforeCreate(tx *gorm.DB) (err error) {
