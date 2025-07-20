@@ -9,6 +9,8 @@ import (
 	"gorm.io/gorm"
 )
 
+
+// to handle url: GET /api/category/
 func FetchCategories(c *fiber.Ctx) error {
 	// Fetch all Categories
 	db, ok := c.Locals("db").(*gorm.DB)
@@ -28,7 +30,10 @@ func FetchCategories(c *fiber.Ctx) error {
 		PostCount string `json:"post_count"`
 	}
 
+	// empty variable of list (slice) of category
 	var categories []models.Category
+
+	// db query 
 	categories_fetch := db.Find(&categories).Model(&CategoryResponse{})
 	if categories_fetch.RowsAffected < 1 {
 		return c.Status(404).JSON(fiber.Map{
