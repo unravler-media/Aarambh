@@ -3,7 +3,6 @@ package logic
 import (
 	"backend/models"
 	"fmt"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -141,9 +140,13 @@ func UpdateCategory(c *fiber.Ctx) error {
 			"response": "DB Fucked",
 		})
 	}
-
+	
+	// get the user id from the JWT session
+	token := c.Locals("session_user").(*jwt.Token).Claims.(jwt.MapClaims)
+	user_id := token["sub"].(string)
 	category_id := c.Query("category_id")
-	fmt.Println(category_id)
+	
+	// fetch the category in question
 	var category models.Category
 	query := db.Find(&category, "id == ?", category_id)
 	if query.Error != nil {
@@ -158,6 +161,16 @@ func UpdateCategory(c *fiber.Ctx) error {
 		})
 	}
 
+	// check if the logged in user is the creator of that category
+	if user_id == category.UserID {
+		// empty means ignore if true
+	} else {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"response": "Unauthorized Operation.",
+		})
+	}
+
+	// if the above check is done and the user logged in is the creator then we can continue
 	if err := c.BodyParser(&category); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"response": "Invalid Information Provided.",
