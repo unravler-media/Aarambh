@@ -78,7 +78,7 @@ func CreateCategory(c *fiber.Ctx) error {
   // Add user id to category
 	category.UserID = token["sub"].(string) // assert string because token["sub"]
  	if creation := db.Create(&category); creation.Error != nil {
-		c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"response": "Cannot Create the category",
 		})
 	}
