@@ -1,9 +1,11 @@
 package models
 
 import (
-	"gorm.io/gorm"
+	"strings"
 	"time"
+
 	"github.com/matoous/go-nanoid/v2"
+	"gorm.io/gorm"
 )
 
 type Category struct {
@@ -17,12 +19,17 @@ type Category struct {
 	User Users `json:"user"gorm:"foreignKey:UserID"`
 }
 
+// This is GormHooks and will run before running the Transaction to Write to DB.
 func (c *Category) BeforeCreate(tx *gorm.DB) (err error) {
+	// instead of UUID we are using NanoID for efficiency.
 	nanoid_id, err := gonanoid.New()
 	if err != nil {
 		return err
 	}
 
 	c.ID = nanoid_id
+
+	// handle slug screation
+	c.Slug = strings.ReplaceAll(c.Name," ", "-") // replace Empty space with -
 	return nil
 }
