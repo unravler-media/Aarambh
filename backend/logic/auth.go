@@ -63,7 +63,6 @@ func LoginHandler(c *fiber.Ctx) error {
 		"sub": string(user.ID),
 		"exp": time.Now().Add(time.Hour * 24).Unix(), // 24 Hours Validity
 	})
-
 	secretKey := os.Getenv("secretKey")
 	token, err := claims.SignedString([]byte(secretKey))
 	if err != nil {

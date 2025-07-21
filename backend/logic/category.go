@@ -6,9 +6,10 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
-)
 
+)
 
 // to handle url: GET /api/category/
 func FetchCategories(c *fiber.Ctx) error {
@@ -24,17 +25,15 @@ func FetchCategories(c *fiber.Ctx) error {
 	// prepare a structure for response
 	type CategoryResponse struct {
 		ID string
-		UpdatedAt time.Time `json:"updated_at"`
 		Name string
 		Slug string
-		PostCount string `json:"post_count"`
 	}
 
 	// empty variable of list (slice) of category
-	var categories []models.Category
+	var categories []CategoryResponse
 
 	// db query 
-	categories_fetch := db.Find(&categories).Model(&CategoryResponse{})
+	categories_fetch := db.Select("id","updated_at","name","slug").Model(&models.Category{}).Find(&categories)
 	if categories_fetch.RowsAffected < 1 {
 		return c.Status(404).JSON(fiber.Map{
 			"response": "No Categories Exist.",
@@ -61,7 +60,10 @@ func CreateCategory(c *fiber.Ctx) error {
 			"response": "DB Fucked",
 		})
 	}
-
+	
+	jwtLocale := c.Locals("session_user").(*jwt.Token)
+	token := jwtLocale.Claims.(jwt.MapClaims)
+	
 	// parse the incoming request.
 	var category models.Category
 
@@ -73,15 +75,23 @@ func CreateCategory(c *fiber.Ctx) error {
 	}
 
 	// using the auto populated category to Create
-	creation := db.Create(&category)
-	if creation.Error != nil {
+  // Add user id to category
+	category.UserID = token["sub"].(string) // assert string because token["sub"]
+ 	if creation := db.Create(&category); creation.Error != nil {
 		c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
 			"response": "Cannot Create the category",
 		})
 	}
+	
+	response := make(map[string]string)
+	response["ID"] = category.ID
+	response["Name"] = category.Name
+	response["Slug"] = category.Slug
+	response["desctiption"] = category.Description
+	response["user"] = category.UserID
 
 	return c.JSON(fiber.Map{
-		"response": &category,
+		"response": &response,
 	})
 }
 
