@@ -30,6 +30,7 @@ func (c *Category) BeforeCreate(tx *gorm.DB) (err error) {
 	c.ID = nanoid_id
 
 	// handle slug screation
-	c.Slug = strings.ReplaceAll(c.Name," ", "-") // replace Empty space with -
+	slug := strings.ToLower(c.Name)
+	c.Slug = strings.ReplaceAll(slug," ", "-") // replace Empty space with -
 	return nil
 }
