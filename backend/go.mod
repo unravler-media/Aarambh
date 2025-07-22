@@ -15,7 +15,7 @@ require (
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/gofiber/contrib/jwt v1.1.2 // indirect
 	github.com/gofiber/fiber v1.13.3 // indirect
-	github.com/gofiber/fiber/v2 v2.52.8 // indirect
+	github.com/gofiber/fiber/v2 v2.52.9 // indirect
 	github.com/gofiber/jwt v0.2.0 // indirect
 	github.com/gofiber/utils v0.0.9 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.3 // indirect
@@ -31,7 +31,9 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
+	github.com/philhofer/fwd v1.1.3-0.20240916144458-20a13a1f6b7c // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/tinylib/msgp v1.2.5 // indirect
 	github.com/tursodatabase/libsql-client-go v0.0.0-20240902231107-85af5b9d094d // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.51.0 // indirect

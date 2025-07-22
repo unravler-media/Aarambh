@@ -12,6 +12,9 @@ import (
 	"backend/routes"
 
 	"github.com/joho/godotenv"
+
+	"github.com/gofiber/fiber/v2/middleware/cache"
+	"time"
 )
 
 func main() {
@@ -53,7 +56,17 @@ func main() {
 
 	// adding database middleware to reuse globally
 	app.Use(databases.InjectDatabase(database))
-
+	
+	// Implement Default In-Memory Caching
+	app.Use(cache.New(cache.Config{
+  	Next: func(c *fiber.Ctx) bool {
+        return c.Query("noCache") == "true"
+    },
+    Expiration: 1 * time.Minute, // Cache Timeout set to 1 Minutes.
+    CacheControl: true,
+	}))
+	
+	
 	// using Routes Grouping for a better DX (Developer Experience)
 	routes.ApiRoutes(app.Group("/api"))
 	
