@@ -1,6 +1,12 @@
 package models
 
-import "time"
+import (
+	"strings"
+	"time"
+
+	gonanoid "github.com/matoous/go-nanoid/v2"
+	"gorm.io/gorm"
+)
 
 type Post struct {
 	ID string `gorm:"primaryKey"`
@@ -17,6 +23,16 @@ type Post struct {
 	Category Category `gorm:"foreignKey:CategoryID"`
 	ReadTime string `json:"read_time"`
 	IsFeatured bool `json:"is_featured"`
+}
+
+// Creating Hooks for Post Model
+func(c *Post) BeforeCreate(tx *gorm.DB) (err error) {
+	// nanoid generation for ID of Post
+	nanoid_id, err := gonanoid.New()
+	c.ID = nanoid_id
+	slug := strings.ToLower(c.PostTitle)
+	c.Slug = strings.ToLower(slug)
+	return nil
 }
 
 // for future implementations
