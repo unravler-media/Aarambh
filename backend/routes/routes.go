@@ -13,6 +13,7 @@ func ApiRoutes(router fiber.Router) {
 
 	AuthenticationRoutes(router.Group("auth/"))
 	CategoryRoutes(router.Group("category/"))
+	PostRoutes(router.Group("posts/"))
 }
 
 // Todo: Add more routes grouping here.
