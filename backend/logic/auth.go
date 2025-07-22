@@ -99,7 +99,13 @@ func RegisterHandler(c *fiber.Ctx) error {
 	}
 
 	// take input from the post request and put it into data var
-	var data = models.Users{}
+	type RequestParams struct {
+		Username string `json:"username" validate:"required,min=4"`
+		Password string `json:"password" validate:"required,min=8"`
+		Email string `json:"email" validate:"required"`
+		FullName string `json:"full_name" validate:"required"`
+	}
+	var data = new(RequestParams)
 
 	// automatically parse the request and fill in the fields inside the provided struct refrence
 	if err := c.BodyParser(&data); err != nil {
@@ -117,13 +123,14 @@ func RegisterHandler(c *fiber.Ctx) error {
 	}
 	
 	// do the validation of user instance
-	if err := validation.Struct(&data); err != nil {
-		errors_list := make(map[string]string)
+	if err := validation.Struct(data); err != nil {
+		errorsList := make(map[string]string)
 		for _, err := range err.(validator.ValidationErrors) {
-			errors_list[err.Field()] = fmt.Sprintf("Validation failed on tag '%s'", err.Tag())
+			errorsList[err.Field()] = fmt.Sprintf("Validation failed on tag '%s'", err.Tag())
 		}
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": errors_list,
+
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": errorsList, // 👈 show detailed field errors
 		})
 	}
 
@@ -151,7 +158,7 @@ func RegisterHandler(c *fiber.Ctx) error {
 	newUser := models.Users{
 		FullName: data.FullName,
 		Username: data.Username,
-		Password: password_hash,
+		Password: string(password_hash),
 	}
 
 	// create a new user instance based on the created struct called newUser
