@@ -16,7 +16,7 @@ type Category struct {
 	Slug string `gorm:"index"`
 	Description string
 	UserID string
-	User Users `json:"user"gorm:"foreignKey:UserID"`
+	User Users `json:"user" gorm:"foreignKey:UserID"`
 }
 
 // This is GormHooks and will run before running the Transaction to Write to DB.
