@@ -1,19 +1,141 @@
 package logic
 
 import (
+	"backend/models"
+	"fmt"
+	"time"
+
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
+	"gorm.io/gorm"
 )
 
+// added just so we can reuse this response struct in this file alone.
+type postsResponse struct {
+	ID string `json:"id"`
+	UpdatedAt time.Time `json:"updated_at"`
+	PostTitle string `json:"post_title" gorm:"index" validate:"required,min=4"`
+	Slug string `json:"slug"`
+	CoverImage string `json:"conver_image"`
+	AuthorID string `json:"author_id"`
+	CategoryID string `json:"category_id"`
+	ReadTime string `json:"read_time"`
+	IsFeatured bool `json:"is_featured"`
+}
+
 func FetchPosts(c *fiber.Ctx) error {
-	return nil
+	db, ok := c.Locals("db").(*gorm.DB)
+	if !ok {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "DB Fucked",
+		})
+	}
+
+	var posts []postsResponse
+
+	query := db.Model(&models.Post{}).Select("id","post_title","slug","cover_image","author_id","category_id","read_time","is_featured").Find(&posts)
+
+	if query.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Unable to query Database",
+		})
+	}
+
+	if query.RowsAffected < 1 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"response": "No Posts Exists.",
+		})
+	}
+	return c.JSON(fiber.Map{
+		"response": posts,
+	}) 
 }
 
 func FetchPost(c *fiber.Ctx) error {
-	return nil
+	db, ok := c.Locals("db").(*gorm.DB)
+	if !ok {
+		c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "DB Fucked",
+		})
+	}
+
+	post_slug := c.Query("post")
+
+	var post models.Post
+	query := db.Model(&models.Post{}).Where("slug = ?", post_slug).First(&post)
+	if query.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Cannot Get the Post.",
+		})
+	}
+
+	if query.RowsAffected < 1 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"response": "Post not Found.",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"response": post,
+	})
 }
 
 func CreatePost(c *fiber.Ctx) error {
-	return nil
+	db, ok := c.Locals("db").(*gorm.DB)
+	if !ok {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "DB Fucked",
+		})
+	}
+	
+	// extracting information from the token and decoding it and storing it inside the token var
+	fmt.Println("Session User", c.Locals("session_user"))
+	session_user := c.Locals("session_user")
+	if session_user == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "User not found in session.",
+		})
+	}
+
+	jwtLocale := c.Locals("session_user").(*jwt.Token)
+	fmt.Println("jwtLocale", jwtLocale)
+	token := jwtLocale.Claims.(jwt.MapClaims)
+
+	// prepare & parse the request parameters
+	var post models.Post
+	if err := c.BodyParser(&post); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Invalid Request Parameters",
+		})
+	}
+
+	// created the post object now add the user id to it.
+	user_id := token["sub"].(string)
+	post.AuthorID = user_id
+
+	query := db.Create(&post)
+	if query.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Cannot Create Post.",
+		})
+	}
+
+	response := make(map[string]any)
+	response["id"] = post.ID
+	response["updated_at"] = post.UpdatedAt
+	response["slug"] = post.Slug
+	response["author_id"] = post.AuthorID
+	response["content"] = post.Content
+	response["short_content"] = post.ShortContent
+	response["category_id"] = post.CategoryID
+	response["cover_image"] = post.CoverImage
+	response["post_title"] = post.PostTitle
+	response["is_featured"] = post.IsFeatured
+	response["read_time"] = post.ReadTime
+
+	return c.JSON(fiber.Map{
+		"response": response,
+	})
 }
 
 func UpdatePost(c *fiber.Ctx) error {

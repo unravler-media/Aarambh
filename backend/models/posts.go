@@ -13,10 +13,10 @@ type Post struct {
 	CreatedAi time.Time
 	UpdatedAt time.Time
 	PostTitle string `json:"post_title" gorm:"index" validate:"required,min=4"`
-	Slug string
+	Slug string `gorm:"index"`
 	ShortContent string `json:"short_content"`
 	Content string `json:"content" validate:"required,min=128"`
-	CoverImage string `json:"conver_image"`
+	CoverImage string `json:"cover_image"`
 	AuthorID string `json:"author_id"`
 	Author Users `gorm:"foreignKey:AuthorID"`
 	CategoryID string `json:"category_id"`
