@@ -3,15 +3,18 @@ package models
 import (
 	"strings"
 	"time"
+	"fmt"
 
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"gorm.io/gorm"
+
+	"backend/helpers"
 )
 
 type Post struct {
 	ID string `gorm:"primaryKey"`
-	CreatedAi time.Time
-	UpdatedAt time.Time
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 	PostTitle string `json:"post_title" gorm:"index" validate:"required,min=4"`
 	Slug string `gorm:"index"`
 	ShortContent string `json:"short_content"`
@@ -32,6 +35,14 @@ func(c *Post) BeforeCreate(tx *gorm.DB) (err error) {
 	c.ID = nanoid_id
 	slug := strings.ToLower(c.PostTitle)
 	c.Slug = strings.ToLower(slug)
+
+	// Calculate readTime of a Post
+	readTime := fmt.Sprintf("Estimated read time: %d minute(s)", helpers.CalculateReadTime(c.Content))
+	c.ReadTime = readTime
+
+	current_time := time.Now()
+	c.CreatedAt = current_time.Format("Jan 2, 2006 at 3:04pm")
+	c.UpdatedAt = current_time.Format("Jan 2, 2006 at 3:04pm")
 	return nil
 }
 

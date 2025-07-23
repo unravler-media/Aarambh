@@ -3,7 +3,6 @@ package logic
 import (
 	"backend/models"
 	"fmt"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -13,7 +12,7 @@ import (
 // added just so we can reuse this response struct in this file alone.
 type postsResponse struct {
 	ID string `json:"id"`
-	UpdatedAt time.Time `json:"updated_at"`
+	UpdatedAt string `json:"updated_at"`
 	PostTitle string `json:"post_title" gorm:"index" validate:"required,min=4"`
 	Slug string `json:"slug"`
 	CoverImage string `json:"conver_image"`
@@ -33,7 +32,7 @@ func FetchPosts(c *fiber.Ctx) error {
 
 	var posts []postsResponse
 
-	query := db.Model(&models.Post{}).Select("id","post_title","slug","cover_image","author_id","category_id","read_time","is_featured").Find(&posts)
+	query := db.Model(&models.Post{}).Select("id","post_title","slug","cover_image","author_id","category_id","read_time","is_featured","updated_at").Find(&posts)
 
 	if query.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
