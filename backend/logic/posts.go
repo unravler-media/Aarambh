@@ -101,7 +101,7 @@ func FetchPost(c *fiber.Ctx) error {
 	post_slug := c.Query("post")
 
 	var post models.Post
-	query := db.Model(&models.Post{}).Where("slug = ?", post_slug).First(&post)
+	query := db.Preload("Author").Preload("Category").Where("slug = ?", post_slug).First(&post)
 	if query.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"response": "Cannot Get the Post.",
@@ -114,8 +114,43 @@ func FetchPost(c *fiber.Ctx) error {
 		})
 	}
 
+	type postResponse struct {
+		ID string
+		UpdatedAt string
+		PostTitle string
+		Slug string
+		ShortContent string
+		Content string
+		CoverImage string
+		Author UserResponse
+		Category categoryResponse
+	}
+
+	var response postResponse
+	response = postResponse{
+		ID: post.ID,
+		UpdatedAt: post.UpdatedAt,
+		PostTitle: post.PostTitle,
+		Slug: post.Slug,
+		ShortContent: post.ShortContent,
+		Content: post.Content,
+		CoverImage: post.CoverImage,
+		Author: UserResponse{
+			ID: post.Author.ID,
+			Username: post.Author.Username,
+			FullName: post.Author.FullName,
+			Avatar: post.Author.Avatar,
+			Role: post.Author.Role,
+		},
+		Category: categoryResponse{
+			ID: post.Category.ID,
+			Name: post.Category.Name,
+			Slug: post.Category.Slug,
+		},
+	}
+
 	return c.JSON(fiber.Map{
-		"response": post,
+		"response": response,
 	})
 }
 
