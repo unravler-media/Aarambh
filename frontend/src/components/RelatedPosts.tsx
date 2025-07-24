@@ -1,7 +1,7 @@
 
 import { BookOpen } from "lucide-react";
 import PostCard from "./PostCard";
-import { Post } from "../data/posts";
+import { Post } from "../hooks/usePosts";
 
 interface RelatedPostsProps {
   posts: Post[];

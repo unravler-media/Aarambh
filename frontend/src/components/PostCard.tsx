@@ -1,9 +1,8 @@
 
 import { Link } from "react-router-dom";
-import { Post } from "../data/posts";
-import { getCategoryNameById } from "../data/posts";
+import { Post } from "../hooks/usePosts";
 import { cn } from "@/lib/utils";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar } from "lucide-react";
 
 interface PostCardProps {
   post: Post;
@@ -13,7 +12,17 @@ interface PostCardProps {
 
 const PostCard = ({ post, className, variant = "default" }: PostCardProps) => {
   const isCompact = variant === "compact";
-  const categoryName = getCategoryNameById(post.categoryId);
+  
+  // Generate avatar fallback using first name initial
+  const getAvatarFallback = (name: string) => {
+    const initial = name.split(' ')[0]?.charAt(0)?.toUpperCase() || 'U';
+    return `data:image/svg+xml;base64,${btoa(`
+      <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <rect width="32" height="32" fill="#151619"/>
+        <text x="16" y="20" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="14" font-weight="bold">${initial}</text>
+      </svg>
+    `)}`;
+  };
 
   return (
     <Link 
@@ -31,11 +40,11 @@ const PostCard = ({ post, className, variant = "default" }: PostCardProps) => {
         />
         <div className="absolute top-3 left-3">
           <Link 
-            to={`/category/${post.categoryId}`} 
+            to={`/category/${post.category?.slug || post.categoryId}`} 
             onClick={(e) => e.stopPropagation()}
             className="px-3 py-1.5 bg-black/60 backdrop-blur-sm text-xs font-medium uppercase text-tech-red rounded-lg hover:bg-black/70 transition-colors"
           >
-            {categoryName}
+            {post.category?.name || 'Uncategorized'}
           </Link>
         </div>
       </div>
@@ -55,7 +64,7 @@ const PostCard = ({ post, className, variant = "default" }: PostCardProps) => {
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#222]">
           <div className="flex items-center">
             <img 
-              src={post.author.avatar} 
+              src={post.author.avatar || getAvatarFallback(post.author.name)} 
               alt={post.author.name}
               className="h-7 w-7 rounded-full mr-2" 
             />
@@ -63,18 +72,9 @@ const PostCard = ({ post, className, variant = "default" }: PostCardProps) => {
           </div>
           
           <div className="flex items-center text-xs text-gray-400">
-            <div className="flex items-center mr-3">
-              <Calendar size={12} className="mr-1" />
-              <span>
-                {new Date(post.publishedAt).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric'
-                })}
-              </span>
-            </div>
             <div className="flex items-center">
-              <Clock size={12} className="mr-1" />
-              <span>{post.readTime} min</span>
+              <Calendar size={12} className="mr-1" />
+              <span>{post.publishedAt}</span>
             </div>
           </div>
         </div>

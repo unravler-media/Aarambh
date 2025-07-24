@@ -1,28 +1,19 @@
 
 import { useState, useEffect } from "react";
 import Layout from "../components/Layout";
-import FeaturedPost from "../components/FeaturedPost";
+import PostCard from "../components/PostCard";
 import CategorySection from "../components/CategorySection";
-import { getFeaturedPosts } from "../data/posts";
+import { usePosts } from "../hooks/usePosts";
 import { categories } from "../data/categories";
 import { Search } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useIsMobile } from "../hooks/use-mobile";
 
 const Index = () => {
-  const [featuredPosts, setFeaturedPosts] = useState(getFeaturedPosts());
+  const { posts, loading, error } = usePosts();
   const isMobile = useIsMobile();
-
-  // Simulate loading effect
-  const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
   
-  if (isLoading) {
+  if (loading) {
     return <Layout>
         <div className="animate-pulse space-y-6">
           <div className="h-12 bg-[#151619] rounded-xl w-1/4 mb-6"></div>
@@ -37,8 +28,16 @@ const Index = () => {
       </Layout>;
   }
 
-  // Determine number of featured posts to show based on screen size
-  const featuredPostsCount = 6;
+  if (error) {
+    return <Layout>
+        <div className="text-center py-12">
+          <p className="text-red-400">Error loading posts: {error}</p>
+        </div>
+      </Layout>;
+  }
+
+  // Show all posts from API
+  const postsToShow = posts;
   
   return (
     <Layout>
@@ -55,22 +54,15 @@ const Index = () => {
       
       <section className="mb-14">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-white">Featured Stories</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-white">Latest Posts</h1>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {featuredPosts.slice(0, featuredPostsCount).map(post => (
-            <FeaturedPost key={post.id} post={post} />
+          {postsToShow.map(post => (
+            <PostCard key={post.id} post={post} />
           ))}
         </div>
       </section>
-      
-      <div className="border-t border-[#222] my-10"></div>
-      
-      {/* Category sections */}
-      <div className="space-y-14">
-        {categories.map(category => <CategorySection key={category.id} category={category} />)}
-      </div>
     </Layout>
   );
 };
