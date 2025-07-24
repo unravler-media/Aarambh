@@ -202,5 +202,49 @@ func UpdatePost(c *fiber.Ctx) error {
 }
 
 func DeletePost(c *fiber.Ctx) error {
-	return nil
+	db, ok := c.Locals("db").(*gorm.DB)
+	if !ok {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "DB Fucked.",
+		})
+	}
+
+	user_session := c.Locals("session_user")
+	if user_session == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Unable to Process information.",
+		})
+	}
+
+	jwtLocale := c.Locals("session_user").(*jwt.Token)
+	token := jwtLocale.Claims.(jwt.MapClaims)
+	user_id := token["sub"].(string)
+
+	post_slug := c.Query("post")
+	if post_slug == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Post Slug Not provided.",
+		})
+	}
+
+	var post models.Post
+	fetch_post := db.First(&post, "slug = ?", post_slug)
+	
+	if fetch_post.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Unable to perform Query.",
+		})
+	}
+
+	if post.AuthorID != user_id {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"response": "Unauthrised Action.",
+		})
+	}
+
+	db.Delete(&post)
+
+	return c.JSON(fiber.Map{
+		"response": "Post Deleted.",
+	})
 }
