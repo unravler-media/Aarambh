@@ -45,7 +45,12 @@ func(c *Post) BeforeCreate(tx *gorm.DB) (err error) {
 	c.UpdatedAt = current_time.Format("Jan 2, 2006 at 3:04pm")
 	return nil
 }
-// TODO: Add BeforeUpdate Hook and handle updatedAt field.
+
+func(c *Post) BeforeUpdate(tx *gorm.DB) (err error) {
+	updatedTime := time.Now().Format("Jan 2, 2006 at 3:04pm")
+	c.UpdatedAt = updatedTime
+	return nil
+} 
 
 // for future implementations
 type PostLike struct {
