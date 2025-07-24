@@ -138,7 +138,67 @@ func CreatePost(c *fiber.Ctx) error {
 }
 
 func UpdatePost(c *fiber.Ctx) error {
-	return nil
+	db, ok := c.Locals("db").(*gorm.DB)
+	if !ok {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "DB Fucked.",
+		})
+	}
+
+	user_session := c.Locals("session_user")
+	if user_session == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Unable to process information.",
+		})
+	}
+
+	jwtLocale := c.Locals("session_user").(*jwt.Token)
+	token := jwtLocale.Claims.(jwt.MapClaims)
+	user_id := token["sub"].(string)
+
+	post_id := c.Query("post_id")
+	if post_id == "" {
+		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Post ID not provided.",
+		})
+	}
+
+	var post models.Post
+	query := db.Where("id = ?", post_id).First(&post)
+	if query.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Unable to fetch request post.",
+		})
+	}
+
+	if query.RowsAffected < 1 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"response": "Post Not Found.",
+		})
+	}
+
+	if post.AuthorID != user_id {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"response": "Unauthrised Action.",
+		})
+	} 
+
+	if err := c.BodyParser(&post); err != nil {
+		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Invalid Request information.",
+		})
+	}
+
+	saving_query := db.Save(&post)
+	if saving_query.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Error Saving the Post.",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"response": "Updated Post.",
+	})
 }
 
 func DeletePost(c *fiber.Ctx) error {
