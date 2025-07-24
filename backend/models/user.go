@@ -19,6 +19,7 @@ type Users struct {
 	Bio string 
 	Role string // options: creator, member, admin
 	Email string `gorm:"index" validate:"required"`
+	Posts []Post `gorm:"foreignKey:AuthorID"` // reverse relation to the Post model.
 }
 
 // Hook to auto add a id to all new created users.

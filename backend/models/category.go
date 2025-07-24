@@ -17,6 +17,7 @@ type Category struct {
 	Description string
 	UserID string
 	User Users `json:"user" gorm:"foreignKey:UserID"`
+	Posts []Post `gorm:"foreignKey:CategoryID"` // reverse relation to the Category Model.
 }
 
 // This is GormHooks and will run before running the Transaction to Write to DB.
