@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Layout from "../components/Layout";
 import PostCard from "../components/PostCard";
@@ -63,7 +62,7 @@ const Search = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {searchResults.map(post => (
-                <PostCard key={post.id} post={post} />
+                <PostCard key={post.id} post={post as any} />
               ))}
             </div>
             

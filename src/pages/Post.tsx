@@ -2,7 +2,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "../components/Layout";
-import { getPostBySlug, getCategoryNameById, getPostsByCategory } from "../data/posts";
+import { usePost } from "../hooks/usePosts";
+import { getPostsByCategory } from "../data/posts";
 import { ChevronLeft } from "lucide-react";
 import CommentSection from "../components/CommentSection";
 import { getCommentsByPostId } from "../data/comments";
@@ -16,34 +17,30 @@ const Post = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   
-  const post = slug ? getPostBySlug(slug) : null;
-  const categoryName = post ? getCategoryNameById(post.categoryId) : "";
-  
-  const [isLoading, setIsLoading] = useState(true);
+  const { post, loading, error } = usePost(slug || '');
   const [relatedPosts, setRelatedPosts] = useState([]);
   
   useEffect(() => {
-    if (!slug || !post) {
+    if (!slug) {
       navigate("/not-found");
       return;
     }
     
-    // Get related posts from the same category
+    if (error) {
+      navigate("/not-found");
+      return;
+    }
+    
+    // Get related posts from the same category (keeping static for now)
     if (post) {
       const categoryPosts = getPostsByCategory(post.categoryId)
         .filter(p => p.id !== post.id)
         .slice(0, 3);
       setRelatedPosts(categoryPosts);
     }
-    
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, [slug, post, navigate]);
+  }, [slug, post, error, navigate]);
   
-  if (isLoading || !post) {
+  if (loading || !post) {
     return (
       <Layout>
         <PostSkeleton />
@@ -78,7 +75,7 @@ const Post = () => {
           <div className="p-3 sm:p-4 md:p-6 lg:p-8 w-full overflow-hidden">
             <PostHeader 
               title={post.title}
-              categoryName={categoryName}
+              categoryName="" // Category name will be handled differently with API
               author={post.author}
               publishedAt={post.publishedAt}
               readTime={post.readTime}
