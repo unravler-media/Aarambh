@@ -156,15 +156,15 @@ func UpdatePost(c *fiber.Ctx) error {
 	token := jwtLocale.Claims.(jwt.MapClaims)
 	user_id := token["sub"].(string)
 
-	post_id := c.Query("post_id")
-	if post_id == "" {
+	post_slug := c.Query("post") // pass in the post slug
+	if post_slug == "" {
 		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"response": "Post ID not provided.",
 		})
 	}
 
 	var post models.Post
-	query := db.Where("id = ?", post_id).First(&post)
+	query := db.Where("slug = ?", post_slug).First(&post)
 	if query.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"response": "Unable to fetch request post.",
