@@ -10,17 +10,31 @@ import (
 )
 
 // added just so we can reuse this response struct in this file alone.
+type UserResponse struct {
+	ID string `json:"id"`
+	Username string `json:"username"`
+	FullName string `json:"full_name"`
+	Avatar string `json:"avatar"`
+	Role string `json:"role"`
+}
+
 type postsResponse struct {
 	ID string `json:"id"`
 	UpdatedAt string `json:"updated_at"`
 	PostTitle string `json:"post_title" gorm:"index" validate:"required,min=4"`
 	Slug string `json:"slug"`
 	CoverImage string `json:"conver_image"`
-	AuthorID string `json:"author_id"`
-	CategoryID string `json:"category_id"`
+	Author UserResponse `json:"author"`
 	ReadTime string `json:"read_time"`
 	IsFeatured bool `json:"is_featured"`
+	Category categoryResponse `json:"category"`
 }
+
+type categoryResponse struct {
+	ID string `json:"id"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+} 
 
 func FetchPosts(c *fiber.Ctx) error {
 	db, ok := c.Locals("db").(*gorm.DB)
@@ -30,9 +44,8 @@ func FetchPosts(c *fiber.Ctx) error {
 		})
 	}
 
-	var posts []postsResponse
-
-	query := db.Model(&models.Post{}).Select("id","post_title","slug","cover_image","author_id","category_id","read_time","is_featured","updated_at").Find(&posts)
+	var posts []models.Post
+	query := db.Debug().Preload("Author").Preload("Category").Select("id","post_title","slug","cover_image","read_time","is_featured","updated_at","author_id","category_id").Find(&posts)
 
 	if query.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -45,8 +58,35 @@ func FetchPosts(c *fiber.Ctx) error {
 			"response": "No Posts Exists.",
 		})
 	}
+
+	var response []postsResponse
+
+  for _, p := range posts {
+  	response = append(response, postsResponse{
+			ID:         p.ID,
+      UpdatedAt:  p.UpdatedAt,
+      PostTitle:  p.PostTitle,
+      Slug:       p.Slug,
+      CoverImage: p.CoverImage,
+      ReadTime:   p.ReadTime,
+      IsFeatured: p.IsFeatured,
+      Author: UserResponse{
+				ID:       p.Author.ID,
+        Username: p.Author.Username,
+        FullName: p.Author.FullName,
+        Avatar:   p.Author.Avatar,
+        Role:     p.Author.Role,
+			},
+			Category: categoryResponse{
+				ID: p.Category.ID,
+				Name: p.Category.Name,
+				Slug: p.Category.Slug,
+			},
+		})
+	}
+
 	return c.JSON(fiber.Map{
-		"response": posts,
+		"response": response,
 	}) 
 }
 
