@@ -101,7 +101,7 @@ func RegisterHandler(c *fiber.Ctx) error {
 	// take input from the post request and put it into data var
 	type RequestParams struct {
 		Username string `json:"username" validate:"required,min=4"`
-		Password string `json:"password" validate:"required,min=8"`
+		Password string `json:"password" validate:"required,min=4"`
 		Email string `json:"email" validate:"required"`
 		FullName string `json:"full_name" validate:"required"`
 	}

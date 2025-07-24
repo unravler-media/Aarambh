@@ -21,18 +21,39 @@ func FetchCategories(c *fiber.Ctx) error {
 		})
 	}
 
+	type UserResponse struct {
+		ID string
+		username string
+		Avatar string 
+		FullName string
+	}
+
+	type PostsResponse struct {
+		ID string
+		PostTitle string
+		Slug string
+		CoverImage string
+		Author UserResponse
+		ReadTime string
+		IsFeatured bool
+	}
+
 	// prepare a structure for response
 	type CategoryResponse struct {
 		ID string
 		Name string
 		Slug string
+		Description string
+		Posts []PostsResponse
 	}
 
 	// empty variable of list (slice) of category
-	var categories []CategoryResponse
+	var categories []models.Category
 
 	// db query 
-	categories_fetch := db.Select("id","updated_at","name","slug").Model(&models.Category{}).Find(&categories)
+	categories_fetch := db.Preload("Posts", func(db *gorm.DB) *gorm.DB {
+		return db.Preload("Author")
+	}).Select("id","updated_at","name","slug","description").Find(&categories)
 	if categories_fetch.RowsAffected < 1 {
 		return c.Status(404).JSON(fiber.Map{
 			"response": "No Categories Exist.",
@@ -46,8 +67,41 @@ func FetchCategories(c *fiber.Ctx) error {
 		})
 	}
 
+	// Build response
+	var response []CategoryResponse
+	for _, category := range categories {
+		// Map posts
+		var postsResp []PostsResponse
+		for _, post := range category.Posts {
+			postsResp = append(postsResp, PostsResponse{
+				ID:         post.ID,
+				PostTitle:  post.PostTitle,
+				Slug:       post.Slug,
+				CoverImage: post.CoverImage,
+				ReadTime:   post.ReadTime,
+				IsFeatured: post.IsFeatured,
+				Author: UserResponse{
+					ID:       post.Author.ID,
+					username: post.Author.Username,
+					FullName: post.Author.FullName,
+					Avatar:   post.Author.Avatar,
+				},
+			})
+		}
+
+		// Add full category
+		response = append(response, CategoryResponse{
+			ID:          category.ID,
+			Name:        category.Name,
+			Slug:        category.Slug,
+			Description: category.Description,
+			Posts: postsResp,
+		})
+	}
+
+
 	return c.JSON(fiber.Map{
-		"response": categories,
+		"response": response,
 	})
 }
 

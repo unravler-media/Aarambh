@@ -13,7 +13,7 @@ type Users struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	Username string `gorm:"index" validate:"required,min=4"`
-	Password string `json:"-" validate:"required,min=8"` // field is excluded from JSON encoding to prevent it from being exposed.
+	Password string `json:"-" validate:"required,min=4"` // field is excluded from JSON encoding to prevent it from being exposed.
 	FullName string `json:"full_name" gorm:"index"`
 	Avatar string
 	Bio string 
