@@ -50,6 +50,7 @@ export interface Post {
   title: string;
   slug: string;
   excerpt: string;
+  shortContent: string;
   content: string;
   coverImage: string;
   author: {
@@ -80,6 +81,7 @@ const transformApiPost = (apiPost: ApiPost): Post => ({
   title: apiPost.post_title,
   slug: apiPost.slug,
   excerpt: '', // Not available in list API
+  shortContent: '', // Not available in list API
   content: '', // Not available in list API
   coverImage: apiPost.conver_image,
   author: {
@@ -100,6 +102,7 @@ const transformApiPostDetail = (apiPost: ApiPostDetail): Post => ({
   title: apiPost.PostTitle,
   slug: apiPost.Slug,
   excerpt: apiPost.ShortContent,
+  shortContent: apiPost.ShortContent,
   content: apiPost.Content,
   coverImage: apiPost.CoverImage,
   author: {
