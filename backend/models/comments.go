@@ -19,6 +19,7 @@ type Comment struct {
 	Post Post `gorm:"foreignKey:PostID"`
 }
 
+// Hooks for Further Processig of Data BeforeSave the model and before updating.
 func(c *Comment) BeforeSave(tx *gorm.DB) (err error) {
 	nano_id, err := gonanoid.New()
 	c.ID = nano_id
