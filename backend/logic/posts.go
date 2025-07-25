@@ -101,7 +101,7 @@ func FetchPost(c *fiber.Ctx) error {
 	post_slug := c.Query("post")
 
 	var post models.Post
-	query := db.Preload("Author").Preload("Category").Where("slug = ?", post_slug).First(&post)
+	query := db.Preload("Author").Preload("Category").Preload("Comments").Preload("Comments.Author").Where("slug = ?", post_slug).First(&post)
 	if query.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"response": "Cannot Get the Post.",
@@ -114,6 +114,13 @@ func FetchPost(c *fiber.Ctx) error {
 		})
 	}
 
+	type commentsResponse struct {
+		ID string
+		UpdatedAt string
+		Author UserResponse
+		Comment string
+	}
+
 	type postResponse struct {
 		ID string
 		UpdatedAt string
@@ -124,6 +131,26 @@ func FetchPost(c *fiber.Ctx) error {
 		CoverImage string
 		Author UserResponse
 		Category categoryResponse
+		Comments []commentsResponse
+	}
+
+
+
+	// Transform comments
+	var transformedComments []commentsResponse
+	for _, comment := range post.Comments {
+		transformedComments = append(transformedComments, commentsResponse{
+			ID:        comment.ID,
+			UpdatedAt: comment.UpdatedAt,
+			Comment:   comment.Comment,
+			Author: UserResponse{
+				ID:       comment.Author.ID,
+				Username: comment.Author.Username,
+				FullName: comment.Author.FullName,
+				Avatar:   comment.Author.Avatar,
+				Role:     comment.Author.Role,
+			},
+		})
 	}
 
 	var response postResponse
@@ -147,6 +174,7 @@ func FetchPost(c *fiber.Ctx) error {
 			Name: post.Category.Name,
 			Slug: post.Category.Slug,
 		},
+		Comments: transformedComments,
 	}
 
 	return c.JSON(fiber.Map{
