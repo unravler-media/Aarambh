@@ -27,7 +27,7 @@ type Post struct {
 	ReadTime string `json:"read_time"`
 	IsFeatured bool `json:"is_featured"`
 	// Creating reverse relation to Comments to Preload in future
-	Posts []Post `gorm:"foreignKey:PostID"` 
+	Comments []Comment `gorm:"foreignKey:PostID"` 
 	// PostID is what we used in COmments Model to refrence into this Model
 }
 
