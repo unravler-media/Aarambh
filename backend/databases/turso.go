@@ -35,6 +35,7 @@ func TursoConnecter() *gorm.DB {
 		&models.Users{},
 		&models.Category{},
 		&models.Post{},
+		&models.Comment{},
 	)
 
 	if migrations != nil {
