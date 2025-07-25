@@ -12,10 +12,10 @@ import { Eye, EyeOff, UserPlus } from 'lucide-react';
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'member' as UserRole,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,7 +37,7 @@ const Register = () => {
     }
 
     try {
-      await register(formData.name, formData.email, formData.password, formData.role);
+      await register(formData.name, formData.username, formData.email, formData.password, 'member');
       toast({
         title: "Registration successful",
         description: "Welcome to Aarambh!",
@@ -96,6 +96,19 @@ const Register = () => {
                 />
               </div>
               <div className="space-y-2">
+                <Label htmlFor="username" className="text-gray-300">Username</Label>
+                <Input
+                  id="username"
+                  name="username"
+                  type="text"
+                  placeholder="Enter your username"
+                  value={formData.username}
+                  onChange={handleInputChange}
+                  required
+                  className="bg-[#0A0B0F] border-[#2A2C36] text-white focus:border-tech-red"
+                />
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="email" className="text-gray-300">Email</Label>
                 <Input
                   id="email"
@@ -107,20 +120,6 @@ const Register = () => {
                   required
                   className="bg-[#0A0B0F] border-[#2A2C36] text-white focus:border-tech-red"
                 />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="role" className="text-gray-300">Account Type</Label>
-                <select
-                  id="role"
-                  name="role"
-                  value={formData.role}
-                  onChange={handleInputChange}
-                  className="w-full h-10 px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] text-white rounded-md focus:border-tech-red focus:outline-none"
-                >
-                  <option value="member">Member - View and interact with content</option>
-                  <option value="creator">Creator - Create and manage your posts</option>
-                  <option value="admin">Admin - Full platform access</option>
-                </select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-gray-300">Password</Label>

@@ -4,6 +4,7 @@ import { Calendar, Clock } from "lucide-react";
 interface PostHeaderProps {
   title: string;
   categoryName: string;
+  shortContent: string;
   author: {
     name: string;
     avatar: string;
@@ -12,18 +13,7 @@ interface PostHeaderProps {
   readTime: number;
 }
 
-const PostHeader = ({ title, categoryName, author, publishedAt, readTime }: PostHeaderProps) => {
-  // Generate avatar fallback using first name initial
-  const getAvatarFallback = (name: string) => {
-    const initial = name.split(' ')[0]?.charAt(0)?.toUpperCase() || 'U';
-    return `data:image/svg+xml;base64,${btoa(`
-      <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-        <rect width="32" height="32" fill="#151619"/>
-        <text x="16" y="20" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="14" font-weight="bold">${initial}</text>
-      </svg>
-    `)}`;
-  };
-
+const PostHeader = ({ title, categoryName, shortContent, author, publishedAt, readTime }: PostHeaderProps) => {
   return (
     <>
       <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
@@ -36,13 +26,25 @@ const PostHeader = ({ title, categoryName, author, publishedAt, readTime }: Post
         {title}
       </h1>
       
+      <p className="text-gray-300 text-sm sm:text-base mb-4 sm:mb-6 leading-relaxed">
+        {shortContent}
+      </p>
+      
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-t border-b border-[#252833] py-4 mb-6 sm:mb-8 gap-4">
         <div className="flex items-center">
-          <img 
-            src={author.avatar || getAvatarFallback(author.name)} 
-            alt={author.name}
-            className="h-10 w-10 sm:h-12 sm:w-12 rounded-full mr-3 sm:mr-4" 
-          />
+          {author.avatar ? (
+            <img 
+              src={author.avatar} 
+              alt={author.name}
+              className="h-10 w-10 sm:h-12 sm:w-12 rounded-full mr-3 sm:mr-4" 
+            />
+          ) : (
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full mr-3 sm:mr-4 bg-tech-red flex items-center justify-center">
+              <span className="text-white font-semibold text-sm sm:text-base">
+                {author.name.charAt(0).toUpperCase()}
+              </span>
+            </div>
+          )}
           <div>
             <p className="font-medium text-white">{author.name}</p>
           </div>
@@ -51,9 +53,7 @@ const PostHeader = ({ title, categoryName, author, publishedAt, readTime }: Post
         <div className="flex items-center text-gray-400 text-sm gap-4">
           <div className="flex items-center">
             <Calendar size={14} className="mr-1" />
-            <span>
-            {publishedAt}
-            </span>
+            <span>{publishedAt}</span>
           </div>
           <div className="flex items-center">
             <Clock size={14} className="mr-1" />

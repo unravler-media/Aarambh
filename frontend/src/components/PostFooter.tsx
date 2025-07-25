@@ -23,11 +23,19 @@ const PostFooter = ({ author }: PostFooterProps) => {
   return (
     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-8 pt-6 border-t border-[#252833]">
       <div className="flex items-center">
-        <img 
-          src={author.avatar || getAvatarFallback(author.name)}
-          alt={author.name}
-          className="h-10 w-10 rounded-full mr-3" 
-        />
+        {author.avatar ? (
+          <img 
+            src={author.avatar} 
+            alt={author.name}
+            className="h-10 w-10 rounded-full mr-3" 
+          />
+        ) : (
+          <div className="h-10 w-10 rounded-full mr-3 bg-tech-red flex items-center justify-center">
+            <span className="text-white font-semibold text-sm">
+              {author.name.charAt(0).toUpperCase()}
+            </span>
+          </div>
+        )}
         <div>
           <p className="font-medium text-white text-sm">{author.name}</p>
         </div>
