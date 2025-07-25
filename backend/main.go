@@ -41,7 +41,7 @@ func main() {
 	// CORS middleware 
 	app.Use(cors.New(cors.Config{
 		AllowMethods: "GET, POST, PUT, DELETE",
-		// AllowOrigins: "localhost,127.0.0.1,aarambh-frontend.vercel.app",
+		AllowOrigins: "https://localhost, https://127.0.0.1, https://aarambh-one.vercel.app, https://*.lovable.app",
 	}))
 	
 	// adding validator globally to reuse later in project 
