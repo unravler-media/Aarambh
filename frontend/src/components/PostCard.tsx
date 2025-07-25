@@ -40,7 +40,7 @@ const PostCard = ({ post, className, variant = "default" }: PostCardProps) => {
         />
         <div className="absolute top-3 left-3">
           <Link 
-            to={`/category/${post.category?.slug || post.categoryId}`} 
+            to={`/category/${post.category?.slug}`} 
             onClick={(e) => e.stopPropagation()}
             className="px-3 py-1.5 bg-black/60 backdrop-blur-sm text-xs font-medium uppercase text-tech-red rounded-lg hover:bg-black/70 transition-colors"
           >
@@ -58,7 +58,7 @@ const PostCard = ({ post, className, variant = "default" }: PostCardProps) => {
         </h2>
         
         {!isCompact && (
-          <p className="text-gray-400 text-sm line-clamp-2 mb-4">{post.excerpt}</p>
+          <p className="text-gray-400 text-sm line-clamp-2 mb-4">{post.short_content}</p>
         )}
         
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#222]">
