@@ -26,6 +26,9 @@ type Post struct {
 	Category Category `gorm:"foreignKey:CategoryID"`
 	ReadTime string `json:"read_time"`
 	IsFeatured bool `json:"is_featured"`
+	// Creating reverse relation to Comments to Preload in future
+	Posts []Post `gorm:"foreignKey:PostID"` 
+	// PostID is what we used in COmments Model to refrence into this Model
 }
 
 // Creating Hooks for Post Model
