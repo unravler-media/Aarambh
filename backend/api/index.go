@@ -1,20 +1,19 @@
 package handler
 
 import (
- "github.com/gofiber/fiber/v2/middleware/adaptor"
- "github.com/gofiber/fiber/v2"
- "net/http"
-
-	// "fmt"
 	"github.com/go-playground/validator/v10"
 	gojson "github.com/goccy/go-json"
-	
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+
 	"backend/databases"
 	"backend/routes"
 
-// 	"github.com/joho/godotenv"
+	"github.com/gofiber/fiber/v2/middleware/cache"
+	"time"
 
-	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
+	"net/http"
 )
 
 // This vercel.go is basically for deploying to vercel.
@@ -41,18 +40,22 @@ func handler() http.HandlerFunc {
 			AppName:      "Project Aarambh",
 			JSONEncoder:  gojson.Marshal,
 			JSONDecoder:  gojson.Unmarshal,
-		},
+	},
 	)
 
 	// CORS middleware 
 	app.Use(cors.New(cors.Config{
 		AllowMethods: "GET, POST, PUT, DELETE",
+		AllowOrigins: "https://aarambh-one.vercel.app, http://127.0.0.1:3000, https://31f32cda-2994-4292-bed6-4a187ba6a181.lovableproject.com",
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
+		AllowCredentials: true,
 	}))
 	
-	// adding validator globally to reuse globally
+	// adding validator globally to reuse later in project 
 	var validate *validator.Validate
 	validate = validator.New(validator.WithRequiredStructEnabled())
-
+	
+	// Using in the fiber middleware to initiate & validator 
 	app.Use(func(c *fiber.Ctx) error {
 		c.Locals("validator", validate)
 		return c.Next()
@@ -60,7 +63,22 @@ func handler() http.HandlerFunc {
 
 	// adding database middleware to reuse globally
 	app.Use(databases.InjectDatabase(database))
+	
+	// Implement Default In-Memory Caching
+	app.Use(cache.New(cache.Config{
+  	Next: func(c *fiber.Ctx) bool {
+        return c.Query("noCache") == "true"
+    },
+    Expiration: 1 * time.Minute, // Cache Timeout set to 1 Minutes.
+    CacheControl: true,
+	}))
+	
+	
+	// using Routes Grouping for a better DX (Developer Experience)
 	routes.ApiRoutes(app.Group("/api"))
+	
+
+	// Sample Route we can remove it as well.
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Status(200).JSON(fiber.Map{
 			"response": "Server is up!",
