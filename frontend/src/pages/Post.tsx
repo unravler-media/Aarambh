@@ -48,7 +48,7 @@ const Post = () => {
     );
   }
 
-  const comments = getCommentsByPostId(slug);
+  const comments = post.comments || [];
 
   return (
     <Layout>

@@ -15,7 +15,7 @@ const Layout = ({ children }: LayoutProps) => {
       <MobileNav />
       <main className="flex-1 w-full md:ml-64 mt-14 md:mt-0 transition-all duration-300 overflow-hidden">
         <ScrollArea className="h-screen kinetic-scroll">
-          <div className="container px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 mx-auto max-w-4xl lg:max-w-5xl w-full overflow-hidden min-w-0">
+          <div className="container px-3 sm:px-4 md:px-4 lg:px-6 py-4 sm:py-6 mx-auto max-w-5xl lg:max-w-6xl xl:max-w-7xl w-full overflow-hidden min-w-0">
             <div className="fade-in-up">
               {children}
             </div>
