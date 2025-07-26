@@ -162,7 +162,7 @@ func FetchCategories(c *fiber.Ctx) error {
 		Description string
 	}
 
-	var category result
+	var category []result
 	query_lookup := db.Model(&models.Category{}).Select("id", "name", "slug", "description").Find(&category)
 
 	if query_lookup.Error != nil {
