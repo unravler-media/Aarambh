@@ -73,10 +73,10 @@ const Sidebar = () => {
               <div className="text-red-400 text-sm px-3">Failed to load categories</div>
             ) : (
               <div className="relative">
-                <ul className="space-y-2">
-                  {categories
-                    .slice(0, showAllCategories ? categories.length : 4)
-                    .map(category => (
+                 <ul className="space-y-2">
+                   {(Array.isArray(categories) ? categories : [])
+                     .slice(0, showAllCategories ? categories.length : 4)
+                     .map(category => (
                     <li key={category.ID}>
                       <Link 
                         to={`/category/${category.Slug || category.Name.toLowerCase()}`} 

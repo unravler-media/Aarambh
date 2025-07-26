@@ -90,7 +90,7 @@ const MobileNav = () => {
                 {categoriesLoading ? (
                   <li className="px-3 py-2.5 text-gray-500">Loading categories...</li>
                 ) : (
-                  categories.map(category => (
+                  (Array.isArray(categories) ? categories : []).map(category => (
                     <li key={category.ID}>
                       <Link 
                         to={`/category/${category.Slug}`} 

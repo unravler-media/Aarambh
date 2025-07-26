@@ -5,6 +5,7 @@ export interface Category {
   ID: string;
   Name: string;
   Slug: string;
+  Description: string;
 }
 
 interface CategoriesResponse {
@@ -27,7 +28,7 @@ export const useCategories = () => {
         }
         
         const data: CategoriesResponse = await response.json();
-        setCategories(data.response);
+        setCategories(Array.isArray(data.response) ? data.response : []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
