@@ -52,6 +52,9 @@ func(c *Post) BeforeCreate(tx *gorm.DB) (err error) {
 func(c *Post) BeforeUpdate(tx *gorm.DB) (err error) {
 	updatedTime := time.Now().Format("Jan 2, 2006 at 3:04pm")
 	c.UpdatedAt = updatedTime
+
+	readTime := fmt.Sprintf("Estimated read time: %d minute(s)", helpers.CalculateReadTime(c.Content))
+	c.ReadTime = readTime
 	return nil
 } 
 

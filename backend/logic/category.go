@@ -11,7 +11,7 @@ import (
 )
 
 // to handle url: GET /api/category/
-func FetchCategories(c *fiber.Ctx) error {
+func FetchCategory(c *fiber.Ctx) error {
 	// Fetch all Categories
 	db, ok := c.Locals("db").(*gorm.DB)
 	if !ok {
@@ -48,12 +48,14 @@ func FetchCategories(c *fiber.Ctx) error {
 	}
 
 	// empty variable of list (slice) of category
-	var categories []models.Category
+	var category models.Category
+
+	query_slug := c.Query("slug")
 
 	// db query 
-	categories_fetch := db.Preload("Posts", func(db *gorm.DB) *gorm.DB {
+	categories_fetch := db.Debug().Preload("Posts", func(db *gorm.DB) *gorm.DB {
 		return db.Preload("Author")
-	}).Select("id","updated_at","name","slug","description").Find(&categories)
+	}).Select("id","updated_at","name","slug","description").Where("slug = ?", query_slug).First(&category)
 	if categories_fetch.RowsAffected < 1 {
 		return c.Status(404).JSON(fiber.Map{
 			"response": "No Categories Exist.",
@@ -68,37 +70,34 @@ func FetchCategories(c *fiber.Ctx) error {
 	}
 
 	// Build response
-	var response []CategoryResponse
-	for _, category := range categories {
+	var response CategoryResponse
 		// Map posts
-		var postsResp []PostsResponse
-		for _, post := range category.Posts {
-			postsResp = append(postsResp, PostsResponse{
-				ID:         post.ID,
-				PostTitle:  post.PostTitle,
-				Slug:       post.Slug,
-				CoverImage: post.CoverImage,
-				ReadTime:   post.ReadTime,
-				IsFeatured: post.IsFeatured,
-				Author: UserResponse{
-					ID:       post.Author.ID,
-					username: post.Author.Username,
-					FullName: post.Author.FullName,
-					Avatar:   post.Author.Avatar,
-				},
-			})
-		}
-
-		// Add full category
-		response = append(response, CategoryResponse{
-			ID:          category.ID,
-			Name:        category.Name,
-			Slug:        category.Slug,
-			Description: category.Description,
-			Posts: postsResp,
+	var postsResp []PostsResponse
+	for _, post := range category.Posts {
+		postsResp = append(postsResp, PostsResponse{
+			ID:         post.ID,
+			PostTitle:  post.PostTitle,
+			Slug:       post.Slug,
+			CoverImage: post.CoverImage,
+			ReadTime:   post.ReadTime,
+			IsFeatured: post.IsFeatured,
+			Author: UserResponse{
+				ID:       post.Author.ID,
+				username: post.Author.Username,
+				FullName: post.Author.FullName,
+				Avatar:   post.Author.Avatar,
+			},
 		})
 	}
 
+	// Add full category
+	response = CategoryResponse{
+		ID:          category.ID,
+		Name:        category.Name,
+		Slug:        category.Slug,
+		Description: category.Description,
+		Posts: postsResp,
+	}
 
 	return c.JSON(fiber.Map{
 		"response": response,
@@ -148,7 +147,7 @@ func CreateCategory(c *fiber.Ctx) error {
 	})
 }
 
-func FetchCategory(c *fiber.Ctx) error {
+func FetchCategories(c *fiber.Ctx) error {
 	// Fetch a Category
 	db, ok := c.Locals("db").(*gorm.DB)
 	if !ok {
@@ -156,8 +155,6 @@ func FetchCategory(c *fiber.Ctx) error {
 			"response": "DB Fucked.",
 		})
 	}	
-	category_id := c.Query("category_id")
-
 	type result struct {
 		ID string
 		Name string
@@ -165,8 +162,8 @@ func FetchCategory(c *fiber.Ctx) error {
 		Description string
 	}
 
-	var categorySingle result
-	query_lookup := db.Debug().Model(&models.Category{}).Select("id", "name", "slug", "description").Where("id = ?", category_id).First(&categorySingle)
+	var category result
+	query_lookup := db.Model(&models.Category{}).Select("id", "name", "slug", "description").Find(&category)
 
 	if query_lookup.Error != nil {
 		fmt.Println("Error while Fetching Categories: ", query_lookup.Error)
@@ -182,7 +179,7 @@ func FetchCategory(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-		"response": categorySingle,
+		"response": category,
 	})
 }
 
