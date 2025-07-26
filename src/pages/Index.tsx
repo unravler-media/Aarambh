@@ -44,7 +44,7 @@ const Index = () => {
     <Layout>
       {/* Search bar */}
       <div className="mb-8">
-        <div className="relative w-full md:w-2/3 lg:w-1/2">
+        <div className="relative w-full">
           <Input
             type="search"
             placeholder="Search articles..."
@@ -56,7 +56,7 @@ const Index = () => {
       
       <section className="mb-14">
         
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 xl:gap-6">
           {postsToShow.map(post => (
             <PostCard key={post.id} post={post} />
           ))}

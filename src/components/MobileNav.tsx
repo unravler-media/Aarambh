@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Grid2X2, Search, Hash, LogIn, UserPlus, User } from "lucide-react";
-import { categories } from "../data/categories";
+import { useCategories } from "../hooks/useCategories";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +10,7 @@ const MobileNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { categories, loading: categoriesLoading } = useCategories();
   
   const isActiveRoute = (path: string) => {
     if (path === "/" && location.pathname === "/") {
@@ -86,18 +87,22 @@ const MobileNav = () => {
             <div>
               <h2 className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-4 pl-3">Categories</h2>
               <ul className="space-y-2">
-                {categories.map(category => (
-                  <li key={category.id}>
-                    <Link 
-                      to={`/category/${category.slug}`} 
-                      className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute(`/category/${category.slug}`) && "bg-[#151619] text-white font-medium")} 
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <Hash size={18} strokeWidth={2.5} />
-                      <span>{category.name}</span>
-                    </Link>
-                  </li>
-                ))}
+                {categoriesLoading ? (
+                  <li className="px-3 py-2.5 text-gray-500">Loading categories...</li>
+                ) : (
+                  categories.map(category => (
+                    <li key={category.ID}>
+                      <Link 
+                        to={`/category/${category.Slug}`} 
+                        className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute(`/category/${category.Slug}`) && "bg-[#151619] text-white font-medium")} 
+                        onClick={() => setIsOpen(false)}
+                      >
+                        <Hash size={18} strokeWidth={2.5} />
+                        <span>{category.Name}</span>
+                      </Link>
+                    </li>
+                  ))
+                )}
               </ul>
             </div>
 

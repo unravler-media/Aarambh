@@ -43,6 +43,18 @@ export interface ApiPostDetail {
     name: string;
     slug: string;
   };
+  Comments: Array<{
+    ID: string;
+    UpdatedAt: string;
+    Author: {
+      id: string;
+      username: string;
+      full_name: string;
+      avatar: string;
+      role: string;
+    };
+    Comment: string;
+  }>;
 }
 
 export interface Post {
@@ -67,6 +79,16 @@ export interface Post {
   publishedAt: string;
   readTime: number;
   isFeatured: boolean;
+  comments?: Array<{
+    id: string;
+    author: {
+      name: string;
+      avatar: string;
+    };
+    content: string;
+    createdAt: string;
+    likes: number;
+  }>;
 }
 
 // Helper function to extract read time number from API string
@@ -115,6 +137,16 @@ const transformApiPostDetail = (apiPost: ApiPostDetail): Post => ({
   publishedAt: apiPost.UpdatedAt,
   readTime: 5, // Default read time for detail API
   isFeatured: false, // Not available in detail API
+  comments: apiPost.Comments?.map(comment => ({
+    id: comment.ID,
+    author: {
+      name: comment.Author.full_name,
+      avatar: comment.Author.avatar,
+    },
+    content: comment.Comment,
+    createdAt: comment.UpdatedAt,
+    likes: 0,
+  })) || [],
 });
 
 export const usePosts = () => {

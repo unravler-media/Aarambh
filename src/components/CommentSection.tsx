@@ -3,9 +3,9 @@ import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/contexts/AuthContext";
 import { MessageCircle } from "lucide-react";
 
 export interface Comment {
@@ -27,20 +27,19 @@ interface CommentSectionProps {
 const CommentSection = ({ postId, comments: initialComments }: CommentSectionProps) => {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [newComment, setNewComment] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const { user, isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!newComment.trim() || !name.trim()) return;
+    if (!newComment.trim() || !user) return;
     
     const comment: Comment = {
       id: `comment-${Date.now()}`,
       author: {
-        name: name,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name.replace(/\s+/g, "").toLowerCase()}`,
+        name: user.name,
+        avatar: user.avatar || "",
       },
       content: newComment,
       createdAt: new Date().toISOString(),
@@ -59,51 +58,29 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
       </div>
 
       {/* Add new comment */}
-      <div className="mb-8 bg-[#151619] p-4 sm:p-6 rounded-xl">
-        <h3 className="text-lg font-semibold text-white mb-4">Leave a comment</h3>
-        <form onSubmit={handleSubmitComment}>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {isAuthenticated && (
+        <div className="mb-8 bg-[#151619] p-4 sm:p-6 rounded-xl">
+          <h3 className="text-lg font-semibold text-white mb-4">Leave a comment</h3>
+          <form onSubmit={handleSubmitComment}>
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm text-gray-300">Name *</Label>
-                <Input 
-                  id="name" 
-                  value={name} 
-                  onChange={(e) => setName(e.target.value)} 
-                  placeholder="Your name"
+                <Label htmlFor="comment" className="text-sm text-gray-300">Comment *</Label>
+                <Textarea 
+                  id="comment" 
+                  value={newComment} 
+                  onChange={(e) => setNewComment(e.target.value)} 
+                  placeholder="Write your comment here..."
                   required
-                  className="bg-[#1A1B22] border-[#252833] text-white"
+                  className="min-h-[120px] bg-[#1A1B22] border-[#252833] text-white"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm text-gray-300">Email (optional)</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  value={email} 
-                  onChange={(e) => setEmail(e.target.value)} 
-                  placeholder="Your email"
-                  className="bg-[#1A1B22] border-[#252833] text-white"
-                />
-              </div>
+              <Button type="submit" className="bg-tech-red hover:bg-tech-red/90 text-white">
+                Post Comment
+              </Button>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="comment" className="text-sm text-gray-300">Comment *</Label>
-              <Textarea 
-                id="comment" 
-                value={newComment} 
-                onChange={(e) => setNewComment(e.target.value)} 
-                placeholder="Write your comment here..."
-                required
-                className="min-h-[120px] bg-[#1A1B22] border-[#252833] text-white"
-              />
-            </div>
-            <Button type="submit" className="bg-tech-red hover:bg-tech-red/90 text-white">
-              Post Comment
-            </Button>
-          </div>
-        </form>
-      </div>
+          </form>
+        </div>
+      )}
 
       {/* Comments list */}
       <div className="space-y-6">
@@ -113,12 +90,20 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
             className="bg-[#151619] p-4 sm:p-6 rounded-xl border border-[#252833] transition-all"
           >
             <div className="flex items-start gap-3 sm:gap-4">
-              <Avatar className="h-10 w-10 border border-[#252833]">
-                <AvatarImage src={comment.author.avatar} alt={comment.author.name} />
-                <AvatarFallback className="bg-[#1A1B22] text-white">
-                  {comment.author.name.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
+              {comment.author.avatar ? (
+                <Avatar className="h-10 w-10 border border-[#252833]">
+                  <AvatarImage src={comment.author.avatar} alt={comment.author.name} />
+                  <AvatarFallback className="bg-[#1A1B22] text-white">
+                    {comment.author.name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <div className="h-10 w-10 rounded-full bg-tech-red flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">
+                    {comment.author.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
               <div className="flex-1">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-2">
                   <h4 className="font-medium text-white">{comment.author.name}</h4>
