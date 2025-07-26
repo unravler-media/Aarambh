@@ -15,6 +15,9 @@ import (
 
 	"github.com/gofiber/fiber/v2/middleware/cache"
 	"time"
+
+	"github.com/gofiber/storage/redis/v3"
+	"os"
 )
 
 func main() {
@@ -60,12 +63,21 @@ func main() {
 	app.Use(databases.InjectDatabase(database))
 	
 	// Implement Default In-Memory Caching
+	
+	// gonna use Redis as storage for caching.
+	store := redis.New(redis.Config{
+		URL: os.Getenv("REDIS_URL"),
+		Reset: false,
+	})
+
+
 	app.Use(cache.New(cache.Config{
   	Next: func(c *fiber.Ctx) bool {
         return c.Query("noCache") == "true"
     },
     Expiration: 1 * time.Minute, // Cache Timeout set to 1 Minutes.
     CacheControl: true,
+		Storage: store,
 	}))
 	
 	

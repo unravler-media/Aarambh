@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"os"
+
 	"github.com/go-playground/validator/v10"
 	gojson "github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
@@ -9,11 +11,15 @@ import (
 	"backend/databases"
 	"backend/routes"
 
-	"github.com/gofiber/fiber/v2/middleware/cache"
 	"time"
 
-	"github.com/gofiber/fiber/v2/middleware/adaptor"
+	"github.com/gofiber/fiber/v2/middleware/cache"
+
 	"net/http"
+
+	"github.com/gofiber/fiber/v2/middleware/adaptor"
+
+	"github.com/gofiber/storage/redis/v3"
 )
 
 // This vercel.go is basically for deploying to vercel.
@@ -65,15 +71,22 @@ func handler() http.HandlerFunc {
 	app.Use(databases.InjectDatabase(database))
 	
 	// Implement Default In-Memory Caching
+
+	// gonna use Redis as storage for caching.
+	store := redis.New(redis.Config{
+		URL: os.Getenv("REDIS_URL"),
+		Reset: false,
+	})
+
 	app.Use(cache.New(cache.Config{
   	Next: func(c *fiber.Ctx) bool {
         return c.Query("noCache") == "true"
     },
     Expiration: 1 * time.Minute, // Cache Timeout set to 1 Minutes.
     CacheControl: true,
-	}))
-	
-	
+		Storage: store,
+	}))	
+
 	// using Routes Grouping for a better DX (Developer Experience)
 	routes.ApiRoutes(app.Group("/api"))
 	
