@@ -41,7 +41,7 @@ func main() {
 	// CORS middleware 
 	app.Use(cors.New(cors.Config{
 		AllowMethods: "GET, POST, PUT, DELETE",
-		AllowOrigins: "https://aarambh-one.vercel.app, http://127.0.0.1:3000",
+		AllowOrigins: "https://aarambh-one.vercel.app, http://127.0.0.1:3000, https://*.lovable.app",
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))
