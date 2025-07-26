@@ -58,7 +58,7 @@ const PostCard = ({ post, className, variant = "default" }: PostCardProps) => {
         </h2>
         
         {!isCompact && (
-          <p className="text-gray-400 text-sm line-clamp-2 mb-4">{post.short_content}</p>
+          <p className="text-gray-400 text-sm line-clamp-2 mb-4">{post.shortContent}</p>
         )}
         
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#222]">
