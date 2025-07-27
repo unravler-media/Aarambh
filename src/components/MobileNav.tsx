@@ -2,15 +2,22 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Grid2X2, Search, Hash, LogIn, UserPlus, User } from "lucide-react";
-import { useCategories } from "../hooks/useCategories";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
-const MobileNav = () => {
+interface MobileNavProps {
+  categoriesData: {
+    categories: any[];
+    loading: boolean;
+    error: string | null;
+  };
+}
+
+const MobileNav = ({ categoriesData }: MobileNavProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { user, logout } = useAuth();
-  const { categories, loading: categoriesLoading } = useCategories();
+  const { categories, loading: categoriesLoading } = categoriesData;
   
   const isActiveRoute = (path: string) => {
     if (path === "/" && location.pathname === "/") {
