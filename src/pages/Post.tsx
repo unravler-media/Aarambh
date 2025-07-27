@@ -91,7 +91,7 @@ const Post = () => {
         {/* Comment Section */}
         <div className="bg-[#0F1013] rounded-xl overflow-hidden mb-8 w-full">
           <div className="p-3 sm:p-4 md:p-6 lg:p-8 w-full overflow-hidden">
-            <CommentSection postId={slug} comments={comments} />
+            <CommentSection postId={post.id} comments={comments} />
           </div>
         </div>
         
