@@ -15,12 +15,14 @@ import NotFound from "./pages/NotFound";
 import AddPost from "./pages/AddPost";
 import EditPost from "./pages/EditPost";
 import { SpeedInsights } from "@vercel/speed-insights/react"
+import { Analytics } from "@vercel/analytics/react"
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <SpeedInsights />
+    <Analytics />
     <TooltipProvider>
       <Toaster />
       <Sonner />
