@@ -7,17 +7,20 @@ import (
 	gojson "github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/utils"
 
 	"backend/databases"
 	"backend/routes"
 
 	"github.com/joho/godotenv"
 
-	"github.com/gofiber/fiber/v2/middleware/cache"
 	"time"
 
-	"github.com/gofiber/storage/redis/v3"
+	"github.com/gofiber/fiber/v2/middleware/cache"
+
 	"os"
+
+	"github.com/gofiber/storage/redis/v3"
 )
 
 func main() {
@@ -78,6 +81,9 @@ func main() {
     Expiration: 1 * time.Minute, // Cache Timeout set to 1 Minutes.
     CacheControl: true,
 		Storage: store,
+		KeyGenerator: func(c *fiber.Ctx) string {
+			return utils.CopyString(c.OriginalURL())
+    },
 	}))
 	
 	
