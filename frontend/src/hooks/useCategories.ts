@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { API_BASE_URL, API_ENDPOINTS } from '../config/api';
 
 export interface Category {
@@ -12,15 +12,46 @@ interface CategoriesResponse {
   response: Category[];
 }
 
+// Cache to persist data across navigations
+let cachedCategories: Category[] | null = null;
+let cachePromise: Promise<Category[]> | null = null;
+
 export const useCategories = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<Category[]>(cachedCategories || []);
+  const [loading, setLoading] = useState(!cachedCategories);
   const [error, setError] = useState<string | null>(null);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    // If we already have cached data, use it
+    if (cachedCategories) {
+      setCategories(cachedCategories);
+      setLoading(false);
+      return;
+    }
+
+    // If we're already fetching, wait for that request
+    if (cachePromise) {
+      cachePromise.then(data => {
+        setCategories(data);
+        setLoading(false);
+      }).catch(err => {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+        setLoading(false);
+      });
+      return;
+    }
+
+    // Only fetch once per session
+    if (hasFetched.current) {
+      return;
+    }
+
+    hasFetched.current = true;
+    setLoading(true);
+
+    const fetchCategories = async (): Promise<Category[]> => {
       try {
-        setLoading(true);
         const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.categories}`);
         
         if (!response.ok) {
@@ -28,15 +59,31 @@ export const useCategories = () => {
         }
         
         const data: CategoriesResponse = await response.json();
-        setCategories(Array.isArray(data.response) ? data.response : []);
+        const categoriesArray = Array.isArray(data.response) ? data.response : [];
+        
+        // Cache the data
+        cachedCategories = categoriesArray;
+        return categoriesArray;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
+        throw err;
       }
     };
 
-    fetchCategories();
+    // Create and cache the promise
+    cachePromise = fetchCategories();
+    
+    cachePromise
+      .then(data => {
+        setCategories(data);
+        setError(null);
+      })
+      .catch(err => {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      })
+      .finally(() => {
+        setLoading(false);
+        cachePromise = null;
+      });
   }, []);
 
   return { categories, loading, error };
