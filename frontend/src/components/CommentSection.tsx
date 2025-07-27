@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
 import { MessageCircle } from "lucide-react";
+import { API_BASE_URL, API_ENDPOINTS } from "@/config/api";
+import { useToast } from "@/components/ui/use-toast";
 
 export interface Comment {
   id: string;
@@ -27,27 +29,74 @@ interface CommentSectionProps {
 const CommentSection = ({ postId, comments: initialComments }: CommentSectionProps) => {
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [newComment, setNewComment] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user, isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
+  const { toast } = useToast();
   
-  const handleSubmitComment = (e: React.FormEvent) => {
+  const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!newComment.trim() || !user) return;
+    if (!newComment.trim() || !user || isSubmitting) return;
     
-    const comment: Comment = {
-      id: `comment-${Date.now()}`,
-      author: {
-        name: user.name,
-        avatar: user.avatar || "",
-      },
-      content: newComment,
-      createdAt: new Date().toISOString(),
-      likes: 0,
-    };
+    setIsSubmitting(true);
     
-    setComments([comment, ...comments]);
-    setNewComment("");
+    try {
+      const authToken = localStorage.getItem('authToken');
+      if (!authToken) {
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "Please log in again to post a comment.",
+        });
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.createComment}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          comment: newComment,
+          post_id: postId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to post comment');
+      }
+
+      // Create optimistic comment for immediate UI update
+      const optimisticComment: Comment = {
+        id: `comment-${Date.now()}`,
+        author: {
+          name: user.name,
+          avatar: user.avatar || "",
+        },
+        content: newComment,
+        createdAt: new Date().toISOString(),
+        likes: 0,
+      };
+      
+      setComments([optimisticComment, ...comments]);
+      setNewComment("");
+      
+      toast({
+        title: "Comment posted!",
+        description: "Your comment has been added successfully.",
+      });
+    } catch (error) {
+      console.error('Error posting comment:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to post comment. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -74,8 +123,12 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
                   className="min-h-[120px] bg-[#1A1B22] border-[#252833] text-white"
                 />
               </div>
-              <Button type="submit" className="bg-tech-red hover:bg-tech-red/90 text-white">
-                Post Comment
+              <Button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="bg-tech-red hover:bg-tech-red/90 text-white disabled:opacity-50"
+              >
+                {isSubmitting ? "Posting..." : "Post Comment"}
               </Button>
             </div>
           </form>

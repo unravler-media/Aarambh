@@ -11,4 +11,5 @@ export const API_ENDPOINTS = {
   categories: '/api/category/',
   posts: '/api/posts/',
   post: '/api/posts/get/',
+  createComment: '/api/comment/create/',
 } as const;
