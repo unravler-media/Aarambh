@@ -118,7 +118,7 @@ func FetchPost(c *fiber.Ctx) error {
 		ID string
 		UpdatedAt string
 		Author UserResponse
-		Comment string
+		CommentText string
 	}
 
 	type postResponse struct {
@@ -142,7 +142,7 @@ func FetchPost(c *fiber.Ctx) error {
 		transformedComments = append(transformedComments, commentsResponse{
 			ID:        comment.ID,
 			UpdatedAt: comment.UpdatedAt,
-			Comment:   comment.Comment,
+			CommentText:   comment.CommentText,
 			Author: UserResponse{
 				ID:       comment.Author.ID,
 				Username: comment.Author.Username,

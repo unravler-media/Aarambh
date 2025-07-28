@@ -12,7 +12,7 @@ import (
 )
 
 type Post struct {
-	ID string `gorm:"primarykey"`
+	ID string `gorm:"primaryKey"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 	PostTitle string `json:"post_title" gorm:"index" validate:"required,min=4"`

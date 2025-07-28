@@ -2,6 +2,7 @@ package logic
 
 import (
 	"backend/models"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -41,7 +42,7 @@ func CreateComment(c *fiber.Ctx) error {
 
 	response := make(map[string]any)
 	response["id"] = comment.ID
-	response["comment"] = comment.Comment
+	response["comment_text"] = comment.CommentText
 	response["updated_at"] = comment.UpdatedAt
 
 	return c.JSON(fiber.Map{
@@ -65,26 +66,26 @@ func UpdateComment(c *fiber.Ctx) error {
 	}
 
 	user_session := session.(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
-	commnt_query := c.Query("id","none")
-	if commnt_query == "none" {
+	comment_id := c.Query("comment_id","none")
+	if comment_id == "none" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"response": "Comment ID Not Provided",
 		})
 	}
 
 	type requestBody struct {
-		Comment string `json:"comment"`
+		CommentText string `json:"comment_text"`
 	}
 
 	var req requestBody
+	var commentInstance models.Comment
+	query := db.First(&commentInstance, "id = ?", comment_id)
+
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"response": "Invalid Request Parameters.",
 		})
 	}
-
-	var comment models.Comment
-	query := db.Preload("Author").Where("id = ?", commnt_query).First(&comment)
 
 	if query.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -98,14 +99,20 @@ func UpdateComment(c *fiber.Ctx) error {
 		})
 	}
 
-	if comment.AuthorID != user_session {
+	if commentInstance.AuthorID != user_session {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"response": "Unauthorized Action.",
 		})
 	}
 
-	query_comment := db.Model(&models.Comment{}).Where("id == ?", commnt_query).Update("comment", req.Comment)
-	if query_comment.Error != nil {
+//err := db.Debug().Model(&commentInstance).Updates(map[string]any{"comment_text": commentInstance.CommentText,}).Error
+	
+	commentInstance.CommentText = req.CommentText
+	commentInstance.AuthorID = user_session
+
+	err := db.Save(&commentInstance).Error
+	if err != nil {
+		fmt.Print(err)
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"response": "Unable to update comment.",
 		})
@@ -114,24 +121,17 @@ func UpdateComment(c *fiber.Ctx) error {
 	type responseStruct struct {
 		ID string `json:"id"`
 		UpdatedAt string `json:"updated_at"`
-		Comment string `json:"name"`
-		Author UserResponse `json:"author"`
+		CommentText string `json:"comment_text"`
+		AuthorID string `json:"author_id"`
 	}
 
-	var authorResponse UserResponse
-	authorResponse = UserResponse{
-		ID: comment.Author.ID,
-		Username: comment.Author.Username,
-		Avatar: comment.Author.Avatar,
-		FullName: comment.Author.FullName,
-	}
 
 	var response responseStruct
 	response = responseStruct{
-		ID: comment.ID,
-		UpdatedAt: comment.UpdatedAt,
-		Comment: comment.Comment,
-		Author: authorResponse,
+		ID: commentInstance.ID,
+		UpdatedAt: commentInstance.UpdatedAt,
+		CommentText: commentInstance.CommentText,
+		AuthorID: commentInstance.AuthorID,
 	}
 
 	return c.JSON(fiber.Map{

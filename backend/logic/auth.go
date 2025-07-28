@@ -16,9 +16,14 @@ import (
 
 // Main logic if somebody does: /api/auth/login/
 func LoginHandler(c *fiber.Ctx) error {
+
+	type reqBody struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+	var req reqBody
 	// parse the request body
-	var data = make(map[string]string) // will make sure we have a dict in request Body
-	if err := c.BodyParser(&data); err != nil {
+	if err := c.BodyParser(&req); err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"response": "Invalid Information",
 		})
@@ -37,7 +42,7 @@ func LoginHandler(c *fiber.Ctx) error {
 	
 	// Gorm DB Query to check if the username in question exists.
 	
-	fetchUser := db.Where("username == ?", data["username"]).First(&user)
+	fetchUser := db.Where("username = ?", req.Username).First(&user)
 	// where: is the condition where we are matching existing users to query username.
 	// first: is the condition where we limit limits to 1 only.
 	// first: inside here we pass the output to the user var
@@ -50,7 +55,7 @@ func LoginHandler(c *fiber.Ctx) error {
 	}
 
 	// if user exists then now we compare passwords
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(data["password"]))
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
 		fmt.Println("Invalid Password: ", err)
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{

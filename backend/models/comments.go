@@ -9,18 +9,18 @@ import (
 )
 
 type Comment struct {
-	ID string `gorm:"primarykey" json:"id"`
+	ID string `gorm:"primaryKey"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 	AuthorID string `json:"author_id"`
 	Author Users `gorm:"foreignKey:AuthorID"`
-	Comment string `json:"comment"`
+	CommentText string `json:"comment_text"`
 	PostID string `json:"post_id"`
 	Post Post `gorm:"foreignKey:PostID"`
 }
 
 // Hooks for Further Processig of Data BeforeSave the model and before updating.
-func(c *Comment) BeforeSave(tx *gorm.DB) (err error) {
+func(c *Comment) BeforeCreate(tx *gorm.DB) (err error) {
 	nano_id, err := gonanoid.New()
 	c.ID = nano_id
 
