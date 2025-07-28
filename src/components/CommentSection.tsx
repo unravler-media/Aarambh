@@ -6,13 +6,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, Edit2, Trash2, Save, X } from "lucide-react";
 import { API_BASE_URL, API_ENDPOINTS } from "@/config/api";
 import { useToast } from "@/components/ui/use-toast";
 
 export interface Comment {
   id: string;
   author: {
+    id: string;
     name: string;
     avatar: string;
   };
@@ -30,6 +31,8 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
   const [comments, setComments] = useState<Comment[]>(initialComments);
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState("");
   const { user, isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const { toast } = useToast();
@@ -74,6 +77,7 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
       const optimisticComment: Comment = {
         id: responseData.response.id,
         author: {
+          id: user.id,
           name: user.username, // Use username instead of full name
           avatar: user.avatar || "",
         },
@@ -99,6 +103,107 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleDeleteComment = async (commentId: string) => {
+    try {
+      const authToken = localStorage.getItem('authToken');
+      if (!authToken) {
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "Please log in again to delete the comment.",
+        });
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/comment/delete/?id=${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete comment');
+      }
+
+      setComments(comments.filter(comment => comment.id !== commentId));
+      
+      toast({
+        title: "Comment deleted!",
+        description: "Your comment has been removed successfully.",
+      });
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to delete comment. Please try again.",
+      });
+    }
+  };
+
+  const handleEditComment = async (commentId: string) => {
+    if (!editingText.trim()) return;
+
+    try {
+      const authToken = localStorage.getItem('authToken');
+      if (!authToken) {
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "Please log in again to edit the comment.",
+        });
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/api/comment/edit/?comment_id=${commentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          comment_text: editingText,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to edit comment');
+      }
+
+      setComments(comments.map(comment => 
+        comment.id === commentId 
+          ? { ...comment, content: editingText }
+          : comment
+      ));
+      
+      setEditingCommentId(null);
+      setEditingText("");
+      
+      toast({
+        title: "Comment updated!",
+        description: "Your comment has been updated successfully.",
+      });
+    } catch (error) {
+      console.error('Error editing comment:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to edit comment. Please try again.",
+      });
+    }
+  };
+
+  const startEditing = (comment: Comment) => {
+    setEditingCommentId(comment.id);
+    setEditingText(comment.content);
+  };
+
+  const cancelEditing = () => {
+    setEditingCommentId(null);
+    setEditingText("");
   };
 
   return (
@@ -160,13 +265,64 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
                 </div>
               )}
               <div className="flex-1">
-                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-2">
-                  <h4 className="font-medium text-white">{comment.author.name}</h4>
-                  <span className="text-xs text-gray-400">
-                     {comment.createdAt}
-                  </span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-3 mb-2">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                    <h4 className="font-medium text-white">{comment.author.name}</h4>
+                    <span className="text-xs text-gray-400">
+                       {comment.createdAt}
+                    </span>
+                  </div>
+                  {user && comment.author.id === user.id && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => startEditing(comment)}
+                        className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#252833]"
+                      >
+                        <Edit2 size={14} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteComment(comment.id)}
+                        className="h-8 w-8 p-0 text-gray-400 hover:text-red-400 hover:bg-[#252833]"
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
+                  )}
                 </div>
-                <p className="text-gray-300 text-sm sm:text-base">{comment.content}</p>
+                {editingCommentId === comment.id ? (
+                  <div className="space-y-3">
+                    <Textarea
+                      value={editingText}
+                      onChange={(e) => setEditingText(e.target.value)}
+                      className="min-h-[80px] bg-[#1A1B22] border-[#252833] text-white"
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={() => handleEditComment(comment.id)}
+                        className="bg-tech-red hover:bg-tech-red/90 text-white"
+                      >
+                        <Save size={14} className="mr-1" />
+                        Save
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={cancelEditing}
+                        className="border-[#252833] text-gray-300 hover:bg-[#252833]"
+                      >
+                        <X size={14} className="mr-1" />
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-gray-300 text-sm sm:text-base">{comment.content}</p>
+                )}
               </div>
             </div>
           </div>

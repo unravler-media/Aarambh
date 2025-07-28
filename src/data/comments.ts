@@ -11,6 +11,7 @@ const dummyComments: Record<string, Comment[]> = {
     {
       id: "comment-1",
       author: {
+        id: "user-1",
         name: "Alex Johnson",
         avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=alex",
       },
@@ -21,6 +22,7 @@ const dummyComments: Record<string, Comment[]> = {
     {
       id: "comment-2",
       author: {
+        id: "user-2",
         name: "Sarah Miller",
         avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah",
       },
@@ -31,6 +33,7 @@ const dummyComments: Record<string, Comment[]> = {
     {
       id: "comment-3",
       author: {
+        id: "user-3",
         name: "Ryan Thompson",
         avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=ryan",
       },
@@ -43,6 +46,7 @@ const dummyComments: Record<string, Comment[]> = {
     {
       id: "comment-1",
       author: {
+        id: "user-4",
         name: "Jennifer Wu",
         avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=jennifer",
       },
@@ -53,6 +57,7 @@ const dummyComments: Record<string, Comment[]> = {
     {
       id: "comment-2",
       author: {
+        id: "user-5",
         name: "David Park",
         avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=david",
       },
@@ -65,6 +70,7 @@ const dummyComments: Record<string, Comment[]> = {
     {
       id: "comment-1",
       author: {
+        id: "user-6",
         name: "Emma Roberts",
         avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=emma",
       },
@@ -75,6 +81,7 @@ const dummyComments: Record<string, Comment[]> = {
     {
       id: "comment-2",
       author: {
+        id: "user-7",
         name: "Miguel Sanchez",
         avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=miguel",
       },
@@ -85,6 +92,7 @@ const dummyComments: Record<string, Comment[]> = {
     {
       id: "comment-3",
       author: {
+        id: "user-8",
         name: "Lisa Chen",
         avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=lisa",
       },
