@@ -53,7 +53,7 @@ export interface ApiPostDetail {
       avatar: string;
       role: string;
     };
-    Comment: string;
+    CommentText: string;
   }>;
 }
 
@@ -140,10 +140,10 @@ const transformApiPostDetail = (apiPost: ApiPostDetail): Post => ({
   comments: apiPost.Comments?.map(comment => ({
     id: comment.ID,
     author: {
-      name: comment.Author.full_name,
-      avatar: comment.Author.avatar,
+    name: comment.Author.username,
+    avatar: comment.Author.avatar,
     },
-    content: comment.Comment,
+    content: comment.CommentText,
     createdAt: comment.UpdatedAt,
     likes: 0,
   })) || [],

@@ -8,6 +8,7 @@ export type UserRole = 'admin' | 'creator' | 'member';
 export interface User {
   id: string;
   name: string;
+  username: string;
   email: string;
   role: UserRole;
   avatar?: string;
@@ -64,22 +65,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const data = await response.json();
-    const token = data.response;
+    const responseData = data.response;
+    
+    console.log('Login response:', responseData); // Debug log
     
     // Store token in localStorage
-    localStorage.setItem('authToken', token);
+    localStorage.setItem('authToken', responseData.token);
     
-    // Create user object (you might want to fetch user details from another endpoint)
-    const mockUser: User = {
-      id: '1',
-      name: 'User',
+    // Create user object from response
+    const user: User = {
+      id: responseData.id,
+      name: responseData.full_name,
+      username: responseData.username,
       email,
-      role: 'member',
+      role: responseData.role || 'member',
+      avatar: responseData.avatar,
       joinedAt: new Date().toISOString(),
     };
     
-    setUser(mockUser);
-    localStorage.setItem('user', JSON.stringify(mockUser));
+    console.log('Storing user:', user); // Debug log
+    setUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
     navigate('/dashboard');
   };
 
