@@ -88,8 +88,26 @@ func LoginHandler(c *fiber.Ctx) error {
 	// setting the token to HTTP Only server side.
 	c.Cookie(&cookie)
 
+	type responseStruct struct {
+		Token string `json:"token"`
+		Id string `json:"id"`
+		Username string `json:"username"`
+		Avatar string `json:"avatar"`
+		Role string `json:"role"`
+		FullName string `json:"full_name"`
+	}
+
+	var responseFinal = responseStruct{
+		Id: user.ID,
+		Token: token,
+		Username: user.Username,
+		Avatar: user.Avatar,
+		Role: user.Role,
+		FullName: user.FullName,
+	}
+
 	return c.Status(200).JSON(fiber.Map{
-		"response": token,
+		"response": &responseFinal,
 	})
 }
 
