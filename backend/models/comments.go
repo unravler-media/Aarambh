@@ -9,7 +9,7 @@ import (
 )
 
 type Comment struct {
-	ID string `gorm:"primaryKey" json:"id"`
+	ID string `gorm:"primarykey" json:"id"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 	AuthorID string `json:"author_id"`

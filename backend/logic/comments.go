@@ -50,7 +50,93 @@ func CreateComment(c *fiber.Ctx) error {
 }
 
 func UpdateComment(c *fiber.Ctx) error {
-	return nil
+	db, ok := c.Locals("db").(*gorm.DB)
+	if !ok {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "DB Fucked.",
+		})
+	}
+
+	session := c.Locals("session_user")
+	if session == nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"response": "Authorisation not provided.",
+		})
+	}
+
+	user_session := session.(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
+	commnt_query := c.Query("id","none")
+	if commnt_query == "none" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Comment ID Not Provided",
+		})
+	}
+
+	type requestBody struct {
+		Comment string `json:"comment"`
+	}
+
+	var req requestBody
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Invalid Request Parameters.",
+		})
+	}
+
+	var comment models.Comment
+	query := db.Preload("Author").Where("id = ?", commnt_query).First(&comment)
+
+	if query.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Error finding the comment.",
+		})
+	}
+
+	if query.RowsAffected < 1 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"response": "Comment not found.",
+		})
+	}
+
+	if comment.AuthorID != user_session {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"response": "Unauthorized Action.",
+		})
+	}
+
+	query_comment := db.Model(&models.Comment{}).Where("id == ?", commnt_query).Update("comment", req.Comment)
+	if query_comment.Error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Unable to update comment.",
+		})
+	}
+
+	type responseStruct struct {
+		ID string `json:"id"`
+		UpdatedAt string `json:"updated_at"`
+		Comment string `json:"name"`
+		Author UserResponse `json:"author"`
+	}
+
+	var authorResponse UserResponse
+	authorResponse = UserResponse{
+		ID: comment.Author.ID,
+		Username: comment.Author.Username,
+		Avatar: comment.Author.Avatar,
+		FullName: comment.Author.FullName,
+	}
+
+	var response responseStruct
+	response = responseStruct{
+		ID: comment.ID,
+		UpdatedAt: comment.UpdatedAt,
+		Comment: comment.Comment,
+		Author: authorResponse,
+	}
+
+	return c.JSON(fiber.Map{
+		"response": response,
+	})
 }
 
 func DeleteComment(c *fiber.Ctx) error {
