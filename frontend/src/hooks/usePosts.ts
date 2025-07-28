@@ -82,6 +82,7 @@ export interface Post {
   comments?: Array<{
     id: string;
     author: {
+      id: string;
       name: string;
       avatar: string;
     };
@@ -140,8 +141,9 @@ const transformApiPostDetail = (apiPost: ApiPostDetail): Post => ({
   comments: apiPost.Comments?.map(comment => ({
     id: comment.ID,
     author: {
-    name: comment.Author.username,
-    avatar: comment.Author.avatar,
+      id: comment.Author.id,
+      name: comment.Author.username,
+      avatar: comment.Author.avatar,
     },
     content: comment.CommentText,
     createdAt: comment.UpdatedAt,
