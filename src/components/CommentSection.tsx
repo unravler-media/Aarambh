@@ -59,7 +59,7 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
           'Authorization': `Bearer ${authToken}`,
         },
         body: JSON.stringify({
-          comment: newComment,
+          comment_text: newComment,
           post_id: postId,
         }),
       });
@@ -68,15 +68,17 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
         throw new Error('Failed to post comment');
       }
 
-      // Create optimistic comment for immediate UI update
+      const responseData = await response.json();
+      
+      // Create optimistic comment for immediate UI update using response data
       const optimisticComment: Comment = {
-        id: `comment-${Date.now()}`,
+        id: responseData.response.id,
         author: {
-          name: user.name,
+          name: user.username, // Use username instead of full name
           avatar: user.avatar || "",
         },
         content: newComment,
-        createdAt: new Date().toISOString(),
+        createdAt: responseData.response.updated_at,
         likes: 0,
       };
       
@@ -161,11 +163,7 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
                 <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mb-2">
                   <h4 className="font-medium text-white">{comment.author.name}</h4>
                   <span className="text-xs text-gray-400">
-                    {new Date(comment.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+                     {comment.createdAt}
                   </span>
                 </div>
                 <p className="text-gray-300 text-sm sm:text-base">{comment.content}</p>
