@@ -1,5 +1,5 @@
 backend/.env
 backend/tmp
-notes
+notes.txt
 .DS_Store
 tmp/
