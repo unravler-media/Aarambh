@@ -1,8 +1,8 @@
 ---
 const {title = "Aarambh - by unravler media."} = Astro.props;
-// import "../styles/starwind.css";
-import "../styles/global.css";
-import Sidebar from "@/components/Sidebar.astro";
+import "../styles/starwind.css";
+// import "../styles/global.css";
+import "../styles/custom.css";
 ---
 
 <html lang="en">
@@ -14,7 +14,6 @@ import Sidebar from "@/components/Sidebar.astro";
     <title>{title}</title>
 	</head>
   <body>
-    <Sidebar />
     <slot />
 	</body>
 </html>
