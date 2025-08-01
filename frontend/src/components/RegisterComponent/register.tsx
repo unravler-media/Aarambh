@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -64,9 +63,9 @@ const Register = () => {
     <div className="min-h-screen bg-[#0A0B0F] flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <Link to="/">
+          <a href="/">
             <h1 className="text-3xl font-bold text-white mb-2">Aarambh.</h1>
-          </Link>
+          </a>
           <p className="text-gray-400">Create your account to get started</p>
         </div>
 
