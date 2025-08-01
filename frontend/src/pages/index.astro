@@ -1,7 +1,8 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro"
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HomePage from "@/components/HomePageComponent/HomePageWithContext";
 ---
 
 <BaseLayout>
-  <h1>Hola Astro!</h1>
+  <HomePage client:only />
 </BaseLayout>
