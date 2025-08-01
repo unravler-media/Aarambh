@@ -168,9 +168,9 @@ const Register = () => {
             <div className="mt-6 text-center">
               <p className="text-gray-400">
                 Already have an account?{' '}
-                <Link to="/login" className="text-tech-red hover:underline">
+                <a href="/login" className="text-tech-red hover:underline">
                   Sign in
-                </Link>
+                </a>
               </p>
             </div>
           </CardContent>
