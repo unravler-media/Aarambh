@@ -15,7 +15,6 @@ func QueryPosts(c *fiber.Ctx) error {
 			"response": "DB Fucked.",
 		})
 	}
-
 	query := c.Query("q", "none")
 	if query == "none" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -26,7 +25,7 @@ func QueryPosts(c *fiber.Ctx) error {
 	type AuthorResponse struct {
 		Username string `json:"username"`
 		FullName string `json:"full_name"`
-		Avatar string `json:"avatar"`
+		Avatar   string `json:"avatar"`
 	}
 
 	type CategoryResponse struct {
@@ -35,20 +34,20 @@ func QueryPosts(c *fiber.Ctx) error {
 	}
 
 	type QueryPosts struct {
-		UpdatedAt string `json:"updated_at"`
-		PostTitle string `json:"post_title"`
-		Slug string `json:"slug"`
+		UpdatedAt    string `json:"updated_at"`
+		PostTitle    string `json:"post_title"`
+		Slug         string `json:"slug"`
 		ShortContent string `json:"short_content"`
-		CoverImage string `json:"cover_image"`
-		Author AuthorResponse
-		Category CategoryResponse
+		CoverImage   string `json:"cover_image"`
+		Author       AuthorResponse
+		Category     CategoryResponse
 	}
 
 	var posts []models.Post
 	fetch_query := db.Debug().Preload("Author", func(db *gorm.DB) *gorm.DB {
-		return db.Select("id","username","full_name","avatar")
+		return db.Select("id", "username", "full_name", "avatar")
 	}).Preload("Category", func(db *gorm.DB) *gorm.DB {
-		return db.Select("id","name","slug")
+		return db.Select("id", "name", "slug")
 	}).Select(
 		"id",
 		"updated_at",
@@ -59,6 +58,7 @@ func QueryPosts(c *fiber.Ctx) error {
 		"author_id",
 		"category_id",
 	).Where("slug LIKE ?", query).Find(&posts)
+
 	if fetch_query.Error != nil {
 		fmt.Printf("ERror in Query: %v", fetch_query)
 		c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -74,24 +74,23 @@ func QueryPosts(c *fiber.Ctx) error {
 
 	var finalResponse []QueryPosts
 	for _, post := range posts {
-    finalResponse = append(finalResponse, QueryPosts{
-        UpdatedAt:    post.UpdatedAt,
-        PostTitle:    post.PostTitle,
-        Slug:         post.Slug,
-        ShortContent: post.ShortContent,
-        CoverImage:   post.CoverImage,
-        Author: AuthorResponse{
-            Username: post.Author.Username,
-            FullName: post.Author.FullName,
-            Avatar:   post.Author.Avatar,
-        },
-        Category: CategoryResponse{
-            Name: post.Category.Name,
-            Slug: post.Category.Slug,
-        },
-    })
-}
-
+		finalResponse = append(finalResponse, QueryPosts{
+			UpdatedAt:    post.UpdatedAt,
+			PostTitle:    post.PostTitle,
+			Slug:         post.Slug,
+			ShortContent: post.ShortContent,
+			CoverImage:   post.CoverImage,
+			Author: AuthorResponse{
+				Username: post.Author.Username,
+				FullName: post.Author.FullName,
+				Avatar:   post.Author.Avatar,
+			},
+			Category: CategoryResponse{
+				Name: post.Category.Name,
+				Slug: post.Category.Slug,
+			},
+		})
+	}
 	return c.JSON(fiber.Map{
 		"response": &finalResponse,
 	})
