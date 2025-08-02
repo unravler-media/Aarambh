@@ -57,7 +57,7 @@ const Index = () => {
       <section className="mb-14">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 xl:gap-6">
           {postsToShow.map(post => (
-            <a key={post.id} href={`/post/${post.slug}`}><PostCard key={post.id} post={post} /></a>
+            <a key={post.id} href={`/posts/${post.slug}`}><PostCard key={post.id} post={post} /></a>
           ))}
         </div>
       </section>
