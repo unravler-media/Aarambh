@@ -36,32 +36,32 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
   return (
     <aside className="bg-[#090A0E] border-r border-[#1A1B22] w-64 min-h-screen hidden md:block fixed left-0 top-0 overflow-y-auto">
       <div className="p-6">
-        <Link to="/" className="flex items-center mb-12 group">
+        <a href="/" className="flex items-center mb-12 group">
           <h1 className="text-2xl font-bold ml-3 text-white">Aarambh.</h1>
-        </Link>
+        </a>
 
         <nav className="space-y-10">
           <div>
             <h2 className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-5 pl-3">Main</h2>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/") && "bg-[#151619] text-white font-medium shadow-sm")}>
+                <a href="/" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/") && "bg-[#151619] text-white font-medium shadow-sm")}>
                   <Grid2X2 size={18} strokeWidth={2.5} />
                   <span>Home</span>
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/search" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/search") && "bg-[#151619] text-white font-medium shadow-sm")}>
+                <a href="/search" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/search") && "bg-[#151619] text-white font-medium shadow-sm")}>
                   <Search size={18} strokeWidth={2.5} />
                   <span>Search</span>
-                </Link>
+                </a>
               </li>
               {user && (
                 <li>
-                  <Link to="/dashboard" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/dashboard") && "bg-[#151619] text-white font-medium shadow-sm")}>
+                  <a href="/dashboard" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/dashboard") && "bg-[#151619] text-white font-medium shadow-sm")}>
                     <User size={18} strokeWidth={2.5} />
                     <span>Dashboard</span>
-                  </Link>
+                  </a>
                 </li>
               )}
             </ul>
@@ -85,8 +85,8 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
                      .slice(0, showAllCategories ? categories.length : 4)
                      .map(category => (
                     <li key={category.ID}>
-                      <Link 
-                        to={`/category/${category.Slug || category.Name.toLowerCase()}`} 
+                      <a 
+                        href={`/category/${category.Slug || category.Name.toLowerCase()}`} 
                         className={cn(
                           "flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", 
                           isActiveRoute(`/category/${category.Slug || category.Name.toLowerCase()}`) && "bg-[#151619] text-white font-medium shadow-sm"
@@ -94,7 +94,7 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
                       >
                         <Hash size={18} strokeWidth={2.5} />
                         <span>{category.Name}</span>
-                      </Link>
+                      </a>
                     </li>
                   ))}
                 </ul>
@@ -133,16 +133,16 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
               {!user ? (
                 <>
                   <li>
-                    <Link to="/login" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/login") && "bg-[#151619] text-white font-medium shadow-sm")}>
+                    <a href="/login" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/login") && "bg-[#151619] text-white font-medium shadow-sm")}>
                       <LogIn size={18} strokeWidth={2.5} />
                       <span>Login</span>
-                    </Link>
+                    </a>
                   </li>
                   <li>
-                    <Link to="/register" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/register") && "bg-[#151619] text-white font-medium shadow-sm")}>
+                    <a href="/register" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/register") && "bg-[#151619] text-white font-medium shadow-sm")}>
                       <UserPlus size={18} strokeWidth={2.5} />
                       <span>Register</span>
-                    </Link>
+                    </a>
                   </li>
                 </>
               ) : (
