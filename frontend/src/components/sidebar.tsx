@@ -1,5 +1,3 @@
-
-import { Link, useLocation } from "react-router-dom";
 import { BookOpen, Grid2X2, Search, Book, Hash, LogIn, UserPlus, User, ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { cn } from "@/lib/utils";
@@ -14,7 +12,6 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ categoriesData }: SidebarProps) => {
-  const location = useLocation();
   const { user, logout } = useAuth();
   const { categories, loading, error } = categoriesData;
   const [showAllCategories, setShowAllCategories] = useState(false);

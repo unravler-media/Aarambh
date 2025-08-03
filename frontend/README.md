@@ -14,7 +14,9 @@ This platform also allows individuals like you to also write good piece of conte
 ## Technical Specifications
 This project has two sections:
 1. Backend - written in pure golang
-2. Frontend - written in React with ShadCN
+2. Frontend - written in React with ShadCN - Initially*
+
+But now we are working with Astro & React + ShadCN - we have dropped Ai Code Gen for the most part as of 1st August 2025
 
 Backend is in GoLang and it is written in Pure Go and by a Human: [Tushar Singh](https://github.com/lonexd3vil/)
 

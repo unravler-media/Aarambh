@@ -1,17 +1,16 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Layout from "../layout.tsx";
 import { usePost } from "../../hooks/usePost.tsx";
 import { getPostsByCategory } from "../../data/posts.ts";
 import { ChevronLeft } from "lucide-react";
-import CommentSection from "../../components/CommentSection"; // TODO: Create this file
-import { getCommentsByPostId } from "../../data/comments"; // TODO: Create this file
-import PostHeader from "../../components/PostHeader"; // TODO: Create this file 
-import PostContent from "../../components/PostContent"; // TODO: Create this file
-import PostFooter from "../../components/PostFooter"; // TODO: Create This file
-import RelatedPosts from "../../components/RelatedPosts"; // TODO: Create this file
-import PostSkeleton from "../../components/PostSkeleton"; // TODO: Create this file 
+import CommentSection from "../../components/CommentSection";
+import { getCommentsByPostId } from "../../data/comments";
+import PostHeader from "../../components/PostHeader";  
+import PostContent from "../../components/PostContent"; 
+import RelatedPosts from "../../components/RelatedPosts"; 
+import PostSkeleton from "../../components/PostSkeleton";  
+import PostFooter from "../../components/PostFooter.tsx";
 
 const Post = () => {
   const navigate = useNavigate();
@@ -24,13 +23,15 @@ const Post = () => {
   useEffect(() => {
     if (!slug) {
       console.log("Slug missing — Not Found");
-      navigate("/not-found");
+      window.location.href = "/not-found"
+      // navigate("/not-found");
       return;
     }
 
     if (error) {
       console.error("Error fetching post");
-      navigate("/not-found");
+      window.location.href = "/not-found"
+      // navigate("/not-found");
       return;
     }
 

@@ -1,5 +1,8 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Category from "@/components/CategoryComponent/CategoryWithProvider";
 ---
 
-<BaseLayout> Single Category Page! </BaseLayout>
+<BaseLayout>
+  <Category client:only />
+</BaseLayout>
