@@ -1,9 +1,8 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import SearchDetailProvider from "@/components/SearchComponent/SearchWithProvider";
 ---
 
 <BaseLayout>
-<div class="searchPage">
-  Search Page!
-</div>
+  <SearchDetailProvider client:only />
 </BaseLayout>
