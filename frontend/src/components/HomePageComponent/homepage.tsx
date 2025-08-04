@@ -36,19 +36,7 @@ const Index = () => {
 
   return (
     <Layout>
-      {/* Search bar */}
-      <div className="mb-8">
-        <div className="relative w-full">
-          <Input
-            type="search"
-            placeholder="Search articles..."
-            className="w-full pl-11 pr-4 py-3 bg-[#151619] border-[#2A2C36] text-white placeholder:text-gray-400 focus:border-tech-red rounded-xl"
-          />
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-        </div>
-      </div>
-
-      <section className="mb-14">
+      <section className="mb-14 mt-5">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-5 xl:gap-6">
           {postsToShow.map(post => (
             <a key={post.id} href={`/posts/${post.slug}`}><PostCard key={post.id} post={post} /></a>
