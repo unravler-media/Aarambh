@@ -44,32 +44,26 @@ const Search = () => {
           </div>
         )}
 
-        {searchError && (
-          <div className="text-center py-12">
-            <p className="text-red-400">Error loading posts: {searchError}</p>
-          </div>
-        )}
-
-        {hasSearched && !searchLoading && !searchError && (
+        {!searchLoading && !searchError && (
           <div>
             <h2 className="text-xl font-bold mb-6 text-white">
               {searchResult.length > 0
                 ? `Found ${searchResult.length} results for "${query}"`
-                : `No results found for "${query}"`}
+                : "No results found"}
             </h2>
 
-            {searchResult.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {searchResult.map((post, i) => (
-                  <SearchPostCard key={i} post={post} />
-                ))}
-              </div>
-            ) : (
+            {searchResult.length < 1 ? (
               <div className="text-center py-12 bg-[#1A1B22] rounded-xl border border-[#2A2C36]">
                 <h3 className="text-xl font-medium mb-2 text-white">No matching articles</h3>
                 <p className="text-gray-400">
                   Try adjusting your search terms or browse our categories
                 </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {searchResult.map((post, i) => (
+                  <SearchPostCard key={i} post={post} />
+                ))}
               </div>
             )}
           </div>

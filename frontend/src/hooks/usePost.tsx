@@ -283,19 +283,22 @@ export const usePostsSearch = (slug: string) => {
           setLoading(true);
           const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.searchPosts}?q=${slug}`);
 
-          if (response.status === 404) {
-            setPosts([]);
-            setError(null);
+          if (!response.ok) {
+            if (response.status === 404) {
+              setPosts([]);
+              setError(null);
+            } else {
+              throw new Error("Failed to fetch posts");
+            }
           }
-
-          if (!response.ok) throw new Error("Failed to fetch posts");
 
           const data = await response.json();
           const transformedPosts = data.response.map(transformApiSearchPost);
           setPosts(transformedPosts);
           setError(null);
         } catch (err) {
-          setError(err instanceof Error ? err.message : "An error occurred");
+          console.log(err instanceof Error ? err.message : "An Error occurred");
+          setError(null);
           setPosts([]);
         } finally {
           setLoading(false);
@@ -303,7 +306,7 @@ export const usePostsSearch = (slug: string) => {
       };
 
       fetchSearchPosts();
-    }, 800); // 👈 800ms debounce delay
+    }, 500); // 👈 800ms debounce delay
 
     return () => clearTimeout(delayDebounce);
   }, [slug]);
