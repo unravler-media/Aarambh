@@ -12,4 +12,5 @@ export const API_ENDPOINTS = {
   posts: '/api/posts/',
   post: '/api/posts/get/',
   createComment: '/api/comment/create/',
+  searchPosts: '/api/query/',
 } as const;

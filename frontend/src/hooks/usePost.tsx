@@ -1,12 +1,31 @@
 import { useState, useEffect } from 'react';
 import { API_BASE_URL, API_ENDPOINTS } from '../config/config';
 
+export interface ApiSearchPost {
+  updated_at: string;
+  post_title: string;
+  slug: string;
+  cover_image: string;
+  short_content: string | any;
+  Author: {
+    username: string;
+    full_name: string;
+    avatar: string;
+  };
+  read_time?: string; // optional
+  Category: {
+    name: string;
+    slug: string;
+  };
+}
+
 export interface ApiPost {
   id: string;
   updated_at: string;
   post_title: string;
   slug: string;
-  conver_image: string;
+  cover_image: string;
+  short_content: string | any;
   author: {
     id: string;
     username: string;
@@ -57,6 +76,24 @@ export interface ApiPostDetail {
   }>;
 }
 
+export interface SearchPost {
+  updated_at: string;
+  post_title: string;
+  slug: string;
+  short_content: string;
+  cover_image: string;
+  author: {
+    username: string;
+    full_name: string;
+    avatar: string;
+  };
+  read_time: string | any;
+  category: {
+    name: string;
+    slug: string;
+  };
+}
+
 export interface Post {
   id: string;
   title: string;
@@ -92,10 +129,10 @@ export interface Post {
   }>;
 }
 
-// Helper function to extract read time number from API string
-const extractReadTime = (readTimeString: string): number => {
+const extractReadTime = (readTimeString?: string): number => {
+  if (typeof readTimeString !== 'string') return 5; // fallback default
   const match = readTimeString.match(/(\d+)/);
-  return match ? parseInt(match[1], 10) : 5; // Default to 5 minutes if no match
+  return match ? parseInt(match[1], 10) : 5;
 };
 
 // Transform API post to internal format
@@ -106,7 +143,7 @@ const transformApiPost = (apiPost: ApiPost): Post => ({
   excerpt: '', // Not available in list API
   shortContent: '', // Not available in list API
   content: '', // Not available in list API
-  coverImage: apiPost.conver_image,
+  coverImage: apiPost.cover_image,
   author: {
     id: apiPost.author.id,
     name: apiPost.author.full_name,
@@ -117,6 +154,24 @@ const transformApiPost = (apiPost: ApiPost): Post => ({
   publishedAt: apiPost.updated_at,
   readTime: extractReadTime(apiPost.read_time),
   isFeatured: apiPost.is_featured,
+});
+
+const transformApiSearchPost = (apiPost: ApiSearchPost): SearchPost => ({
+  post_title: apiPost.post_title,
+  slug: apiPost.slug,
+  short_content: apiPost.short_content,
+  cover_image: apiPost.cover_image,
+  author: {
+    username: apiPost.Author?.username ?? '',
+    full_name: apiPost.Author?.full_name ?? '',
+    avatar: apiPost.Author?.avatar ?? '',
+  },
+  category: {
+    name: apiPost.Category?.name ?? '',
+    slug: apiPost.Category?.slug ?? '',
+  },
+  updated_at: apiPost.updated_at,
+  read_time: extractReadTime(apiPost.read_time), // safe usage now
 });
 
 // Transform API post detail to internal format
@@ -209,4 +264,49 @@ export const usePost = (slug: string) => {
   }, [slug]);
 
   return { post, loading, error };
+};
+
+export const usePostsSearch = (slug: string) => {
+  const [searchResult, setPosts] = useState<Post[]>([]);
+  const [searchLoading, setLoading] = useState(false);
+  const [searchError, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!slug.trim()) {
+      setPosts([]);
+      return;
+    }
+
+    const delayDebounce = setTimeout(() => {
+      const fetchSearchPosts = async () => {
+        try {
+          setLoading(true);
+          const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.searchPosts}?q=${slug}`);
+
+          if (response.status === 404) {
+            setPosts([]);
+            setError(null);
+          }
+
+          if (!response.ok) throw new Error("Failed to fetch posts");
+
+          const data = await response.json();
+          const transformedPosts = data.response.map(transformApiSearchPost);
+          setPosts(transformedPosts);
+          setError(null);
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "An error occurred");
+          setPosts([]);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchSearchPosts();
+    }, 800); // 👈 800ms debounce delay
+
+    return () => clearTimeout(delayDebounce);
+  }, [slug]);
+
+  return { searchResult, searchLoading, searchError };
 };
