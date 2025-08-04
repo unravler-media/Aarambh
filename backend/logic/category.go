@@ -7,7 +7,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
-
 )
 
 // to handle url: GET /api/category/
@@ -22,29 +21,29 @@ func FetchCategory(c *fiber.Ctx) error {
 	}
 
 	type UserResponse struct {
-		ID string
-		username string
-		Avatar string 
-		FullName string
+		ID       string `json:"id"`
+		Username string `json:"username"`
+		Avatar   string `json:"avatar"`
+		FullName string `json:"full_name"`
 	}
 
 	type PostsResponse struct {
-		ID string
-		PostTitle string
-		Slug string
-		CoverImage string
-		Author UserResponse
-		ReadTime string
-		IsFeatured bool
+		ID         string       `json:"id"`
+		PostTitle  string       `json:"post_title"`
+		Slug       string       `json:"slug"`
+		CoverImage string       `json:"cover_image"`
+		Author     UserResponse `json:"author"`
+		ReadTime   string       `json:"read_time"`
+		IsFeatured bool         `json:"is_featured"`
 	}
 
 	// prepare a structure for response
 	type CategoryResponse struct {
-		ID string
-		Name string
-		Slug string
-		Description string
-		Posts []PostsResponse
+		ID          string          `json:"id"`
+		Name        string          `json:"name"`
+		Slug        string          `json:"slug"`
+		Description string          `json:"description"`
+		Posts       []PostsResponse `json:"posts"`
 	}
 
 	// empty variable of list (slice) of category
@@ -52,10 +51,10 @@ func FetchCategory(c *fiber.Ctx) error {
 
 	query_slug := c.Query("slug")
 
-	// db query 
+	// db query
 	categories_fetch := db.Debug().Preload("Posts", func(db *gorm.DB) *gorm.DB {
 		return db.Preload("Author")
-	}).Select("id","updated_at","name","slug","description").Where("slug = ?", query_slug).First(&category)
+	}).Select("id", "updated_at", "name", "slug", "description").Where("slug = ?", query_slug).First(&category)
 	if categories_fetch.RowsAffected < 1 {
 		return c.Status(404).JSON(fiber.Map{
 			"response": "No Categories Exist.",
@@ -71,7 +70,7 @@ func FetchCategory(c *fiber.Ctx) error {
 
 	// Build response
 	var response CategoryResponse
-		// Map posts
+	// Map posts
 	var postsResp []PostsResponse
 	for _, post := range category.Posts {
 		postsResp = append(postsResp, PostsResponse{
@@ -83,7 +82,7 @@ func FetchCategory(c *fiber.Ctx) error {
 			IsFeatured: post.IsFeatured,
 			Author: UserResponse{
 				ID:       post.Author.ID,
-				username: post.Author.Username,
+				Username: post.Author.Username,
 				FullName: post.Author.FullName,
 				Avatar:   post.Author.Avatar,
 			},
@@ -96,7 +95,7 @@ func FetchCategory(c *fiber.Ctx) error {
 		Name:        category.Name,
 		Slug:        category.Slug,
 		Description: category.Description,
-		Posts: postsResp,
+		Posts:       postsResp,
 	}
 
 	return c.JSON(fiber.Map{
@@ -112,10 +111,10 @@ func CreateCategory(c *fiber.Ctx) error {
 			"response": "DB Fucked",
 		})
 	}
-	
+
 	jwtLocale := c.Locals("session_user").(*jwt.Token)
 	token := jwtLocale.Claims.(jwt.MapClaims)
-	
+
 	// parse the incoming request.
 	var category models.Category
 
@@ -127,14 +126,14 @@ func CreateCategory(c *fiber.Ctx) error {
 	}
 
 	// using the auto populated category to Create
-  // Add user id to category
+	// Add user id to category
 	category.UserID = token["sub"].(string) // assert string because token["sub"]
- 	if creation := db.Create(&category); creation.Error != nil {
+	if creation := db.Create(&category); creation.Error != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"response": "Cannot Create the category",
 		})
 	}
-	
+
 	response := make(map[string]string)
 	response["ID"] = category.ID
 	response["Name"] = category.Name
@@ -154,16 +153,18 @@ func FetchCategories(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"response": "DB Fucked.",
 		})
-	}	
+	}
 	type result struct {
-		ID string
-		Name string
-		Slug string
+		ID          string
+		Name        string
+		Slug        string
 		Description string
 	}
 
 	var category []result
-	query_lookup := db.Model(&models.Category{}).Select("id", "name", "slug", "description").Find(&category)
+	query_lookup := db.Model(&models.Category{}).
+		Select("id", "name", "slug", "description").
+		Find(&category)
 
 	if query_lookup.Error != nil {
 		fmt.Println("Error while Fetching Categories: ", query_lookup.Error)
@@ -191,12 +192,12 @@ func UpdateCategory(c *fiber.Ctx) error {
 			"response": "DB Fucked",
 		})
 	}
-	
+
 	// get the user id from the JWT session
 	token := c.Locals("session_user").(*jwt.Token).Claims.(jwt.MapClaims)
 	user_id := token["sub"].(string)
 	category_id := c.Query("category_id")
-	
+
 	// fetch the category in question
 	var category models.Category
 	query := db.Find(&category, "id == ?", category_id)
@@ -225,7 +226,7 @@ func UpdateCategory(c *fiber.Ctx) error {
 	if err := c.BodyParser(&category); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"response": "Invalid Information Provided.",
-		})	
+		})
 	}
 
 	save_query := db.Save(&category)
@@ -247,7 +248,7 @@ func UpdateCategory(c *fiber.Ctx) error {
 }
 
 func DeleteCategory(c *fiber.Ctx) error {
-	// Delete a Category 
+	// Delete a Category
 	db, ok := c.Locals("db").(*gorm.DB)
 	if !ok {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
