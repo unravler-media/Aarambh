@@ -6,10 +6,10 @@ import { getPostsByCategory } from "../../data/posts.ts";
 import { ChevronLeft } from "lucide-react";
 import CommentSection from "../../components/CommentSection";
 import { getCommentsByPostId } from "../../data/comments";
-import PostHeader from "../../components/PostHeader";  
-import PostContent from "../../components/PostContent"; 
-import RelatedPosts from "../../components/RelatedPosts"; 
-import PostSkeleton from "../../components/PostSkeleton";  
+import PostHeader from "../../components/PostHeader";
+import PostContent from "../../components/PostContent";
+import RelatedPosts from "../../components/RelatedPosts";
+import PostSkeleton from "../../components/PostSkeleton";
 import PostFooter from "../../components/PostFooter.tsx";
 
 const Post = () => {
@@ -57,26 +57,26 @@ const Post = () => {
     <Layout>
       <div className="w-full max-w-none overflow-hidden">
         <div className="mb-6">
-          <button 
-            onClick={() => navigate(-1)} 
+          <button
+            onClick={() => navigate(-1)}
             className="inline-flex items-center text-gray-400 hover:text-tech-red transition-colors"
           >
             <ChevronLeft size={16} className="mr-1" />
             Back
           </button>
         </div>
-        
+
         <article className="bg-[#0F1013] rounded-xl overflow-hidden mb-8 w-full">
           <div className="w-full overflow-hidden">
-            <img 
-              src={post.coverImage}
+            <img
+              src={post.cover_image}
               alt={post.title}
               className="w-full h-auto object-cover max-h-[250px] sm:max-h-[300px] md:max-h-[400px] lg:max-h-[450px]"
             />
           </div>
-          
+
           <div className="p-3 sm:p-4 md:p-6 lg:p-8 w-full overflow-hidden">
-            <PostHeader 
+            <PostHeader
               title={post.title}
               categoryName="" // Category name will be handled differently with API
               shortContent={post.shortContent}
@@ -84,20 +84,20 @@ const Post = () => {
               publishedAt={post.publishedAt}
               readTime={post.readTime}
             />
-            
+
             <PostContent content={post.content} />
-            
+
             <PostFooter author={post.author} />
           </div>
         </article>
-        
+
         {/* Comment Section */}
         <div className="bg-[#0F1013] rounded-xl overflow-hidden mb-8 w-full">
           <div className="p-3 sm:p-4 md:p-6 lg:p-8 w-full overflow-hidden">
             <CommentSection postId={post.id} comments={comments} />
           </div>
         </div>
-        
+
         {/* More Articles Section */}
         <RelatedPosts posts={relatedPosts} />
       </div>
