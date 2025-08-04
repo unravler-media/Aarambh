@@ -11,7 +11,6 @@ interface SearchPostCardProps {
 const SearchPostCard = ({ post, className, variant = "default" }: SearchPostCardProps) => {
   const isCompact = variant === "compact";
 
-  console.log(post);
   // Generate avatar fallback using first name initial
   const getAvatarFallback = (name: string) => {
     const initial = name.split(' ')[0]?.charAt(0)?.toUpperCase() || 'U';
@@ -55,13 +54,6 @@ const SearchPostCard = ({ post, className, variant = "default" }: SearchPostCard
               className="h-7 w-7 rounded-full mr-2"
             />
             <span className="text-xs font-medium text-white">{post.author.full_name}</span>
-          </div>
-
-          <div className="flex items-center text-xs text-gray-400">
-            <div className="flex items-center">
-              <Calendar size={12} className="mr-1" />
-              <span>{post.updated_at}</span>
-            </div>
           </div>
         </div>
       </div>

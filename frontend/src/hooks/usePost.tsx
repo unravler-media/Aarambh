@@ -98,13 +98,12 @@ export interface Post {
   id: string;
   title: string;
   slug: string;
-  excerpt: string;
-  shortContent: string;
-  content: string;
+  short_content: string;
+  content?: string;
   cover_image: string;
   author: {
     id: string;
-    name: string;
+    full_name: string;
     avatar: string;
   };
   category?: {
@@ -113,7 +112,7 @@ export interface Post {
     slug: string;
   };
   categoryId: string;
-  publishedAt: string;
+  updated_at: string;
   readTime: number;
   isFeatured: boolean;
   comments?: Array<{
@@ -140,18 +139,16 @@ const transformApiPost = (apiPost: ApiPost): Post => ({
   id: apiPost.id,
   title: apiPost.post_title,
   slug: apiPost.slug,
-  excerpt: '', // Not available in list API
-  shortContent: '', // Not available in list API
-  content: '', // Not available in list API
+  short_content: apiPost.short_content, // Not available in list API
   cover_image: apiPost.cover_image,
   author: {
     id: apiPost.author.id,
-    name: apiPost.author.full_name,
+    full_name: apiPost.author.full_name,
     avatar: apiPost.author.avatar,
   },
   category: apiPost.category,
   categoryId: apiPost.category.id,
-  publishedAt: apiPost.updated_at,
+  updated_at: apiPost.updated_at,
   readTime: extractReadTime(apiPost.read_time),
   isFeatured: apiPost.is_featured,
 });
@@ -179,18 +176,17 @@ const transformApiPostDetail = (apiPost: ApiPostDetail): Post => ({
   id: apiPost.ID,
   title: apiPost.PostTitle,
   slug: apiPost.Slug,
-  excerpt: apiPost.ShortContent,
-  shortContent: apiPost.ShortContent,
+  short_content: apiPost.ShortContent,
   content: apiPost.Content,
   cover_image: apiPost.cover_image,
   author: {
     id: apiPost.Author.id,
-    name: apiPost.Author.full_name,
+    full_name: apiPost.Author.full_name,
     avatar: apiPost.Author.avatar,
   },
   category: apiPost.Category,
   categoryId: apiPost.Category.id,
-  publishedAt: apiPost.UpdatedAt,
+  updated_at: apiPost.UpdatedAt,
   readTime: 5, // Default read time for detail API
   isFeatured: false, // Not available in detail API
   comments: apiPost.Comments?.map(comment => ({

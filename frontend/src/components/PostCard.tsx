@@ -41,25 +41,24 @@ const PostCard = ({ post, className, variant = "default" }: PostCardProps) => {
         )}>
           {post.title}
         </h2>
-
         {!isCompact && (
-          <p className="text-gray-400 text-sm line-clamp-2 mb-4">{post.shortContent}</p>
+          <p className="text-gray-400 text-sm line-clamp-2 mb-4">{post.short_content}</p>
         )}
 
         <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#222]">
           <div className="flex items-center">
             <img
-              src={post.author.avatar || getAvatarFallback(post.author.name)}
-              alt={post.author.name}
+              src={post.author.avatar || getAvatarFallback(post.author.full_name)}
+              alt={post.author.full_name}
               className="h-7 w-7 rounded-full mr-2"
             />
-            <span className="text-xs font-medium text-white">{post.author.name}</span>
+            <span className="text-xs font-medium text-white">{post.author.full_name}</span>
           </div>
 
           <div className="flex items-center text-xs text-gray-400">
             <div className="flex items-center">
               <Calendar size={12} className="mr-1" />
-              <span>{post.publishedAt}</span>
+              <span>{post.updated_at}</span>
             </div>
           </div>
         </div>

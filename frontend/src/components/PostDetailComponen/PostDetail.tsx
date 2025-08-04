@@ -79,9 +79,9 @@ const Post = () => {
             <PostHeader
               title={post.title}
               categoryName="" // Category name will be handled differently with API
-              shortContent={post.shortContent}
+              shortContent={post.short_content}
               author={post.author}
-              publishedAt={post.publishedAt}
+              updated_at={post.updated_at}
               readTime={post.readTime}
             />
 

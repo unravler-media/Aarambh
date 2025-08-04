@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Layout from "../../components/layout.tsx";
 import CategoryHeader from "../../components/CategoryHeader";
-import PostCard from "../../components/PostCard";
+import SearchPostCard from "../../components/SearchPostCard.tsx";
 import { API_BASE_URL } from "../../config/config.ts";
 
 // Helper function to extract read time number from API string
@@ -15,11 +15,14 @@ interface CategoryData {
   name: string;
   slug: string;
   description: string;
+  updated_at: string;
   posts: Array<{
     id: string;
     post_title: string;
     slug: string;
     cover_image: string;
+    updated_at: string;
+    short_content?: string
     author: {
       id: string;
       avatar: string;
@@ -116,23 +119,21 @@ const Category = () => {
   // Transform posts to match PostCard expectations - handle null Posts
   const transformedPosts = (categoryData.posts || []).map(post => ({
     id: post.id,
-    title: post.post_title,
+    post_title: post.post_title,
     slug: post.slug,
-    excerpt: "", // Not provided in API response
-    shortContent: "", // Not provided in API response
+    short_content: post.short_content, // Not provided in API response
     content: "", // Not provided in API response
-    date: "", // Not provided in API response
-    publishedAt: "", // Not provided in API response
+    updated_at: post.updated_at,
     readTime: extractReadTime(post.read_time),
     author: {
-      name: post.author.full_name,
+      full_name: post.author.full_name,
       avatar: post.author.avatar || "",
       id: post.author.id
     },
     category: categoryForHeader,
     categoryId: categoryData.id,
     featuredImage: post.cover_image,
-    coverImage: post.cover_image,
+    cover_image: post.cover_image,
     featured: post.is_featured,
     isFeatured: post.is_featured,
     tags: [] // Not provided in API response
@@ -145,7 +146,7 @@ const Category = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           {transformedPosts.map(post => (
-            <a href={`/posts/${post.slug}`}><PostCard key={post.id} post={post} /></a>
+            <a href={`/posts/${post.slug}`}><SearchPostCard key={post.id} post={post} /></a>
           ))}
         </div>
 
