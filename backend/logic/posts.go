@@ -11,30 +11,30 @@ import (
 
 // added just so we can reuse this response struct in this file alone.
 type UserResponse struct {
-	ID string `json:"id"`
+	ID       string `json:"id"`
 	Username string `json:"username"`
 	FullName string `json:"full_name"`
-	Avatar string `json:"avatar"`
-	Role string `json:"role"`
+	Avatar   string `json:"avatar"`
+	Role     string `json:"role"`
 }
 
 type postsResponse struct {
-	ID string `json:"id"`
-	UpdatedAt string `json:"updated_at"`
-	PostTitle string `json:"post_title" gorm:"index" validate:"required,min=4"`
-	Slug string `json:"slug"`
-	CoverImage string `json:"conver_image"`
-	Author UserResponse `json:"author"`
-	ReadTime string `json:"read_time"`
-	IsFeatured bool `json:"is_featured"`
-	Category categoryResponse `json:"category"`
+	ID         string           `json:"id"`
+	UpdatedAt  string           `json:"updated_at"`
+	PostTitle  string           `json:"post_title"  gorm:"index" validate:"required,min=4"`
+	Slug       string           `json:"slug"`
+	CoverImage string           `json:"cover_image"`
+	Author     UserResponse     `json:"author"`
+	ReadTime   string           `json:"read_time"`
+	IsFeatured bool             `json:"is_featured"`
+	Category   categoryResponse `json:"category"`
 }
 
 type categoryResponse struct {
-	ID string `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 	Slug string `json:"slug"`
-} 
+}
 
 func FetchPosts(c *fiber.Ctx) error {
 	db, ok := c.Locals("db").(*gorm.DB)
@@ -45,7 +45,11 @@ func FetchPosts(c *fiber.Ctx) error {
 	}
 
 	var posts []models.Post
-	query := db.Debug().Preload("Author").Preload("Category").Select("id","post_title","slug","cover_image","read_time","is_featured","updated_at","author_id","category_id").Find(&posts)
+	query := db.Debug().
+		Preload("Author").
+		Preload("Category").
+		Select("id", "post_title", "slug", "cover_image", "read_time", "is_featured", "updated_at", "author_id", "category_id").
+		Find(&posts)
 
 	if query.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -61,24 +65,24 @@ func FetchPosts(c *fiber.Ctx) error {
 
 	var response []postsResponse
 
-  for _, p := range posts {
-  	response = append(response, postsResponse{
+	for _, p := range posts {
+		response = append(response, postsResponse{
 			ID:         p.ID,
-      UpdatedAt:  p.UpdatedAt,
-      PostTitle:  p.PostTitle,
-      Slug:       p.Slug,
-      CoverImage: p.CoverImage,
-      ReadTime:   p.ReadTime,
-      IsFeatured: p.IsFeatured,
-      Author: UserResponse{
+			UpdatedAt:  p.UpdatedAt,
+			PostTitle:  p.PostTitle,
+			Slug:       p.Slug,
+			CoverImage: p.CoverImage,
+			ReadTime:   p.ReadTime,
+			IsFeatured: p.IsFeatured,
+			Author: UserResponse{
 				ID:       p.Author.ID,
-        Username: p.Author.Username,
-        FullName: p.Author.FullName,
-        Avatar:   p.Author.Avatar,
-        Role:     p.Author.Role,
+				Username: p.Author.Username,
+				FullName: p.Author.FullName,
+				Avatar:   p.Author.Avatar,
+				Role:     p.Author.Role,
 			},
 			Category: categoryResponse{
-				ID: p.Category.ID,
+				ID:   p.Category.ID,
 				Name: p.Category.Name,
 				Slug: p.Category.Slug,
 			},
@@ -87,7 +91,7 @@ func FetchPosts(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{
 		"response": response,
-	}) 
+	})
 }
 
 func FetchPost(c *fiber.Ctx) error {
@@ -101,7 +105,12 @@ func FetchPost(c *fiber.Ctx) error {
 	post_slug := c.Query("post")
 
 	var post models.Post
-	query := db.Preload("Author").Preload("Category").Preload("Comments").Preload("Comments.Author").Where("slug = ?", post_slug).First(&post)
+	query := db.Preload("Author").
+		Preload("Category").
+		Preload("Comments").
+		Preload("Comments.Author").
+		Where("slug = ?", post_slug).
+		First(&post)
 	if query.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"response": "Cannot Get the Post.",
@@ -115,34 +124,32 @@ func FetchPost(c *fiber.Ctx) error {
 	}
 
 	type commentsResponse struct {
-		ID string
-		UpdatedAt string
-		Author UserResponse
+		ID          string
+		UpdatedAt   string
+		Author      UserResponse
 		CommentText string
 	}
 
 	type postResponse struct {
-		ID string
-		UpdatedAt string
-		PostTitle string
-		Slug string
+		ID           string
+		UpdatedAt    string
+		PostTitle    string
+		Slug         string
 		ShortContent string
-		Content string
-		CoverImage string
-		Author UserResponse
-		Category categoryResponse
-		Comments []commentsResponse
+		Content      string
+		CoverImage   string
+		Author       UserResponse
+		Category     categoryResponse
+		Comments     []commentsResponse
 	}
-
-
 
 	// Transform comments
 	var transformedComments []commentsResponse
 	for _, comment := range post.Comments {
 		transformedComments = append(transformedComments, commentsResponse{
-			ID:        comment.ID,
-			UpdatedAt: comment.UpdatedAt,
-			CommentText:   comment.CommentText,
+			ID:          comment.ID,
+			UpdatedAt:   comment.UpdatedAt,
+			CommentText: comment.CommentText,
 			Author: UserResponse{
 				ID:       comment.Author.ID,
 				Username: comment.Author.Username,
@@ -155,22 +162,22 @@ func FetchPost(c *fiber.Ctx) error {
 
 	var response postResponse
 	response = postResponse{
-		ID: post.ID,
-		UpdatedAt: post.UpdatedAt,
-		PostTitle: post.PostTitle,
-		Slug: post.Slug,
+		ID:           post.ID,
+		UpdatedAt:    post.UpdatedAt,
+		PostTitle:    post.PostTitle,
+		Slug:         post.Slug,
 		ShortContent: post.ShortContent,
-		Content: post.Content,
-		CoverImage: post.CoverImage,
+		Content:      post.Content,
+		CoverImage:   post.CoverImage,
 		Author: UserResponse{
-			ID: post.Author.ID,
+			ID:       post.Author.ID,
 			Username: post.Author.Username,
 			FullName: post.Author.FullName,
-			Avatar: post.Author.Avatar,
-			Role: post.Author.Role,
+			Avatar:   post.Author.Avatar,
+			Role:     post.Author.Role,
 		},
 		Category: categoryResponse{
-			ID: post.Category.ID,
+			ID:   post.Category.ID,
 			Name: post.Category.Name,
 			Slug: post.Category.Slug,
 		},
@@ -189,7 +196,7 @@ func CreatePost(c *fiber.Ctx) error {
 			"response": "DB Fucked",
 		})
 	}
-	
+
 	// extracting information from the token and decoding it and storing it inside the token var
 	fmt.Println("Session User", c.Locals("session_user"))
 	session_user := c.Locals("session_user")
@@ -284,7 +291,7 @@ func UpdatePost(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"response": "Unauthrised Action.",
 		})
-	} 
+	}
 
 	if err := c.BodyParser(&post); err != nil {
 		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -332,7 +339,7 @@ func DeletePost(c *fiber.Ctx) error {
 
 	var post models.Post
 	fetch_post := db.First(&post, "slug = ?", post_slug)
-	
+
 	if fetch_post.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"response": "Unable to perform Query.",
