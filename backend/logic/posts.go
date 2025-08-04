@@ -137,7 +137,7 @@ func FetchPost(c *fiber.Ctx) error {
 		Slug         string
 		ShortContent string
 		Content      string
-		CoverImage   string
+		CoverImage   string `json:"cover_image"`
 		Author       UserResponse
 		Category     categoryResponse
 		Comments     []commentsResponse
