@@ -11,22 +11,22 @@ const extractReadTime = (readTimeString: string): number => {
 };
 
 interface CategoryData {
-  ID: string;
-  Name: string;
-  Slug: string;
-  Description: string;
-  Posts: Array<{
-    ID: string;
-    PostTitle: string;
-    Slug: string;
-    CoverImage: string;
-    Author: {
-      ID: string;
-      Avatar: string;
-      FullName: string;
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  posts: Array<{
+    id: string;
+    post_title: string;
+    slug: string;
+    cover_image: string;
+    author: {
+      id: string;
+      avatar: string;
+      full_name: string;
     };
-    ReadTime: string;
-    IsFeatured: boolean;
+    read_time: string;
+    is_featured: boolean;
   }> | null;
 }
 
@@ -40,7 +40,7 @@ const Category = () => {
   const [categoryData, setCategoryData] = useState<CategoryData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   useEffect(() => {
     if (!slug) {
       window.location.href = "/not-found"
@@ -52,7 +52,7 @@ const Category = () => {
       try {
         setIsLoading(true);
         const response = await fetch(`${API_BASE_URL}/api/category/get?slug=${slug}`);
-        
+
         if (!response.ok) {
           if (response.status === 404) {
             window.location.href = "/not-found"
@@ -61,7 +61,7 @@ const Category = () => {
           }
           throw new Error('Failed to fetch category');
         }
-        
+
         const data: CategoryResponse = await response.json();
         setCategoryData(data.response);
       } catch (err) {
@@ -106,35 +106,35 @@ const Category = () => {
 
   // Transform the category data to match the expected format
   const categoryForHeader = {
-    id: categoryData.ID,
-    name: categoryData.Name,
-    slug: categoryData.Slug,
-    description: categoryData.Description,
-    postCount: categoryData.Posts?.length || 0
+    id: categoryData.id,
+    name: categoryData.name,
+    slug: categoryData.slug,
+    description: categoryData.description,
+    postCount: categoryData.posts?.length || 0
   };
 
   // Transform posts to match PostCard expectations - handle null Posts
-  const transformedPosts = (categoryData.Posts || []).map(post => ({
-    id: post.ID,
-    title: post.PostTitle,
-    slug: post.Slug,
+  const transformedPosts = (categoryData.posts || []).map(post => ({
+    id: post.id,
+    title: post.post_title,
+    slug: post.slug,
     excerpt: "", // Not provided in API response
     shortContent: "", // Not provided in API response
     content: "", // Not provided in API response
     date: "", // Not provided in API response
     publishedAt: "", // Not provided in API response
-    readTime: extractReadTime(post.ReadTime),
+    readTime: extractReadTime(post.read_time),
     author: {
-      name: post.Author.FullName,
-      avatar: post.Author.Avatar || "",
-      id: post.Author.ID
+      name: post.author.full_name,
+      avatar: post.author.avatar || "",
+      id: post.author.id
     },
     category: categoryForHeader,
-    categoryId: categoryData.ID,
-    featuredImage: post.CoverImage,
-    coverImage: post.CoverImage,
-    featured: post.IsFeatured,
-    isFeatured: post.IsFeatured,
+    categoryId: categoryData.id,
+    featuredImage: post.cover_image,
+    coverImage: post.cover_image,
+    featured: post.is_featured,
+    isFeatured: post.is_featured,
     tags: [] // Not provided in API response
   }));
 
@@ -142,13 +142,13 @@ const Category = () => {
     <Layout>
       <div className="max-w-7xl mx-auto px-4 py-8">
         <CategoryHeader category={categoryForHeader} />
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           {transformedPosts.map(post => (
             <a href={`/posts/${post.slug}`}><PostCard key={post.id} post={post} /></a>
           ))}
         </div>
-        
+
         {transformedPosts.length === 0 && (
           <div className="text-center py-12 bg-[#1A1B22] rounded-xl border border-[#2A2C36] mt-8">
             <h3 className="text-xl font-medium mb-2 text-white">No articles found</h3>
