@@ -19,15 +19,16 @@ type UserResponse struct {
 }
 
 type postsResponse struct {
-	ID         string           `json:"id"`
-	UpdatedAt  string           `json:"updated_at"`
-	PostTitle  string           `json:"post_title"  gorm:"index" validate:"required,min=4"`
-	Slug       string           `json:"slug"`
-	CoverImage string           `json:"cover_image"`
-	Author     UserResponse     `json:"author"`
-	ReadTime   string           `json:"read_time"`
-	IsFeatured bool             `json:"is_featured"`
-	Category   categoryResponse `json:"category"`
+	ID           string           `json:"id"`
+	UpdatedAt    string           `json:"updated_at"`
+	PostTitle    string           `json:"post_title"    gorm:"index" validate:"required,min=4"`
+	Slug         string           `json:"slug"`
+	CoverImage   string           `json:"cover_image"`
+	Author       UserResponse     `json:"author"`
+	ReadTime     string           `json:"read_time"`
+	IsFeatured   bool             `json:"is_featured"`
+	Category     categoryResponse `json:"category"`
+	ShortContent string           `json:"short_content"`
 }
 
 type categoryResponse struct {
@@ -48,7 +49,7 @@ func FetchPosts(c *fiber.Ctx) error {
 	query := db.Debug().
 		Preload("Author").
 		Preload("Category").
-		Select("id", "post_title", "slug", "cover_image", "read_time", "is_featured", "updated_at", "author_id", "category_id").
+		Select("id", "post_title", "slug", "cover_image", "read_time", "is_featured", "updated_at", "author_id", "category_id", "short_content").
 		Find(&posts)
 
 	if query.Error != nil {
@@ -67,13 +68,14 @@ func FetchPosts(c *fiber.Ctx) error {
 
 	for _, p := range posts {
 		response = append(response, postsResponse{
-			ID:         p.ID,
-			UpdatedAt:  p.UpdatedAt,
-			PostTitle:  p.PostTitle,
-			Slug:       p.Slug,
-			CoverImage: p.CoverImage,
-			ReadTime:   p.ReadTime,
-			IsFeatured: p.IsFeatured,
+			ID:           p.ID,
+			UpdatedAt:    p.UpdatedAt,
+			PostTitle:    p.PostTitle,
+			Slug:         p.Slug,
+			CoverImage:   p.CoverImage,
+			ReadTime:     p.ReadTime,
+			IsFeatured:   p.IsFeatured,
+			ShortContent: p.ShortContent,
 			Author: UserResponse{
 				ID:       p.Author.ID,
 				Username: p.Author.Username,

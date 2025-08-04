@@ -28,13 +28,14 @@ func FetchCategory(c *fiber.Ctx) error {
 	}
 
 	type PostsResponse struct {
-		ID         string       `json:"id"`
-		PostTitle  string       `json:"post_title"`
-		Slug       string       `json:"slug"`
-		CoverImage string       `json:"cover_image"`
-		Author     UserResponse `json:"author"`
-		ReadTime   string       `json:"read_time"`
-		IsFeatured bool         `json:"is_featured"`
+		ID           string       `json:"id"`
+		PostTitle    string       `json:"post_title"`
+		Slug         string       `json:"slug"`
+		CoverImage   string       `json:"cover_image"`
+		Author       UserResponse `json:"author"`
+		ReadTime     string       `json:"read_time"`
+		IsFeatured   bool         `json:"is_featured"`
+		ShortContent string       `json:"short_content"`
 	}
 
 	// prepare a structure for response
@@ -74,12 +75,13 @@ func FetchCategory(c *fiber.Ctx) error {
 	var postsResp []PostsResponse
 	for _, post := range category.Posts {
 		postsResp = append(postsResp, PostsResponse{
-			ID:         post.ID,
-			PostTitle:  post.PostTitle,
-			Slug:       post.Slug,
-			CoverImage: post.CoverImage,
-			ReadTime:   post.ReadTime,
-			IsFeatured: post.IsFeatured,
+			ID:           post.ID,
+			PostTitle:    post.PostTitle,
+			Slug:         post.Slug,
+			CoverImage:   post.CoverImage,
+			ReadTime:     post.ReadTime,
+			IsFeatured:   post.IsFeatured,
+			ShortContent: post.ShortContent,
 			Author: UserResponse{
 				ID:       post.Author.ID,
 				Username: post.Author.Username,
