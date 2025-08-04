@@ -49,7 +49,7 @@ export interface ApiPostDetail {
   Slug: string;
   ShortContent: string;
   Content: string;
-  CoverImage: string;
+  cover_image: string;
   Author: {
     id: string;
     username: string;
@@ -101,7 +101,7 @@ export interface Post {
   excerpt: string;
   shortContent: string;
   content: string;
-  coverImage: string;
+  cover_image: string;
   author: {
     id: string;
     name: string;
@@ -143,7 +143,7 @@ const transformApiPost = (apiPost: ApiPost): Post => ({
   excerpt: '', // Not available in list API
   shortContent: '', // Not available in list API
   content: '', // Not available in list API
-  coverImage: apiPost.cover_image,
+  cover_image: apiPost.cover_image,
   author: {
     id: apiPost.author.id,
     name: apiPost.author.full_name,
@@ -182,7 +182,7 @@ const transformApiPostDetail = (apiPost: ApiPostDetail): Post => ({
   excerpt: apiPost.ShortContent,
   shortContent: apiPost.ShortContent,
   content: apiPost.Content,
-  coverImage: apiPost.CoverImage,
+  cover_image: apiPost.cover_image,
   author: {
     id: apiPost.Author.id,
     name: apiPost.Author.full_name,
