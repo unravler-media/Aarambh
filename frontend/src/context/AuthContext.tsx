@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../config/config';
 
 export type UserRole = 'admin' | 'creator' | 'member';
@@ -36,7 +35,6 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
@@ -65,12 +63,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const data = await response.json();
     const responseData = data.response;
-    
-    console.log('Login response:', responseData); // Debug log
-    
+
     // Store token in localStorage
     localStorage.setItem('authToken', responseData.token);
-    
+
     // Create user object from response
     const user: User = {
       id: responseData.id,
@@ -81,15 +77,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       avatar: responseData.avatar,
       joinedAt: new Date().toISOString(),
     };
-    
-    console.log('Storing user:', user); // Debug log
+
     setUser(user);
     localStorage.setItem('user', JSON.stringify(user));
     // navigate('/'); used for react only.
     window.location.href = "/";
   };
 
-  const register = async (name: string, username: string, email: string, password: string, role: UserRole) => {
+  const register = async (name: string, username: string, email: string, password: string) => {
     const response = await fetch(`${API_BASE_URL}/api/auth/register/`, {
       method: 'POST',
       headers: {

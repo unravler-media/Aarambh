@@ -1,5 +1,5 @@
 import { BookOpen, Grid2X2, Search, Book, Hash, LogIn, UserPlus, User, ChevronDown, ChevronUp } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
@@ -15,7 +15,7 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
   const { user, logout } = useAuth();
   const { categories, loading, error } = categoriesData;
   const [showAllCategories, setShowAllCategories] = useState(false);
-  
+
   const isActiveRoute = (path: string) => {
     if (path === "/" && location.pathname === "/") {
       return true;
@@ -66,7 +66,7 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
 
           <div>
             <h2 className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-5 pl-3">Categories</h2>
-            
+
             {loading ? (
               <div className="space-y-2">
                 {[1, 2, 3, 4].map(i => (
@@ -77,25 +77,25 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
               <div className="text-red-400 text-sm px-3">Failed to load categories</div>
             ) : (
               <div className="relative">
-                 <ul className="space-y-2">
-                   {(Array.isArray(categories) ? categories : [])
-                     .slice(0, showAllCategories ? categories.length : 4)
-                     .map(category => (
-                    <li key={category.ID}>
-                      <a 
-                        href={`/category/${category.Slug || category.Name.toLowerCase()}`} 
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", 
-                          isActiveRoute(`/category/${category.Slug || category.Name.toLowerCase()}`) && "bg-[#151619] text-white font-medium shadow-sm"
-                        )}
-                      >
-                        <Hash size={18} strokeWidth={2.5} />
-                        <span>{category.Name}</span>
-                      </a>
-                    </li>
-                  ))}
+                <ul className="space-y-2">
+                  {(Array.isArray(categories) ? categories : [])
+                    .slice(0, showAllCategories ? categories.length : 4)
+                    .map(category => (
+                      <li key={category.ID}>
+                        <a
+                          href={`/category/${category.Slug || category.Name.toLowerCase()}`}
+                          className={cn(
+                            "flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all",
+                            isActiveRoute(`/category/${category.Slug || category.Name.toLowerCase()}`) && "bg-[#151619] text-white font-medium shadow-sm"
+                          )}
+                        >
+                          <Hash size={18} strokeWidth={2.5} />
+                          <span>{category.Name}</span>
+                        </a>
+                      </li>
+                    ))}
                 </ul>
-                
+
                 {categories.length > 4 && (
                   <div className="mt-2">
                     {!showAllCategories ? (
@@ -144,7 +144,7 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
                 </>
               ) : (
                 <li>
-                  <button 
+                  <button
                     onClick={handleLogout}
                     className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all w-full text-left"
                   >
