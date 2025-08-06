@@ -33,7 +33,7 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
   return (
     <aside className="bg-[#090A0E] border-r border-[#1A1B22] w-64 min-h-screen hidden md:block fixed left-0 top-0 overflow-y-auto">
       <div className="p-6">
-        <a href="/" className="flex items-center mb-12 group">
+        <a href="/" onClick={e => { e.preventDefault(), window.location.href = "/" }} className="flex items-center mb-12 group">
           <h1 className="text-2xl font-bold ml-3 text-white">Aarambh.</h1>
         </a>
 
@@ -42,20 +42,20 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
             <h2 className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-5 pl-3">Main</h2>
             <ul className="space-y-2">
               <li>
-                <a href="/" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/") && "bg-[#151619] text-white font-medium shadow-sm")}>
+                <a href="/" onClick={e => { e.preventDefault(), window.location.href = "/" }} className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/") && "bg-[#151619] text-white font-medium shadow-sm")}>
                   <Grid2X2 size={18} strokeWidth={2.5} />
                   <span>Home</span>
                 </a>
               </li>
               <li>
-                <a href="search" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/search") && "bg-[#151619] text-white font-medium shadow-sm")}>
+                <a href="search" onClick={e => { e.preventDefault(), window.location.href = "/search" }} className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/search") && "bg-[#151619] text-white font-medium shadow-sm")}>
                   <Search size={18} strokeWidth={2.5} />
                   <span>Search</span>
                 </a>
               </li>
               {user && (
                 <li>
-                  <a href="`dashboard" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/dashboard") && "bg-[#151619] text-white font-medium shadow-sm")}>
+                  <a href="dashboard" onClick={e => { e.preventDefault(), window.location.href = "/dashboard" }} className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/dashboard") && "bg-[#151619] text-white font-medium shadow-sm")}>
                     <User size={18} strokeWidth={2.5} />
                     <span>Dashboard</span>
                   </a>
@@ -83,10 +83,11 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
                     .map(category => (
                       <li key={category.ID}>
                         <a
-                          href={`category/${category.Slug || category.Name.toLowerCase()}`}
+                          href={`category/${category.Slug}`}
+                          onClick={e => { e.preventDefault(), window.location.href = `category/${category.Slug}` }}
                           className={cn(
                             "flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all",
-                            isActiveRoute(`category/${category.Slug || category.Name.toLowerCase()}`) && "bg-[#151619] text-white font-medium shadow-sm"
+                            isActiveRoute(`category/${category.Slug}`) && "bg-[#151619] text-white font-medium shadow-sm"
                           )}
                         >
                           <Hash size={18} strokeWidth={2.5} />
@@ -130,13 +131,13 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
               {!user ? (
                 <>
                   <li>
-                    <a href="login" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/login") && "bg-[#151619] text-white font-medium shadow-sm")}>
+                    <a href="login" onClick={e => { e.preventDefault(), window.location.href = "/login" }} className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/login") && "bg-[#151619] text-white font-medium shadow-sm")}>
                       <LogIn size={18} strokeWidth={2.5} />
                       <span>Login</span>
                     </a>
                   </li>
                   <li>
-                    <a href="register" className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/register") && "bg-[#151619] text-white font-medium shadow-sm")}>
+                    <a href="register" onClick={e => { e.preventDefault(), window.location.href = "/register" }} className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/register") && "bg-[#151619] text-white font-medium shadow-sm")}>
                       <UserPlus size={18} strokeWidth={2.5} />
                       <span>Register</span>
                     </a>
