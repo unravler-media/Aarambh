@@ -3,15 +3,11 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/go-playground/validator/v10"
 	gojson "github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cache"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/gofiber/fiber/v2/utils"
-	"github.com/gofiber/storage/redis/v3"
 	"github.com/joho/godotenv"
 
 	"backend/databases"
@@ -20,7 +16,7 @@ import (
 
 func main() {
 	// To Ensure loading of .env files. (dont need this in serverless environments)
-	err := godotenv.Load()
+	err := godotenv.Load(".env")
 	if err != nil {
 		fmt.Println("Something went wrong while importing ENV Variables.")
 	}
@@ -48,8 +44,7 @@ func main() {
 	}))
 
 	// adding validator globally to reuse later in project
-	var validate *validator.Validate
-	validate = validator.New(validator.WithRequiredStructEnabled())
+	var validate = validator.New(validator.WithRequiredStructEnabled())
 
 	// Using in the fiber middleware to initiate & validator
 	app.Use(func(c *fiber.Ctx) error {
@@ -60,25 +55,28 @@ func main() {
 	// adding database middleware to reuse globally
 	app.Use(databases.InjectDatabase(database))
 
+	// Using custom Caching solution
+	// app.Use(middlewares.CacheRequests(5 * time.Minute))
+	fmt.Println(os.Getenv("REDIS_URL"))
 	// Implement Default In-Memory Caching
 
 	// gonna use Redis as storage for caching.
-	store := redis.New(redis.Config{
-		URL:   os.Getenv("REDIS_URL"),
-		Reset: false,
-	})
-
-	app.Use(cache.New(cache.Config{
-		Next: func(c *fiber.Ctx) bool {
-			return c.Query("noCache") == "true"
-		},
-		Expiration:   1 * time.Minute, // Cache Timeout set to 1 Minutes.
-		CacheControl: true,
-		Storage:      store,
-		KeyGenerator: func(c *fiber.Ctx) string {
-			return utils.CopyString(c.OriginalURL())
-		},
-	}))
+	// store := redis.New(redis.Config{
+	// 	URL:   os.Getenv("REDIS_URL"),
+	// 	Reset: false,
+	// })
+	//
+	// app.Use(cache.New(cache.Config{
+	// 	Next: func(c *fiber.Ctx) bool {
+	// 		return c.Query("noCache") == "true"
+	// 	},
+	// 	Expiration:   1 * time.Minute, // Cache Timeout set to 1 Minutes.
+	// 	CacheControl: true,
+	// 	Storage:      store,
+	// 	KeyGenerator: func(c *fiber.Ctx) string {
+	// 		return utils.CopyString(c.OriginalURL())
+	// 	},
+	// }))
 
 	// using Routes Grouping for a better DX (Developer Experience)
 	routes.ApiRoutes(app.Group("/api"))
