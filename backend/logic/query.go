@@ -57,7 +57,7 @@ func QueryPosts(c *fiber.Ctx) error {
 		"cover_image",
 		"author_id",
 		"category_id",
-	).Where("slug LIKE ?", query).Find(&posts)
+	).Where("slug LIKE ?", "%"+query+"%").Find(&posts)
 
 	if fetch_query.Error != nil {
 		fmt.Printf("ERror in Query: %v", fetch_query)
