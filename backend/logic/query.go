@@ -45,9 +45,9 @@ func QueryPosts(c *fiber.Ctx) error {
 
 	var posts []models.Post
 	fetch_query := db.Debug().Preload("Author", func(db *gorm.DB) *gorm.DB {
-		return db.Select("id", "username", "full_name", "avatar")
+		return db.Select("id", "username", "full_name", "avatar").Distinct()
 	}).Preload("Category", func(db *gorm.DB) *gorm.DB {
-		return db.Select("id", "name", "slug")
+		return db.Select("id", "name", "slug").Distinct()
 	}).Select(
 		"id",
 		"updated_at",
