@@ -1,8 +1,10 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import Category from "@/components/CategoryComponent/CategoryWithProvider";
+import AstroCategory from "@/components/CategoryComponent/AstroCategory.astro";
+import Category from "@/components/CategoryComponent/Category.tsx";
 ---
 
 <BaseLayout>
-  <Category client:only />
+  <Category client:only="react" />
+  <!-- <AstroCategory /> -->
 </BaseLayout>

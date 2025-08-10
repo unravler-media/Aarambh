@@ -1,8 +1,8 @@
 ---
 const { title = "Aarambh - by unravler media." } = Astro.props;
-import "../styles/starwind.css";
-// import "../styles/global.css";
-import "../styles/custom.css";
+// import "../styles/starwind.css";
+import "../styles/global.css";
+// import "../index.css";
 ---
 
 <html lang="en">
@@ -14,6 +14,16 @@ import "../styles/custom.css";
     <title>{title}</title>
   </head>
   <body>
-    <slot />
+    <!-- <div class="flex min-h-screen bg-[#0A0B0F] overflow-hidden" > -->
+      <!-- TODO: Add Main Sidebar component here -->
+      <!-- TODO: Add the mobile sidebar component here -->
+      <!-- <main class="flex-1 w-full md:ml-64 mt-14 md:mt-0 transition-all duration-300 overflow-hidden"> -->
+      <!--   <div class="container px-3 sm:px-4 md:px-4 lg:px-6 py-4 sm:py-6 mx-auto max-w-5xl lg:max-w-6xl xl:max-w-7xl w-full overflow-hidden min-w-0"> -->
+      <!--     <div class="fade-in-up"> -->
+            <slot />
+    <!--       </div> -->
+    <!--     </div> -->
+    <!--   </main> -->
+    <!-- </div> -->
   </body>
 </html>

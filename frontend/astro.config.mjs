@@ -1,4 +1,5 @@
 import tailwindcss from "@tailwindcss/vite";
+import path from "node:path";
 // @ts-check
 import { defineConfig } from 'astro/config';
 
@@ -10,7 +11,9 @@ import react from "@astrojs/react";
 export default defineConfig({
   output: "server",
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss({
+      config: path.resolve("./tailwind.config.js")
+    })],
 	},
 
   adapter: vercel(),
