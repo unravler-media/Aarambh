@@ -1,0 +1,46 @@
+---
+import CategoryHeader from "../SubComponents/CategoryHeader.astro";
+import SearchPostCard from "../SubComponents/SearchPostCard.astro";
+import * as fetcher from "../../hooks/fetcher.ts";
+
+const url = new URL(Astro.request.url);
+const slug = url.pathname.replace(/^\/category\//, "");
+
+if (!slug) {
+  return Astro.redirect("/404");
+}
+
+let isLoading = true;
+const categoryData: fetcher.SingleCategory = await fetcher.fetchCategory(slug);
+isLoading = false;
+
+var postCount = 0;
+---
+  {isLoading ? <div class="animate-pulse space-y-8 max-w-7xl mx-auto px-4 py-8">
+          <div class="h-32 bg-[#1A1B22] rounded-xl"></div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((_) => (
+              <div class="h-72 bg-[#1A1B22] rounded-xl"></div>
+            ))}
+          </div>
+  </div>
+  :  <div class="max-w-7xl mx-auto px-4 py-8">
+    <CategoryHeader name={categoryData.name} description={categoryData.description} postCount={postCount} />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+          {categoryData.posts.map(post => (
+            <a href={`/posts/${post.slug}`}><SearchPostCard post={post} /></a>
+          ))}
+        </div>
+
+        {postCount === 0 && (
+          <div class="text-center py-12 bg-[#1A1B22] rounded-xl border border-[#2A2C36] mt-8">
+            <h3 class="text-xl font-medium mb-2 text-white">No articles found</h3>
+            <p class="text-gray-400">
+              We haven't published any articles in this category yet.
+            </p>
+          </div>
+        )}
+      </div>
+
+ }
