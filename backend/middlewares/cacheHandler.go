@@ -1,30 +1,19 @@
 package middlewares
 
 import (
-	"context"
-	"fmt"
-	"os"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
+
+	"context"
 )
 
-// Redis client (reuse for all funcs)
-var redisClient *redis.Client
 var ctx = context.Background()
+var redisClient *redis.Client
 
-func init() {
-	err := godotenv.Load()
-	if err != nil {
-		panic("Unable to load environment variables!")
-	}
-	config, err := redis.ParseURL(os.Getenv("REDIS_URL"))
-	if err != nil {
-		panic("Invalid REDIS_URL: " + err.Error())
-	}
-	redisClient = redis.NewClient(config)
+func InitialiseRedisClient(client *redis.Client) {
+	redisClient = client
 }
 
 // CacheRequests caches GET responses for a given expiration time
@@ -71,11 +60,11 @@ func InvalidateCacheCompletely() error {
 }
 
 // Invalidate Specific Keys in Cache
-func InvalidateCacheKeys(keys []string) error {
-	operation, err := redisClient.Del(ctx, keys...).Result()
-	if err != nil {
-		return err
-	}
-	fmt.Println("Hooks Operation: ", operation)
-	return nil
-}
+// func InvalidateCacheKeys(keys []string) error {
+// 	operation, err := redisClient.Del(ctx, keys...).Result()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	fmt.Println("Hooks Operation: ", operation)
+// 	return nil
+// }

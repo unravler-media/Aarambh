@@ -1,18 +1,21 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/go-playground/validator/v10"
 	gojson "github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/joho/godotenv"
 
 	"backend/databases"
 	"backend/helpers"
 	"backend/middlewares"
 	"backend/routes"
+
+	"fmt"
+	"os"
+
+	"github.com/joho/godotenv"
+	"github.com/redis/go-redis/v9"
 )
 
 func main() {
@@ -56,12 +59,19 @@ func main() {
 	// adding database middleware to reuse globally
 	app.Use(databases.InjectDatabase(database))
 
+	var redisClient *redis.Client
+	config, err := redis.ParseURL(os.Getenv("REDIS_URL"))
+	if err != nil {
+		panic("Invalid REDIS_URL: " + err.Error())
+	}
+	redisClient = redis.NewClient(config)
+
 	// Using custom Caching solution
+	middlewares.InitialiseRedisClient(redisClient)
 	app.Use(middlewares.CacheRequests(0)) // 0 = Persistent TTL. We can also do 5 * time.minutes
 	helpers.WipeCacheGlobalHook(
 		database,
 	) // utilising Gorm global lifecycle hook to wipe redis clean.
-	// Implement Default In-Memory Caching
 
 	// gonna use Redis as storage for caching.
 	// store := redis.New(redis.Config{
