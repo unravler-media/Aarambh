@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/go-playground/validator/v10"
 	gojson "github.com/goccy/go-json"
@@ -11,12 +10,14 @@ import (
 	"github.com/joho/godotenv"
 
 	"backend/databases"
+	"backend/helpers"
+	"backend/middlewares"
 	"backend/routes"
 )
 
 func main() {
 	// To Ensure loading of .env files. (dont need this in serverless environments)
-	err := godotenv.Load(".env")
+	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Something went wrong while importing ENV Variables.")
 	}
@@ -56,8 +57,10 @@ func main() {
 	app.Use(databases.InjectDatabase(database))
 
 	// Using custom Caching solution
-	// app.Use(middlewares.CacheRequests(5 * time.Minute))
-	fmt.Println(os.Getenv("REDIS_URL"))
+	app.Use(middlewares.CacheRequests(0)) // 0 = Persistent TTL. We can also do 5 * time.minutes
+	helpers.WipeCacheGlobalHook(
+		database,
+	) // utilising Gorm global lifecycle hook to wipe redis clean.
 	// Implement Default In-Memory Caching
 
 	// gonna use Redis as storage for caching.

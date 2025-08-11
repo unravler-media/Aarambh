@@ -4,20 +4,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/matoous/go-nanoid/v2"
+	gonanoid "github.com/matoous/go-nanoid/v2"
 	"gorm.io/gorm"
 )
 
 type Category struct {
-	ID string `gorm:"primaryKey"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Name string `gorm:"index"`
-	Slug string `gorm:"index"`
+	ID          string `gorm:"primaryKey"`
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Name        string `gorm:"index"`
+	Slug        string `gorm:"index"`
 	Description string
-	UserID string
-	User Users `json:"user" gorm:"foreignKey:UserID"`
-	Posts []Post `gorm:"foreignKey:CategoryID"` // reverse relation to the Category Model.
+	UserID      string
+	User        Users  `gorm:"foreignKey:UserID"     json:"user"`
+	Posts       []Post `gorm:"foreignKey:CategoryID"` // reverse relation to the Category Model.
 }
 
 // This is GormHooks and will run before running the Transaction to Write to DB.
@@ -32,6 +32,6 @@ func (c *Category) BeforeCreate(tx *gorm.DB) (err error) {
 
 	// handle slug screation
 	slug := strings.ToLower(c.Name)
-	c.Slug = strings.ReplaceAll(slug," ", "-") // replace Empty space with -
+	c.Slug = strings.ReplaceAll(slug, " ", "-") // replace Empty space with -
 	return nil
 }
