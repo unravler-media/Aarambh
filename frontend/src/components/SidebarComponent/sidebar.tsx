@@ -83,8 +83,8 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
                     .map(category => (
                       <li key={category.ID}>
                         <a
-                          href={`category/${category.Slug}`}
-                          onClick={e => { e.preventDefault(), window.location.href = `category/${category.Slug}` }}
+                          href={`/category/${category.Slug}`}
+                          onClick={e => { e.preventDefault(), window.location.href = `/category/${category.Slug}` }}
                           className={cn(
                             "flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all",
                             isActiveRoute(`category/${category.Slug}`) && "bg-[#151619] text-white font-medium shadow-sm"
