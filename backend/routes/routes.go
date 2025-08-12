@@ -1,8 +1,9 @@
 package routes
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"backend/logic"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 func ApiRoutes(router fiber.Router) {
@@ -16,6 +17,7 @@ func ApiRoutes(router fiber.Router) {
 	CategoryRoutes(router.Group("category/"))
 	PostRoutes(router.Group("posts/"))
 	CommentRoutes(router.Group("comment/"))
+	DashboardRoutes(router.Group("dashboard/"))
 	router.Get("query/", logic.QueryPosts)
 }
 
