@@ -75,6 +75,14 @@ type PostLike struct {
 	Post        Post      `gorm:"foreignKey:PostID"`
 }
 
+// Creating Hooks for PostLike Model
+func (c *PostLike) BeforeCreate(tx *gorm.DB) (err error) {
+	// nanoid generation for ID of Post
+	nanoid_id, err := gonanoid.New()
+	c.ID = nanoid_id
+	return nil
+}
+
 type PostView struct {
 	ID           string    `gorm:"primaryKey"`
 	CreatedAt    time.Time `                               json:"created_at"`
@@ -83,4 +91,12 @@ type PostView struct {
 	ViewedBy     Users     `gorm:"foreignKey:ViewedByUser"`
 	ViewedPostID string    `                               json:"viewed_post_id"`
 	ViewedPost   Post      `gorm:"foreignKey:ViewedPostID"`
+}
+
+// Creating Hooks for PostView Model
+func (c *PostView) BeforeCreate(tx *gorm.DB) (err error) {
+	// nanoid generation for ID of Post
+	nanoid_id, err := gonanoid.New()
+	c.ID = nanoid_id
+	return nil
 }
