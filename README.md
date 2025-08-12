@@ -13,9 +13,14 @@ This platform also allows individuals like you to also write good piece of conte
 
 ## Technical Specifications
 This project has two sections:
-1. Backend - written in pure golang
-2. Frontend - written in React with ShadCN
+1. Backend - written in GoLang with [GoFiber Framework](https://gofiber.io/) & LibSQL - [Turso](https://turso.tech/) with Redis - [Upstash](https://upstash.com/).
+2. Frontend - written in Astro(React with ShadCN)
 
-Backend is in GoLang and it is written in Pure Go and by a Human: [Tushar Singh](https://github.com/lonexd3vil/)
+Backend Developer: [Tushar Singh](https://github.com/lonexd3vil/)
 
+## Updates
+#### Branch V1
 Frontend however is written by Ai with what we call nowadays as VibeCoding*, we are using Lovable to accompolish our Frontend Requirements and this helps us reduce development time a lot allowing us to focus more on the backend logic and produce results faster.
+
+#### Branch V2 - Production
+We have combined the V1 CodeBase with Astro and will follow to continue with less Ai code generation.
