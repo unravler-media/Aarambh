@@ -100,3 +100,21 @@ func (c *PostView) BeforeCreate(tx *gorm.DB) (err error) {
 	c.ID = nanoid_id
 	return nil
 }
+
+type SavedPosts struct {
+	ID          string    `gorm:"primaryKey"`
+	CreatedAt   time.Time `                              json:"created_at"`
+	UpdatedAt   time.Time `                              json:"updated_at"`
+	SavedByUser string    `                              json:"saved_by_user"`
+	SavedBy     Users     `gorm:"foreignKey:SavedByUser"`
+	SavedPostID string    `                              json:"saved_post_id"`
+	SavedPost   Post      `gorm:"foreignKey:SavedPostID"`
+}
+
+// Creating Hooks for SavedPosts Model
+func (c *SavedPosts) BeforeCreate(tx *gorm.DB) (err error) {
+	// nanoid generation for ID of Post
+	nanoid_id, err := gonanoid.New()
+	c.ID = nanoid_id
+	return nil
+}
