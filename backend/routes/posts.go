@@ -15,6 +15,7 @@ func PostRoutes(router fiber.Router) {
 	router.Post("create/", middlewares.Protect(), logic.CreatePost)
 	router.Post("like/:slug", middlewares.Protect(), logic.LikePost)
 	router.Post("read/:slug", middlewares.Protect(), logic.ReadPost)
+	router.Post("save/:slug", middlewares.Protect(), logic.SavePost)
 
 	router.Put("update/", middlewares.Protect(), logic.UpdatePost)
 	router.Delete("delete/", middlewares.Protect(), logic.DeletePost)

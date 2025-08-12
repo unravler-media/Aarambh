@@ -490,3 +490,68 @@ func ReadPost(c *fiber.Ctx) error {
 	}
 	return c.SendStatus(200)
 }
+
+func SavePost(c *fiber.Ctx) error {
+	db, ok := c.Locals("db").(*gorm.DB)
+	if !ok {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "DB Fucked.",
+		})
+	}
+	// Get user information from headers.
+	user_session := c.Locals("session_user")
+	if user_session == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "User session unavailable.",
+		})
+	}
+
+	user := user_session.(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
+	// get the post from the slug
+	post_slug := c.Params("slug")
+	var postHolder models.Post
+	fetch_post_query := db.First(&postHolder, "slug = ?", post_slug)
+
+	if fetch_post_query.RowsAffected < 1 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"response": "Post Not Found!",
+		})
+	}
+
+	if fetch_post_query.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Something went wrong while getting Post.",
+		})
+	}
+
+	// Validate if the post in question is already saved by the user in question or not.
+	var already_saved_post models.SavedPosts
+	already_saved := db.Where("saved_by_user = ? AND saved_post_id = ?", user, postHolder.ID).
+		Find(&already_saved_post)
+
+	if already_saved.RowsAffected > 0 {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"response": "Already Saved!",
+		})
+	} // means post is liked by this user in past.
+
+	if already_saved.Error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Cannot Validate.",
+		})
+	}
+
+	// if post exists create a new instance of PostLike and submit data into that struct
+	var SavedPostInstance models.SavedPosts
+	SavedPostInstance.SavedByUser = user
+	SavedPostInstance.SavedPostID = postHolder.ID
+
+	viewing := db.Create(&SavedPostInstance)
+	if viewing.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Cannot Save the Post.",
+		})
+	}
+	return c.SendStatus(200)
+
+}
