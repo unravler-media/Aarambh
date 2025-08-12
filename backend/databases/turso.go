@@ -40,6 +40,7 @@ func TursoConnecter() *gorm.DB {
 		&models.Comment{},
 		&models.PostLike{},
 		&models.PostView{},
+		&models.SavedPosts{},
 	)
 
 	if migrations != nil {
