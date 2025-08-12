@@ -360,3 +360,97 @@ func DeletePost(c *fiber.Ctx) error {
 		"response": "Post Deleted.",
 	})
 }
+
+func LikePost(c *fiber.Ctx) error {
+	db, ok := c.Locals("db").(*gorm.DB)
+	if !ok {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "DB Fucked.",
+		})
+	}
+	// Get user information from headers.
+	user_session := c.Locals("session_user")
+	if user_session == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "User session unavailable.",
+		})
+	}
+
+	user := user_session.(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
+	// get the post from the slug
+	post_slug := c.Params("slug")
+	var postHolder models.Post
+	fetch_post_query := db.First(&postHolder, "slug = ?", post_slug)
+
+	if fetch_post_query.RowsAffected < 1 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"response": "Post Not Found!",
+		})
+	}
+
+	if fetch_post_query.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Something went wrong while getting Post.",
+		})
+	}
+
+	// if post exists create a new instance of PostLike and submit data into that struct
+	var likedPostInstance models.PostLike
+	likedPostInstance.LikedByUser = user
+	likedPostInstance.PostID = postHolder.ID
+
+	liking := db.Create(&likedPostInstance)
+	if liking.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Cannot Like the Post.",
+		})
+	}
+	return c.SendStatus(200)
+}
+
+func ReadPost(c *fiber.Ctx) error {
+	db, ok := c.Locals("db").(*gorm.DB)
+	if !ok {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "DB Fucked.",
+		})
+	}
+	// Get user information from headers.
+	user_session := c.Locals("session_user")
+	if user_session == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "User session unavailable.",
+		})
+	}
+
+	user := user_session.(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
+	// get the post from the slug
+	post_slug := c.Params("slug")
+	var postHolder models.Post
+	fetch_post_query := db.First(&postHolder, "slug = ?", post_slug)
+
+	if fetch_post_query.RowsAffected < 1 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"response": "Post Not Found!",
+		})
+	}
+
+	if fetch_post_query.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Something went wrong while getting Post.",
+		})
+	}
+
+	// if post exists create a new instance of PostLike and submit data into that struct
+	var ViewedPostInstance models.PostView
+	ViewedPostInstance.ViewedByUser = user
+	ViewedPostInstance.ViewedPostID = postHolder.ID
+
+	viewing := db.Create(&ViewedPostInstance)
+	if viewing.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Cannot Like the Post.",
+		})
+	}
+	return c.SendStatus(200)
+}

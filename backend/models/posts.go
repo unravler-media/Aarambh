@@ -1,9 +1,9 @@
 package models
 
 import (
+	"fmt"
 	"strings"
 	"time"
-	"fmt"
 
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"gorm.io/gorm"
@@ -12,35 +12,38 @@ import (
 )
 
 type Post struct {
-	ID string `gorm:"primaryKey"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-	PostTitle string `json:"post_title" gorm:"index" validate:"required,min=4"`
-	Slug string `gorm:"index"`
-	ShortContent string `json:"short_content"`
-	Content string `json:"content" validate:"required,min=128"`
-	CoverImage string `json:"cover_image"`
-	AuthorID string `json:"author_id"`
-	Author Users `gorm:"foreignKey:AuthorID"`
-	CategoryID string `json:"category_id"`
-	Category Category `gorm:"foreignKey:CategoryID"`
-	ReadTime string `json:"read_time"`
-	IsFeatured bool `json:"is_featured"`
+	ID           string   `gorm:"primaryKey"`
+	CreatedAt    string   `                             json:"created_at"`
+	UpdatedAt    string   `                             json:"updated_at"`
+	PostTitle    string   `gorm:"index"                 json:"post_title"    validate:"required,min=4"`
+	Slug         string   `gorm:"index"`
+	ShortContent string   `                             json:"short_content"`
+	Content      string   `                             json:"content"       validate:"required,min=128"`
+	CoverImage   string   `                             json:"cover_image"`
+	AuthorID     string   `                             json:"author_id"`
+	Author       Users    `gorm:"foreignKey:AuthorID"`
+	CategoryID   string   `                             json:"category_id"`
+	Category     Category `gorm:"foreignKey:CategoryID"`
+	ReadTime     string   `                             json:"read_time"`
+	IsFeatured   bool     `                             json:"is_featured"`
 	// Creating reverse relation to Comments to Preload in future
-	Comments []Comment `gorm:"foreignKey:PostID"` 
+	Comments []Comment `gorm:"foreignKey:PostID"`
 	// PostID is what we used in COmments Model to refrence into this Model
 }
 
 // Creating Hooks for Post Model
-func(c *Post) BeforeCreate(tx *gorm.DB) (err error) {
+func (c *Post) BeforeCreate(tx *gorm.DB) (err error) {
 	// nanoid generation for ID of Post
 	nanoid_id, err := gonanoid.New()
 	c.ID = nanoid_id
 	slug := strings.ToLower(c.PostTitle)
-	c.Slug = strings.ReplaceAll(slug, " ","-")
+	c.Slug = strings.ReplaceAll(slug, " ", "-")
 
 	// Calculate readTime of a Post
-	readTime := fmt.Sprintf("Estimated read time: %d minute(s)", helpers.CalculateReadTime(c.Content))
+	readTime := fmt.Sprintf(
+		"Estimated read time: %d minute(s)",
+		helpers.CalculateReadTime(c.Content),
+	)
 	c.ReadTime = readTime
 
 	current_time := time.Now()
@@ -49,32 +52,35 @@ func(c *Post) BeforeCreate(tx *gorm.DB) (err error) {
 	return nil
 }
 
-func(c *Post) BeforeUpdate(tx *gorm.DB) (err error) {
+func (c *Post) BeforeUpdate(tx *gorm.DB) (err error) {
 	updatedTime := time.Now().Format("Jan 2, 2006 at 3:04pm")
 	c.UpdatedAt = updatedTime
 
-	readTime := fmt.Sprintf("Estimated read time: %d minute(s)", helpers.CalculateReadTime(c.Content))
+	readTime := fmt.Sprintf(
+		"Estimated read time: %d minute(s)",
+		helpers.CalculateReadTime(c.Content),
+	)
 	c.ReadTime = readTime
 	return nil
-} 
+}
 
 // for future implementations
 type PostLike struct {
-	ID string `gorm:"primaryKey"`
-	CreatedAi time.Time
-	UpdatedAt time.Time
-	LikedByUser string `json:"liked_by_user"`
-	LikedBy Users `gorm:"foreignKey:LikedByUser"`
-	PostID string `json:"post_id"`
-	Post Post `gorm:"foreignKey:PostID"`
+	ID          string    `gorm:"primaryKey"`
+	CreatedAt   time.Time `                              json:"created_at"`
+	UpdatedAt   time.Time `                              json:"updated_at"`
+	LikedByUser string    `                              json:"liked_by_user"`
+	LikedBy     Users     `gorm:"foreignKey:LikedByUser"`
+	PostID      string    `                              json:"post_id"`
+	Post        Post      `gorm:"foreignKey:PostID"`
 }
 
 type PostView struct {
-	ID string `gorm:"primaryKey"`
-	CreatedAi time.Time
-	ViewedByUser string `json:"viewed_by_user"`
-	ViewedBy Users `gorm:"foreignKey:ViewedByUser"`
-	ViewedPostID string `json:"viewed_post_id"`
-	ViewedPost Post `gorm:"foreignKey:ViewedPostID"`
-	IsAnonymous bool `json:"is_anonymous" gorm:"index"`
+	ID           string    `gorm:"primaryKey"`
+	CreatedAt    time.Time `                               json:"created_at"`
+	UpdatedAt    time.Time `                               json:"updated_at"`
+	ViewedByUser string    `                               json:"viewed_by_user"`
+	ViewedBy     Users     `gorm:"foreignKey:ViewedByUser"`
+	ViewedPostID string    `                               json:"viewed_post_id"`
+	ViewedPost   Post      `gorm:"foreignKey:ViewedPostID"`
 }
