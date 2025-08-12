@@ -10,4 +10,6 @@ import (
 
 func DashboardRoutes(router fiber.Router) {
 	router.Post("member/", middlewares.Protect(), logic.MemberDashboard)
+	router.Post("creator/", middlewares.Protect(), logic.CreatorDashboard)
+	router.Post("admin/", middlewares.Protect(), logic.AdminDashboard)
 }
