@@ -368,6 +368,7 @@ func LikePost(c *fiber.Ctx) error {
 			"response": "DB Fucked.",
 		})
 	}
+
 	// Get user information from headers.
 	user_session := c.Locals("session_user")
 	if user_session == nil {
@@ -377,6 +378,7 @@ func LikePost(c *fiber.Ctx) error {
 	}
 
 	user := user_session.(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
+
 	// get the post from the slug
 	post_slug := c.Params("slug")
 	var postHolder models.Post
@@ -391,6 +393,23 @@ func LikePost(c *fiber.Ctx) error {
 	if fetch_post_query.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"response": "Something went wrong while getting Post.",
+		})
+	}
+
+	// Validate if the post in question is already liked by the user in question or not.
+	var already_liked_post models.PostLike
+	already_liked := db.Where("liked_by_user = ? AND post_id = ?", user, postHolder.ID).
+		Find(&already_liked_post)
+
+	if already_liked.RowsAffected > 0 {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"response": "Already Liked!",
+		})
+	} // means post is liked by this user in past.
+
+	if already_liked.Error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Cannot Validate.",
 		})
 	}
 
@@ -438,6 +457,23 @@ func ReadPost(c *fiber.Ctx) error {
 	if fetch_post_query.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"response": "Something went wrong while getting Post.",
+		})
+	}
+
+	// Validate if the post in question is already liked by the user in question or not.
+	var already_viewed_post models.PostView
+	already_viewed := db.Where("viewed_by_user = ? AND viewed_post_id = ?", user, postHolder.ID).
+		Find(&already_viewed_post)
+
+	if already_viewed.RowsAffected > 0 {
+		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+			"response": "Already Viewed!",
+		})
+	} // means post is liked by this user in past.
+
+	if already_viewed.Error != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Cannot Validate.",
 		})
 	}
 
