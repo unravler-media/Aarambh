@@ -2,9 +2,9 @@ import { useAuth } from '../../context/AuthContext.tsx';
 import Layout from '../../components/layout.tsx';
 
 // Import Main Seperate Dashboard Pages. Will be rendered conditionally.
-import AdminDashboard from '@/components/dashboard/AdminDashboard';
-import CreatorDashboard from '@/components/dashboard/CreatorDashboard';
-import MemberDashboard from '@/components/dashboard/MemberDashboard';
+import AdminDashboard from './boards/AdminDashboard.tsx';
+import CreatorDashboard from './boards/CreatorDashboard.tsx';
+import MemberDashboard from './boards/MemberDashboard.tsx';
 
 const Dashboard = () => {
   const { user } = useAuth();
