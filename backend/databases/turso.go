@@ -1,27 +1,29 @@
 package databases
 
 import (
-	"fmt"
 	"backend/models"
+	"fmt"
+
 	"github.com/gofiber/fiber/v2"
 
 	// gonna use this custom packagr to implement Turso's LibSql in Gorm Config
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 
 	// using custom sql version (libsql)
-	sqlite "github.com/ytsruh/gorm-libsql"
 	"os"
+
+	sqlite "github.com/ytsruh/gorm-libsql"
 	"gorm.io/gorm"
 )
 
 func TursoConnecter() *gorm.DB {
 	api_host := os.Getenv("turso_api")
 
-	// Creating a GORM config & Passing Creds. 
+	// Creating a GORM config & Passing Creds.
 	db, err := gorm.Open(sqlite.New(
 		sqlite.Config{
 			DriverName: "libsql",
-			DSN: api_host, // URI: libsql://<uri>?authToken=authtoken from Turso Here
+			DSN:        api_host, // URI: libsql://<uri>?authToken=authtoken from Turso Here
 		},
 	), &gorm.Config{})
 	if err != nil {
@@ -36,13 +38,15 @@ func TursoConnecter() *gorm.DB {
 		&models.Category{},
 		&models.Post{},
 		&models.Comment{},
+		&models.PostLike{},
+		&models.PostView{},
 	)
 
 	if migrations != nil {
 		fmt.Println("[!] Error while doing migrations!", err)
 		return db
 	}
-	fmt.Println("[*] Succesfully Ran Migrations.")	
+	fmt.Println("[*] Succesfully Ran Migrations.")
 	return db
 }
 
