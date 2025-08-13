@@ -12,22 +12,25 @@ import (
 )
 
 type Post struct {
-	ID           string   `gorm:"primaryKey"`
-	CreatedAt    string   `                             json:"created_at"`
-	UpdatedAt    string   `                             json:"updated_at"`
-	PostTitle    string   `gorm:"index"                 json:"post_title"    validate:"required,min=4"`
+	ID           string   `gorm:"primaryKey"              json:"id"`
+	CreatedAt    string   `                               json:"created_at"`
+	UpdatedAt    string   `                               json:"updated_at"`
+	PostTitle    string   `gorm:"index"                   json:"post_title"    validate:"required,min=4"`
 	Slug         string   `gorm:"index"`
-	ShortContent string   `                             json:"short_content"`
-	Content      string   `                             json:"content"       validate:"required,min=128"`
-	CoverImage   string   `                             json:"cover_image"`
-	AuthorID     string   `                             json:"author_id"`
+	ShortContent string   `                               json:"short_content"`
+	Content      string   `                               json:"content"       validate:"required,min=128"`
+	CoverImage   string   `                               json:"cover_image"`
+	AuthorID     string   `                               json:"author_id"`
 	Author       Users    `gorm:"foreignKey:AuthorID"`
-	CategoryID   string   `                             json:"category_id"`
+	CategoryID   string   `                               json:"category_id"`
 	Category     Category `gorm:"foreignKey:CategoryID"`
-	ReadTime     string   `                             json:"read_time"`
-	IsFeatured   bool     `                             json:"is_featured"`
+	ReadTime     string   `                               json:"read_time"`
+	IsFeatured   bool     `                               json:"is_featured"`
 	// Creating reverse relation to Comments to Preload in future
-	Comments []Comment `gorm:"foreignKey:PostID"`
+	Comments   []Comment    `gorm:"foreignKey:PostID"`
+	PostLikes  []PostLike   `gorm:"foreignKey:PostID"`
+	PostViews  []PostView   `gorm:"foreignKey:ViewedPostID"`
+	PostsSaved []SavedPosts `gorm:"foreignKey:SavedPostID"`
 	// PostID is what we used in COmments Model to refrence into this Model
 }
 
