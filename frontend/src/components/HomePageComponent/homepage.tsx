@@ -2,8 +2,6 @@
 import Layout from "@/components/layout";
 import PostCard from "@/components/PostCard";
 import { usePosts } from "@/hooks/usePost";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
 
 const Index = () => {
   const { posts, loading, error } = usePosts();
