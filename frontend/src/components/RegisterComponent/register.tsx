@@ -72,7 +72,7 @@ const Register = () => {
         <Card className="bg-[#151619] border-[#2A2C36]">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-white flex items-center gap-2">
-              <UserPlus size={24} className="text-tech-red" />
+              <UserPlus size={24} className="text-red-400" />
               Sign up
             </CardTitle>
             <CardDescription className="text-gray-400">
@@ -157,7 +157,7 @@ const Register = () => {
               </div>
               <Button
                 type="submit"
-                className="w-full bg-tech-red hover:bg-tech-red/90"
+                className="w-full text-red-400 hover:text-red-400/70"
                 disabled={isLoading}
               >
                 {isLoading ? 'Creating account...' : 'Create account'}
@@ -167,7 +167,7 @@ const Register = () => {
             <div className="mt-6 text-center">
               <p className="text-gray-400">
                 Already have an account?{' '}
-                <a href="/login" className="text-tech-red hover:underline">
+                <a href="/login" className="text-gray-400 hover:underline">
                   Sign in
                 </a>
               </p>

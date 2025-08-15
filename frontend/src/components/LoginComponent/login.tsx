@@ -50,7 +50,7 @@ const Login = () => {
         <Card className="bg-[#151619] border-[#2A2C36]">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-white flex items-center gap-2">
-              <LogIn size={24} className="text-tech-red" />
+              <LogIn size={24} className="text-red-400" />
               Sign in
             </CardTitle>
             <CardDescription className="text-gray-400">
@@ -94,7 +94,7 @@ const Login = () => {
               </div>
               <Button
                 type="submit"
-                className="w-full bg-tech-red hover:bg-tech-red/90"
+                className="w-full text-red-400 hover:text-red-400/70"
                 disabled={isLoading}
               >
                 {isLoading ? 'Signing in...' : 'Sign in'}
@@ -104,7 +104,7 @@ const Login = () => {
             <div className="mt-6 text-center">
               <p className="text-gray-400">
                 Don't have an account?{' '}
-                <a href="/register" className="text-tech-red hover:underline">
+                <a href="/register" className="text-red-red hover:underline">
                   Sign up
                 </a>
               </p>

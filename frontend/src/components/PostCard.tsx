@@ -28,7 +28,7 @@ const PostCard = ({ post, className, variant = "default" }: PostCardProps) => {
         <img src={post.cover_image} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         <div className="absolute top-3 left-3">
           <div
-            className="px-3 py-1.5 bg-black/60 backdrop-blur-sm text-xs font-medium uppercase text-white rounded-lg hover:bg-black/70 transition-colors">
+            className="px-3 py-1.5 bg-black/60 backdrop-blur-sm text-xs font-medium uppercase text-red-400 rounded-lg hover:bg-black/70 transition-colors">
             {post.category?.name || 'Uncategorized'}
           </div>
         </div>
