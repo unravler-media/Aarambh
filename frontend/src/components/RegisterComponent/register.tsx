@@ -157,7 +157,7 @@ const Register = () => {
               </div>
               <Button
                 type="submit"
-                className="w-full text-red-400 hover:text-red-400/70"
+                className="w-full text-red-400 hover:text-red-400/70 hover:cursor-pointer hover:underline"
                 disabled={isLoading}
               >
                 {isLoading ? 'Creating account...' : 'Create account'}
@@ -167,7 +167,7 @@ const Register = () => {
             <div className="mt-6 text-center">
               <p className="text-gray-400">
                 Already have an account?{' '}
-                <a href="/login" className="text-gray-400 hover:underline">
+                <a href="/login" className="text-gray-400 hover:underline hover:cursor-pointer">
                   Sign in
                 </a>
               </p>
