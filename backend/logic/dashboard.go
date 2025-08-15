@@ -37,12 +37,31 @@ type AuthorDTO struct {
 
 // DTO struct for Recent Posts
 type RecentPostDTO struct {
-	UpdatedAt    string    `json:"updated_at"`
-	PostTitle    string    `json:"post_title"`
-	Slug         string    `json:"Slug"`
-	ShortContent string    `json:"short_content"`
-	CoverImage   string    `json:"cover_image"`
-	Author       AuthorDTO `json:"Author"`
+	UpdatedAt  string    `json:"updated_at"`
+	PostTitle  string    `json:"post_title"`
+	Slug       string    `json:"Slug"`
+	CoverImage string    `json:"cover_image"`
+	Author     AuthorDTO `json:"Author"`
+}
+
+// DTO struct for Comments Created by User
+type CommentCreatedDTO struct {
+	CommentID   string `json:"comment_id"`
+	CommentText string `json:"comment_text"` // Updated field name
+	CreatedAt   string `json:"created_at"`
+	PostSlug    string `json:"post_slug"`
+	PostTitle   string `json:"post_title"`
+}
+
+// Temporary struct for scanning raw SQL results
+type RecentPostScanResult struct {
+	UpdatedAt  string `json:"updated_at"`
+	PostTitle  string `json:"post_title"`
+	Slug       string `json:"slug"`
+	CoverImage string `json:"cover_image"`
+	Username   string `json:"username"`
+	FullName   string `json:"full_name"`
+	Avatar     string `json:"avatar"`
 }
 
 func MemberDashboard(c *fiber.Ctx) error {
@@ -56,6 +75,7 @@ func MemberDashboard(c *fiber.Ctx) error {
 		savedPostsCount, savedWeeklyCount    int64
 		postsReadCount, postsReadWeeklyCount int64
 		recentlyLiked, recentlySaved         []RecentPostDTO
+		commentsCreated                      []CommentCreatedDTO
 	)
 
 	// Counts
@@ -80,48 +100,74 @@ func MemberDashboard(c *fiber.Ctx) error {
 		Count(&postsReadWeeklyCount)
 
 	// Recently liked posts
+	var recentlyLikedScan []RecentPostScanResult
 	db.Table("posts").
-		Select(`posts.updated_at, posts.post_title, posts.slug, posts.short_content, posts.cover_image,
+		Select(`posts.updated_at, posts.post_title, posts.slug, posts.cover_image,
 		        users.username, users.full_name, users.avatar`).
 		Joins("JOIN post_likes ON post_likes.post_id = posts.id").
 		Joins("JOIN users ON users.id = posts.author_id").
 		Where("post_likes.liked_by_user = ?", userID).
 		Order("post_likes.created_at DESC").
 		Limit(5).
-		Scan(&recentlyLiked)
+		Scan(&recentlyLikedScan)
 
-	// Map Author fields properly
-	for i := range recentlyLiked {
-		recentlyLiked[i].Author = AuthorDTO{
-			Username: recentlyLiked[i].Author.Username,
-			FullName: recentlyLiked[i].Author.FullName,
-			Avatar:   recentlyLiked[i].Author.Avatar,
-		}
+	// Map to RecentPostDTO for recently liked
+	for _, item := range recentlyLikedScan {
+		recentlyLiked = append(recentlyLiked, RecentPostDTO{
+			UpdatedAt:  item.UpdatedAt,
+			PostTitle:  item.PostTitle,
+			Slug:       item.Slug,
+			CoverImage: item.CoverImage,
+			Author: AuthorDTO{
+				Username: item.Username,
+				FullName: item.FullName,
+				Avatar:   item.Avatar,
+			},
+		})
 	}
 
 	// Recently saved posts
+	var recentlySavedScan []RecentPostScanResult
 	db.Table("posts").
-		Select(`posts.updated_at, posts.post_title, posts.slug, posts.short_content, posts.cover_image,
+		Select(`posts.updated_at, posts.post_title, posts.slug, posts.cover_image,
 		        users.username, users.full_name, users.avatar`).
 		Joins("JOIN saved_posts ON saved_posts.saved_post_id = posts.id").
 		Joins("JOIN users ON users.id = posts.author_id").
 		Where("saved_posts.saved_by_user = ?", userID).
 		Order("saved_posts.created_at DESC").
 		Limit(5).
-		Scan(&recentlySaved)
+		Scan(&recentlySavedScan)
 
-	for i := range recentlySaved {
-		recentlySaved[i].Author = AuthorDTO{
-			Username: recentlySaved[i].Author.Username,
-			FullName: recentlySaved[i].Author.FullName,
-			Avatar:   recentlySaved[i].Author.Avatar,
-		}
+	// Map to RecentPostDTO for recently saved
+	for _, item := range recentlySavedScan {
+		recentlySaved = append(recentlySaved, RecentPostDTO{
+			UpdatedAt:  item.UpdatedAt,
+			PostTitle:  item.PostTitle,
+			Slug:       item.Slug,
+			CoverImage: item.CoverImage,
+			Author: AuthorDTO{
+				Username: item.Username,
+				FullName: item.FullName,
+				Avatar:   item.Avatar,
+			},
+		})
 	}
+
+	// Comments created by user (last 10)
+	db.Table("comments").
+		Select(`comments.id as comment_id, comments.comment_text, comments.created_at,
+		        posts.slug as post_slug, posts.post_title`).
+		Joins("JOIN posts ON posts.id = comments.post_id").
+		Where("comments.author_id = ?", userID).
+		Order("comments.created_at DESC").
+		Limit(10).
+		Scan(&commentsCreated)
 
 	// Final JSON output
 	return c.JSON(fiber.Map{
 		"comments_total":     commentsCount,
 		"comments_weekly":    commentsWeeklyCount,
+		"comments_created":   commentsCreated,
 		"liked_posts_total":  likedPostsCount,
 		"liked_posts_weekly": likedWeeklyCount,
 		"posts_read_total":   postsReadCount,
