@@ -8,6 +8,13 @@ export interface memberDashboardResponse {
   liked_posts_weekly: number;
   posts_read_total: number;
   posts_read_weekly: number;
+  comments_created?: Array<{
+    comment_id: string,
+    comment_text: string,
+    created_at: string,
+    post_slug: string,
+    post_title: string,
+  }>;
   recently_liked?: Array<{
     updated_at: string;
     post_title: string;
@@ -41,6 +48,13 @@ const processDashboard = (dashboard: memberDashboardResponse): memberDashboardRe
   liked_posts_weekly: dashboard.liked_posts_weekly,
   posts_read_total: dashboard.posts_read_total,
   posts_read_weekly: dashboard.posts_read_weekly,
+  comments_created: dashboard.comments_created?.map(comment => ({
+    post_title: comment.post_title,
+    post_slug: comment.post_slug,
+    created_at: comment.created_at,
+    comment_id: comment.comment_id,
+    comment_text: comment.comment_text,
+  })),
   recently_liked: dashboard.recently_liked?.map(post => ({
     updated_at: post.updated_at,
     post_title: post.post_title,

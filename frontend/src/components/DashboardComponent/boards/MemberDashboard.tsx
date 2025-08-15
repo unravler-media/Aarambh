@@ -119,7 +119,7 @@ const MemberDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dashboard?.recently_liked.map((post) => (
+                  {dashboard?.recently_liked?.map((post) => (
                     <div key={post.Slug} className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <a href={`/posts/${post.Slug}`} ><p className="text-white font-medium truncate hover:text-gray-400">{post.post_title}</p></a>
@@ -142,7 +142,7 @@ const MemberDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dashboard?.recently_saved.map((post) => (
+                  {dashboard?.recently_saved?.map((post) => (
                     <div key={post.Slug} className="flex items-center justify-between">
                       <div className="flex-1 min-w-0">
                         <a href={`/posts/${post.Slug}`} ><p className="text-white font-medium truncate hover:text-gray-400">{post.post_title}</p></a>
@@ -169,7 +169,7 @@ const MemberDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {dashboard?.recently_liked.map((post) => (
+              {dashboard?.recently_liked?.map((post) => (
                 <div key={post.Slug} className="p-4 rounded-lg bg-[#0A0B0F] border border-[#2A2C36]">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
@@ -193,7 +193,7 @@ const MemberDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {dashboard?.recently_saved.map((post) => (
+              {dashboard?.recently_saved?.map((post) => (
                 <div key={post.Slug} className="p-4 rounded-lg bg-[#0A0B0F] border border-[#2A2C36]">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
@@ -211,27 +211,29 @@ const MemberDashboard = () => {
       }
 
       {
-        // activeTab === 'comments' && (
-        //   <Card className="bg-[#151619] border-[#2A2C36]">
-        //     <CardHeader>
-        //       <CardTitle className="text-white">My Comments</CardTitle>
-        //       <CardDescription className="text-gray-400">Comments you've made on posts</CardDescription>
-        //     </CardHeader>
-        //     <CardContent>
-        //       <div className="space-y-4">
-        //         {dashboard?.recently_saved.map((comment) => (
-        //           <div key={comment.Slug} className="p-4 rounded-lg bg-[#0A0B0F] border border-[#2A2C36]">
-        //             <div className="space-y-2">
-        //               <h3 className="text-white font-medium">{comment.post_title}</h3>
-        //               <p className="text-gray-300">{comment.Slug}</p>
-        //               <p className="text-sm text-gray-500">Commented on {comment.updated_at}</p>
-        //             </div>
-        //           </div>
-        //         ))}
-        //       </div>
-        //     </CardContent>
-        //   </Card>
-        // )
+        activeTab === 'comments' && (
+          <Card className="bg-[#151619] border-[#2A2C36]">
+            <CardHeader>
+              <CardTitle className="text-white">My Comments</CardTitle>
+              <CardDescription className="text-gray-400">Comments you've made on posts</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {dashboard?.comments_created?.map((comment) => (
+                  <div key={comment.comment_id} className="p-4 rounded-lg bg-[#0A0B0F] border border-[#2A2C36]">
+                    <div className="space-y-2">
+                      <a href={`/posts/${comment.post_slug}`}>
+                        <h3 className="text-white font-medium hover:text-gray-400">{comment.comment_text}</h3>
+                        <p className="text-gray-300">{comment.post_title}</p>
+                        <p className="text-sm text-gray-500">Commented on {comment.created_at}</p>
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )
       }
 
       {
