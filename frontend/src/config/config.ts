@@ -13,7 +13,7 @@ export const API_ENDPOINTS = {
   post: '/api/posts/get/',
   createComment: '/api/comment/create/',
   searchPosts: '/api/query/',
-  memberDashboard: '/api/dashbaord/member/',
+  memberDashboard: '/api/dashboard/member/',
   creatorDashboard: '/api/dashboard/creator/',
   adminDashboard: '/api/dashboard/admin/'
 } as const;

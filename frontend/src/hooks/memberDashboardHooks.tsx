@@ -3,7 +3,7 @@ import { API_BASE_URL, API_ENDPOINTS } from "@/config/config";
 
 export interface memberDashboardResponse {
   comments_total: number;
-  comments_weeky: number;
+  comments_weekly: number;
   liked_posts_total: number;
   liked_posts_weekly: number;
   posts_read_total: number;
@@ -32,13 +32,13 @@ export interface memberDashboardResponse {
       Avatar: string
     }
   }>
-  saved_posts_total: string;
-  saved_posts_weekly: string;
+  saved_posts_total: number;
+  saved_posts_weekly: number;
 }
 
 const processDashboard = (dashboard: memberDashboardResponse): memberDashboardResponse => ({
   comments_total: dashboard.comments_total,
-  comments_weeky: dashboard.comments_weeky,
+  comments_weekly: dashboard.comments_weekly,
   liked_posts_total: dashboard.liked_posts_total,
   liked_posts_weekly: dashboard.liked_posts_weekly,
   posts_read_total: dashboard.posts_read_total,
@@ -80,13 +80,22 @@ export const useDashboard = () => {
     const fetchDashboard = async () => {
       try {
         // fetch user dashboard
+        const authToken = localStorage.getItem('authToken');
         setLoading(true)
-        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.memberDashboard}`);
+        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.memberDashboard}`, {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`,
+          },
+          credentials: 'include',
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch Dashboard.");
         }
         const data = await response.json();
-        setDashboard(processDashboard(data.response));
+        const result = processDashboard(data);
+        setDashboard(result);
       }
       catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');

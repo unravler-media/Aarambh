@@ -10,8 +10,8 @@ import (
 
 type UserClaims struct {
 	Username string `json:"username"`
-	Email string `json:"email"`
-	Role  string `json:"role"`
+	Email    string `json:"email"`
+	Role     string `json:"role"`
 	FullName string `json:"full_name"`
 	jwt.RegisteredClaims
 }
@@ -23,12 +23,12 @@ type UserClaims struct {
 // (and its claims) will be stored in c.Locals()
 func Protect() func(*fiber.Ctx) error {
 	// Create Configuration for JWT Auth Middleware
-	
+
 	config := jwtMiddleware.Config{
 		SigningKey: jwtMiddleware.SigningKey{
 			Key: []byte(os.Getenv("secretKey")),
 		},
-		ContextKey: "session_user",
+		ContextKey:   "session_user",
 		ErrorHandler: jwtError, // This is the default, but good to be explicit
 		// Claims: &UserClaims{},  // This is important if you have custom claims
 	}
