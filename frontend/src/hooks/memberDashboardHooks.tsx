@@ -8,11 +8,10 @@ export interface memberDashboardResponse {
   liked_posts_weekly: number;
   posts_read_total: number;
   posts_read_weekly: number;
-  recently_liked: Array<{
+  recently_liked?: Array<{
     updated_at: string;
     post_title: string;
     Slug: string;
-    short_content: string;
     cover_image: string;
     Author: {
       Username: string,
@@ -20,11 +19,10 @@ export interface memberDashboardResponse {
       Avatar: string
     }
   }>;
-  recently_saved: Array<{
+  recently_saved?: Array<{
     updated_at: string;
     post_title: string;
     Slug: string;
-    short_content: string;
     cover_image: string;
     Author: {
       Username: string,
@@ -47,7 +45,6 @@ const processDashboard = (dashboard: memberDashboardResponse): memberDashboardRe
     updated_at: post.updated_at,
     post_title: post.post_title,
     Slug: post.Slug,
-    short_content: post.short_content,
     cover_image: post.cover_image,
     Author: {
       Username: post.Author.Username,
@@ -59,7 +56,6 @@ const processDashboard = (dashboard: memberDashboardResponse): memberDashboardRe
     updated_at: post.updated_at,
     post_title: post.post_title,
     Slug: post.Slug,
-    short_content: post.short_content,
     cover_image: post.cover_image,
     Author: {
       Username: post.Author.Username,
