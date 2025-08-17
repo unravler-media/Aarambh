@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { API_BASE_URL, API_ENDPOINTS } from "@/config/config";
 
+export interface addPostInterface {
+  post_title: string;
+  short_content: string;
+  content: string;
+  cover_image: string;
+  category_id: string;
+  is_featured: boolean;
+}
+
 export interface creatorDashboardResponse {
   recent_posts: Array<{
     post_title: string;
