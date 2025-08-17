@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { FileText, TrendingUp, Eye, Edit, Trash2, Plus, User, X } from 'lucide-react';
 import { useDashboard } from '@/hooks/creatorDashboard';
 import Layout from '@/components/layout';
+import UserSats from './userStats.tsx';
 
 
 const CreatorDashboard = () => {
@@ -176,12 +177,12 @@ const CreatorDashboard = () => {
 
       {/* Navigation Tabs */}
       <div className="flex flex-wrap gap-2 border-b border-[#2A2C36] pb-4">
-        {['overview', 'posts'].map((tab) => (
+        {['overview', 'posts', 'profile'].map((tab) => (
           <Button
             key={tab}
             variant={activeTab === tab ? 'default' : 'ghost'}
             onClick={() => setActiveTab(tab)}
-            className={activeTab === tab ? 'text-red-400 hover:text-red-400/90 hover:cursor-pointer' : 'text-gray-400 hover:text-white hover:cursor-pointer'}
+            className={activeTab === tab ? 'text-white hover:text-gray-400 hover:cursor-pointer' : 'text-gray-400 hover:text-white hover:cursor-pointer'}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
           </Button>
@@ -203,7 +204,7 @@ const CreatorDashboard = () => {
             </Card>
             <Card className="bg-[#151619] border-[#2A2C36]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">Total Views</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-400">Total Views on Posts</CardTitle>
                 <TrendingUp className="h-4 w-4 text-red-400" />
               </CardHeader>
               <CardContent>
@@ -212,7 +213,7 @@ const CreatorDashboard = () => {
             </Card>
             <Card className="bg-[#151619] border-[#2A2C36]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">Total Likes</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-400">Total Likes on Posts</CardTitle>
                 <Eye className="h-4 w-4 text-red-400" />
               </CardHeader>
               <CardContent>
@@ -221,7 +222,7 @@ const CreatorDashboard = () => {
             </Card>
             <Card className="bg-[#151619] border-[#2A2C36]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-400">Comments</CardTitle>
+                <CardTitle className="text-sm font-medium text-gray-400">Total Comments on Posts</CardTitle>
                 <FileText className="h-4 w-4 text-red-400" />
               </CardHeader>
               <CardContent>
@@ -324,6 +325,11 @@ const CreatorDashboard = () => {
           </CardContent>
         </Card>
       )}
+
+      {activeTab === 'profile' && (
+        <UserSats />
+      )}
+
     </div>
   );
 };

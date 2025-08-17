@@ -1,37 +1,15 @@
+// this component is just a trimmed down version of memberDashboard.
 import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, Bookmark, MessageCircle, User, Eye, X } from 'lucide-react';
+import { Heart, Bookmark, MessageCircle, Eye } from 'lucide-react';
 import { useDashboard } from '@/hooks/memberDashboardHooks';
 import Layout from '@/components/layout';
 
-const MemberDashboard = () => {
+const UserStats = () => {
   const { dashboard, loading, error } = useDashboard();
-  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
 
-  const [showProfileModal, setShowProfileModal] = useState(false);
-  const [profileData, setProfileData] = useState({
-    fullName: user?.name || '',
-    email: user?.email || '',
-    avatar: user?.avatar || '',
-    username: user?.username || '',
-    role: user?.role || '',
-  });
-
-  const handleProfileUpdate = () => {
-    // Handle profile update logic here
-    console.log('Profile updated:', profileData);
-    setShowProfileModal(false);
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    setProfileData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
 
   if (loading) {
     return <Layout>
@@ -60,107 +38,6 @@ const MemberDashboard = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-white">Member Dashboard</h1>
-          <p className="text-gray-400 mt-1">Welcome back, {user?.name}</p>
-        </div>
-        <Button
-          variant="outline"
-          className="border-[#2A2C36] text-gray-400 hover:text-white"
-          onClick={() => setShowProfileModal(true)}>
-          <User size={16} className="mr-2" />
-          Edit Profile
-        </Button>
-      </div>
-
-      {/* Profile Edit Modal */}
-      {showProfileModal && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-[#0A0B0F] rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <Card className="bg-[#151619] border-[#2A2C36] border-0">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                <div>
-                  <CardTitle className="text-white">Profile Settings</CardTitle>
-                  <CardDescription className="text-gray-400">Update your profile information</CardDescription>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowProfileModal(false)}
-                  className="text-gray-400 hover:text-white"
-                >
-                  <X size={20} />
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  <div className="flex items-center gap-6">
-                    <div className="w-20 h-20  rounded-full flex items-center justify-center">
-                      { /* TODO: add conditional in future if user has a profile show it otherwise show this */},
-                      <User size={32} className="text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-medium">{user?.name}</h3>
-                      <p className="text-gray-400">{user?.email} - {user?.role}</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-gray-400 text-sm">Full Name</label>
-                      <input
-                        type="text"
-                        value={profileData.fullName}
-                        onChange={(e) => handleInputChange('fullName', e.target.value)}
-                        className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 focus:outline-none"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-gray-400 text-sm">Username</label>
-                      <input
-                        type="email"
-                        value={profileData.username}
-                        className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 cursor-not-allowed"
-                        readOnly
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-gray-400 text-sm">Email</label>
-                      <input
-                        type="email"
-                        value={profileData.email}
-                        className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 cursor-not-allowed"
-                        readOnly
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-4">
-                    <Button
-                      onClick={handleProfileUpdate}
-                      className="bg-red-400 hover:bg-red-400/90 text-white"
-                    >
-                      Update Profile
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowProfileModal(false)}
-                      className="border-[#2A2C36] text-gray-400 hover:text-white"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      )}
-
-
       {/* Navigation Tabs */}
       <div className="flex flex-wrap gap-2 border-b border-[#2A2C36] pb-4">
         {['overview', 'liked', 'saved', 'comments'].map((tab) => (
@@ -404,4 +281,4 @@ const MemberDashboard = () => {
   );
 };
 
-export default MemberDashboard;
+export default UserStats;
