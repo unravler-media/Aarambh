@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { API_BASE_URL, API_ENDPOINTS } from "@/config/config";
 
-export interface addPostInterface {
+export interface AddPostInterface {
   post_title: string;
   short_content: string;
   content: string;
