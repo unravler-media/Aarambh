@@ -3,7 +3,7 @@ import Layout from '../../components/layout.tsx';
 
 // Import Main Seperate Dashboard Pages. Will be rendered conditionally.
 import AdminDashboard from './boards/AdminDashboard.tsx';
-import CreatorDashboard from './boards/CreatorDashboard.tsx';
+import CreatorDashboardProvider from './boards/CreatorDashboard/CreatorWithProvider.tsx';
 import MemberDashboard from './boards/MemberDashboard.tsx';
 
 const Dashboard = () => {
@@ -24,7 +24,7 @@ const Dashboard = () => {
       case 'admin':
         return <AdminDashboard />;
       case 'creator':
-        return <CreatorDashboard />;
+        return <CreatorDashboardProvider />;
       case 'member':
         return <MemberDashboard />;
       default:

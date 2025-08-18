@@ -38,8 +38,8 @@ const processDashboard = (dashboard: creatorDashboardResponse): creatorDashboard
     comments_count: post.comments_count,
     status: post.status || "published",
   }))
-
 });
+
 
 export const useDashboard = () => {
   const [dashboard, setDashboard] = useState<creatorDashboardResponse | null>(null);
@@ -78,4 +78,41 @@ export const useDashboard = () => {
   }, []);
 
   return { dashboard, loading, error }
+};
+
+export const processNewPost = async (data: AddPostInterface) => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.createPost}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        post_title: data.post_title,
+        short_content: data.short_content,
+        content: data.content,
+        cover_image: data.cover_image,
+        category_id: data.category_id,
+        is_featured: data.is_featured,
+      }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 400) {
+        console.log("unauthorised token")
+        // localStorage.removeItem('user');
+        // localStorage.removeItem('authToken');
+        // window.location.href = "/";
+      } else {
+        throw new Error(`Unable to create a new post: ${await response.text()}`);
+      }
+    }
+
+    return await response.json();
+  } catch (err) {
+    throw err;
+  }
 };

@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { FileText, TrendingUp, Eye, Edit, Trash2, Plus, User, X, ChevronDown, CheckIcon } from 'lucide-react';
-import { useDashboard } from '@/hooks/creatorDashboard';
+import { useDashboard, processNewPost } from '@/hooks/creatorDashboard';
+import type { AddPostInterface } from '@/hooks/creatorDashboard';
 import Layout from '@/components/layout';
-import UserSats from './userStats.tsx';
+import UserSats from '../userStats.tsx';
 import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { useCategories, type Category } from '@/hooks/useCategories.tsx';
 import { Editor } from '@tinymce/tinymce-react';
@@ -42,22 +43,25 @@ const CreatorDashboard = () => {
   };
 
   const [showAddPostModal, setShowAddPostModal] = useState(false);
-  const [postData, setPostData] = useState({
-    postTitle: '',
-    shortContent: '',
+  const [postData, setPostData] = useState<AddPostInterface>({
+    post_title: '',
+    short_content: '',
     content: '',
-    coverImage: '',
-    categoryId: '',
-    isFeatured: ''
+    cover_image: '',
+    category_id: '',
+    is_featured: false
   });
   const [selected, setSelected] = useState<Category>();
 
-  const handlePostUpdate = () => {
-    // Handle profile update logic here
-    console.log('Post Created:', postData);
-    setShowAddPostModal(false);
+  const handlePostUpdate = async () => {
+    try {
+      console.log("Post Created:", postData);
+      await processNewPost(postData);
+      setShowAddPostModal(false);
+    } catch (err) {
+      console.error(err);
+    }
   };
-
   const handlePostInputChange = (field: string, value: string) => {
     setPostData(prev => ({
       ...prev,
@@ -160,8 +164,8 @@ const CreatorDashboard = () => {
                       <label className="text-gray-400 text-sm">Post Title</label>
                       <input
                         type="text"
-                        value={postData.postTitle}
-                        onChange={(e) => handlePostInputChange('postTitle', e.target.value)}
+                        value={postData.post_title}
+                        onChange={(e) => handlePostInputChange('post_title', e.target.value)}
                         className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 focus:outline-none"
                       />
                     </div>
@@ -170,7 +174,7 @@ const CreatorDashboard = () => {
 
                       <Listbox value={selected} onChange={(val) => {
                         setSelected(val);
-                        handlePostInputChange("categoryId", val.ID);
+                        handlePostInputChange("category_id", val.ID);
                       }}>
                         <Label className="block text-sm/6 font-medium text-white">Post Category</Label>
                         <div className="relative mt-2">
@@ -199,7 +203,7 @@ const CreatorDashboard = () => {
                                 <div className="flex items-center">
                                   <Button
                                     className="ml-3 block truncate font-normal group-data-selected:font-semibold"
-                                    onClick={() => handlePostInputChange("categoryId", category.ID)}>
+                                    onClick={() => handlePostInputChange("category_id", category.ID)}>
                                     {category.Name}
                                   </Button>
                                 </div>
@@ -216,19 +220,18 @@ const CreatorDashboard = () => {
                     <div className="space-y-1">
                       <label className="text-gray-400 text-sm">Featured</label>
                       <input
-                        type="text"
-                        value={postData.isFeatured}
-                        onChange={(e) => handlePostInputChange('isFeatured', e.target.value)}
-                        className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400"
-                      />
-                    </div>
+                        type="checkbox"
+                        checked={postData.is_featured} // <-- bind to checked, not value
+                        onChange={(e) => handlePostInputChange('is_featured', e.target.checked)} // <-- use e.target.checked
+                        className="w-5 h-5 accent-red-400"
+                      />                    </div>
 
                     <div className="space-y-1">
                       <label className="text-gray-400 text-sm">Cover Image</label>
                       <input
                         type="text"
-                        value={postData.coverImage}
-                        onChange={(e) => handlePostInputChange('coverImage', e.target.value)}
+                        value={postData.cover_image}
+                        onChange={(e) => handlePostInputChange('cover_image', e.target.value)}
                         className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400"
                       />
                     </div>
@@ -238,8 +241,8 @@ const CreatorDashboard = () => {
                     <label className="text-gray-400 text-sm">Short Content</label>
                     <input
                       type="text"
-                      value={postData.shortContent}
-                      onChange={(e) => handlePostInputChange('shortContent', e.target.value)}
+                      value={postData.short_content}
+                      onChange={(e) => handlePostInputChange('short_content', e.target.value)}
                       className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400"
                     />
                   </div>
