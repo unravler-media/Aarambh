@@ -248,23 +248,52 @@ const CreatorDashboard = () => {
                       apiKey='dt775bgzqw3gx7h13waz8gh1361rghoujlwmdha0k0mr62yy'
                       onInit={(evt, editor) => console.log("Editor is ready:", editor, evt)}
                       onEditorChange={(e) => handlePostInputChange('content', e)}
-                      initialValue="<p>Write Your Post Body here.</p>"
+                      initialValue=""
                       init={{
+                        placeholder: "Write Your Post Body here.",
+                        paste_as_text: true,
                         browser_spellcheck: true,
                         contextmenu: true,
                         height: 260,
                         skin: 'snow',
-                        menubar: true,
-                        plugins: [
-                          'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-                          'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                          'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount', 'codesample'
-                        ],
-                        toolbar: 'undo redo | blocks | codesample | ' +
-                          'bold italic forecolor | alignleft aligncenter ' +
-                          'alignright alignjustify | bullist numlist outdent indent | ' +
-                          'removeformat | help',
-                        codesample_languages: [
+                        // menubar: true,
+                        plugins: 'link image code table lists advlist media hr emoticons autosave codesample fullscreen preview wordcount charmap',
+                        toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | link image | bullist numlist | codesample | fullscreen',
+                        menubar: 'file edit view insert format tools table help',
+                        menu: {
+                          file: {
+                            title: 'File',
+                            items: 'newdocument | restoredraft | preview | print'
+                          },
+                          edit: {
+                            title: 'Edit',
+                            items: 'undo redo | cut copy paste | selectall | searchreplace'
+                          },
+                          view: {
+                            title: 'View',
+                            items: 'visualaid visualchars visualblocks | preview | fullscreen | code'
+                          },
+                          insert: {
+                            title: 'Insert',
+                            items: 'image link media codesample | charmap hr'
+                          },
+                          format: {
+                            title: 'Format',
+                            items: 'bold italic underline strikethrough superscript subscript | formats | removeformat'
+                          },
+                          tools: {
+                            title: 'Tools',
+                            items: 'spellchecker spellcheckerlanguage | code | wordcount'
+                          },
+                          table: {
+                            title: 'Table',
+                            items: 'inserttable | cell row column | tableprops deletetable'
+                          },
+                          help: {
+                            title: 'Help',
+                            items: 'help'
+                          }
+                        }, codesample_languages: [
                           { text: 'HTML/XML', value: 'markup' },
                           { text: 'JavaScript', value: 'javascript' },
                           { text: 'CSS', value: 'css' },
