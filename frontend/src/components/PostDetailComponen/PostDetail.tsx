@@ -59,7 +59,7 @@ const Post = () => {
         <div className="mb-6">
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center text-gray-400 hover:text-tech-red transition-colors"
+            className="inline-flex items-center text-gray-400 hover:text-white hover:cursor-pointer transition-colors"
           >
             <ChevronLeft size={16} className="mr-1" />
             Back

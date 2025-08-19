@@ -35,14 +35,14 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
   const { user, isAuthenticated } = useAuth();
   const isMobile = useIsMobile();
   const { toast } = useToast();
-  
+
   const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!newComment.trim() || !user || isSubmitting) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const authToken = localStorage.getItem('authToken');
       if (!authToken) {
@@ -71,7 +71,7 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
       }
 
       const responseData = await response.json();
-      
+
       // Create optimistic comment for immediate UI update using response data
       const optimisticComment: Comment = {
         id: responseData.response.id,
@@ -84,10 +84,10 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
         createdAt: responseData.response.updated_at,
         likes: 0,
       };
-      
+
       setComments([optimisticComment, ...comments]);
       setNewComment("");
-      
+
       toast({
         title: "Comment posted!",
         description: "Your comment has been added successfully.",
@@ -128,7 +128,7 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
       }
 
       setComments(comments.filter(comment => comment.id !== commentId));
-      
+
       toast({
         title: "Comment deleted!",
         description: "Your comment has been removed successfully.",
@@ -172,15 +172,15 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
         throw new Error('Failed to edit comment');
       }
 
-      setComments(comments.map(comment => 
-        comment.id === commentId 
+      setComments(comments.map(comment =>
+        comment.id === commentId
           ? { ...comment, content: editingText }
           : comment
       ));
-      
+
       setEditingCommentId(null);
       setEditingText("");
-      
+
       toast({
         title: "Comment updated!",
         description: "Your comment has been updated successfully.",
@@ -220,19 +220,19 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="comment" className="text-sm text-gray-300">Comment *</Label>
-                <Textarea 
-                  id="comment" 
-                  value={newComment} 
-                  onChange={(e) => setNewComment(e.target.value)} 
+                <Textarea
+                  id="comment"
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
                   placeholder="Write your comment here..."
                   required
                   className="min-h-[120px] bg-[#1A1B22] border-[#252833] text-white"
                 />
               </div>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isSubmitting}
-                className="bg-tech-red hover:bg-tech-red/90 text-white disabled:opacity-50"
+                className="text-white hover:text-gray-400 hover:cursor-pointer disabled:opacity-50"
               >
                 {isSubmitting ? "Posting..." : "Post Comment"}
               </Button>
@@ -244,8 +244,8 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
       {/* Comments list */}
       <div className="space-y-6">
         {comments.map((comment) => (
-          <div 
-            key={comment.id} 
+          <div
+            key={comment.id}
             className="bg-[#151619] p-4 sm:p-6 rounded-xl border border-[#252833] transition-all"
           >
             <div className="flex items-start gap-3 sm:gap-4">
@@ -268,7 +268,7 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
                   <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
                     <h4 className="font-medium text-white">{comment.author.name}</h4>
                     <span className="text-xs text-gray-400">
-                       {comment.createdAt}
+                      {comment.createdAt}
                     </span>
                   </div>
                   {user && comment.author.id === user.id && (
@@ -277,7 +277,7 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
                         variant="ghost"
                         size="sm"
                         onClick={() => startEditing(comment)}
-                        className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#252833]"
+                        className="h-8 w-8 p-0 text-gray-400 hover:text-white hover:bg-[#252833] hover:cursor-pointer"
                       >
                         <Edit2 size={14} />
                       </Button>
@@ -285,7 +285,7 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDeleteComment(comment.id)}
-                        className="h-8 w-8 p-0 text-gray-400 hover:text-red-400 hover:bg-[#252833]"
+                        className="h-8 w-8 p-0 text-gray-400 hover:text-red-400 hover:bg-[#252833] hover:cursor-pointer"
                       >
                         <Trash2 size={14} />
                       </Button>
@@ -303,7 +303,7 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
                       <Button
                         size="sm"
                         onClick={() => handleEditComment(comment.id)}
-                        className="bg-tech-red hover:bg-tech-red/90 text-white"
+                        className="hover:text-gray-400 hover:cursor-pointer text-white"
                       >
                         <Save size={14} className="mr-1" />
                         Save
@@ -312,7 +312,7 @@ const CommentSection = ({ postId, comments: initialComments }: CommentSectionPro
                         variant="outline"
                         size="sm"
                         onClick={cancelEditing}
-                        className="border-[#252833] text-gray-300 hover:bg-[#252833]"
+                        className="hover:cursor-pointer border-[#252833] text-gray-300 hover:bg-[#252833]"
                       >
                         <X size={14} className="mr-1" />
                         Cancel
