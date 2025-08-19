@@ -12,6 +12,7 @@ export const API_ENDPOINTS = {
   posts: '/api/posts/',
   post: '/api/posts/get/',
   createPost: '/api/posts/create/',
+  updatePost: '/api/posts/update/',
   createComment: '/api/comment/create/',
   searchPosts: '/api/query/',
   memberDashboard: '/api/dashboard/member/',

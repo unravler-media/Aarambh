@@ -103,11 +103,48 @@ export const processNewPost = async (data: AddPostInterface) => {
     if (!response.ok) {
       if (response.status === 400) {
         console.log("unauthorised token")
-        // localStorage.removeItem('user');
-        // localStorage.removeItem('authToken');
-        // window.location.href = "/";
+        localStorage.removeItem('user');
+        localStorage.removeItem('authToken');
+        window.location.href = "/";
       } else {
         throw new Error(`Unable to create a new post: ${await response.text()}`);
+      }
+    }
+
+    return await response.json();
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const processPostEdit = async (data: AddPostInterface, slug: string) => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.updatePost}/?post=${slug}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        post_title: data.post_title,
+        short_content: data.short_content,
+        content: data.content,
+        cover_image: data.cover_image,
+        category_id: data.category_id,
+        is_featured: data.is_featured,
+      }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 400) {
+        console.log("unauthorised token")
+        localStorage.removeItem('user');
+        localStorage.removeItem('authToken');
+        window.location.href = "/";
+      } else {
+        throw new Error(`Unable to edit a new post: ${await response.text()}`);
       }
     }
 

@@ -1,4 +1,4 @@
-import { BookOpen, Grid2X2, Search, Book, Hash, LogIn, UserPlus, User, ChevronDown, ChevronUp } from "lucide-react";
+import { Grid2X2, Search, Hash, LogIn, UserPlus, User, ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -104,7 +104,7 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
                         <div className="absolute inset-x-0 top-0 h-4 bg-gradient-to-b from-transparent to-[#090A0E] pointer-events-none z-0"></div>
                         <button
                           onClick={() => setShowAllCategories(true)}
-                          className="relative z-10 flex items-center gap-2 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-[#151619] transition-all w-full text-sm mt-1 bg-[#090A0E]/80"
+                          className="relative z-10 flex items-center gap-2 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-[#151619] transition-all w-full text-sm mt-1 bg-[#090A0E]/80 hover:cursor-pointer"
                         >
                           <ChevronDown size={16} />
                           <span>Load More ({categories.length - 4})</span>
@@ -113,7 +113,7 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
                     ) : (
                       <button
                         onClick={() => setShowAllCategories(false)}
-                        className="flex items-center gap-2 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-[#151619] transition-all w-full text-sm mt-2"
+                        className="flex items-center gap-2 px-3 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-[#151619] transition-all w-full text-sm mt-2 hover:cursor-pointer"
                       >
                         <ChevronUp size={16} />
                         <span>Collapse</span>
@@ -131,13 +131,13 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
               {!user ? (
                 <>
                   <li>
-                    <a href="login" onClick={e => { e.preventDefault(), window.location.href = "/login" }} className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/login") && "bg-[#151619] text-white font-medium shadow-sm")}>
+                    <a href="login" onClick={e => { e.preventDefault(), window.location.href = "/login" }} className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/login") && "bg-[#151619] text-white font-medium shadow-sm hover:cursor-pointer")}>
                       <LogIn size={18} strokeWidth={2.5} />
                       <span>Login</span>
                     </a>
                   </li>
                   <li>
-                    <a href="register" onClick={e => { e.preventDefault(), window.location.href = "/register" }} className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/register") && "bg-[#151619] text-white font-medium shadow-sm")}>
+                    <a href="register" onClick={e => { e.preventDefault(), window.location.href = "/register" }} className={cn("flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all", isActiveRoute("/register") && "bg-[#151619] text-white font-medium shadow-sm hover:cursor-pointer")}>
                       <UserPlus size={18} strokeWidth={2.5} />
                       <span>Register</span>
                     </a>
@@ -147,7 +147,7 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
                 <li>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all w-full text-left"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-gray-400 hover:bg-[#151619] hover:text-white transition-all w-full text-left hover:cursor-pointer"
                   >
                     <LogIn size={18} strokeWidth={2.5} />
                     <span>Logout</span>

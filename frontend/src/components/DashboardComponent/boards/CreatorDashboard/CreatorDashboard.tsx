@@ -12,6 +12,7 @@ import UserSats from '../userStats.tsx';
 import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
 import { useCategories, type Category } from '@/hooks/useCategories.tsx';
 import { Editor } from '@tinymce/tinymce-react';
+import EditPostComp from './editPostComp.tsx';
 
 const CreatorDashboard = () => {
 
@@ -71,6 +72,9 @@ const CreatorDashboard = () => {
     }));
   };
 
+  const [showEditPostModal, setShowEditPostModal] = useState(false);
+  const [editablePostSlug, setEditablePostSlug] = useState("");
+
   if (loading) {
     return <Layout>
       <div className="animate-pulse space-y-6">
@@ -122,6 +126,7 @@ const CreatorDashboard = () => {
           </Button>
         </div>
       </div>
+
       {/* Add New Post Modal */}
       {showAddPostModal && (
         <div className="fixed inset-0 backdrop-blur-sm bg-opacity-50 flex items-center justify-center p-8 z-50">
@@ -136,9 +141,9 @@ const CreatorDashboard = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowAddPostModal(false)}
-                  className="text-gray-400 hover:text-white"
+                  className="text-gray-400 hover:text-white hover:cursor-pointer"
                 >
-                  <X size={20} />
+                  <X size={30} />
                 </Button>
               </CardHeader>
               <CardContent>
@@ -212,14 +217,15 @@ const CreatorDashboard = () => {
                         </div>
                       </Listbox>                  </div>
 
-                    <div className="space-y-1">
+                    { /* <div className="space-y-1">
                       <label className="text-gray-400 text-sm">Featured</label>
                       <input
                         type="checkbox"
                         checked={postData.is_featured} // <-- bind to checked, not value
                         onChange={(e) => handlePostInputChange('is_featured', e.target.checked)} // <-- use e.target.checked
                         className="w-5 h-5 accent-red-400"
-                      />                    </div>
+                      />
+                      </div> */ }
 
                     <div className="space-y-1">
                       <label className="text-gray-400 text-sm">Cover Image</label>
@@ -227,23 +233,23 @@ const CreatorDashboard = () => {
                         type="text"
                         value={postData.cover_image}
                         onChange={(e) => handlePostInputChange('cover_image', e.target.value)}
-                        className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400"
+                        className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 focus:outline-none"
                       />
                     </div>
+                    <div className="space-y-1">
+                      <label className="text-gray-400 text-sm">Post Introduction</label>
+                      <input
+                        type="text"
+                        value={postData.short_content}
+                        onChange={(e) => handlePostInputChange('short_content', e.target.value)}
+                        className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 focus:outline-none"
+                      />
+                    </div>
+
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-gray-400 text-sm">Short Content</label>
-                    <input
-                      type="text"
-                      value={postData.short_content}
-                      onChange={(e) => handlePostInputChange('short_content', e.target.value)}
-                      className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-gray-400 text-sm">Content</label>
+                    <label className="text-gray-400 text-sm">Post Body</label>
                     <Editor
                       apiKey='dt775bgzqw3gx7h13waz8gh1361rghoujlwmdha0k0mr62yy'
                       onInit={(evt, editor) => console.log("Editor is ready:", editor, evt)}
@@ -251,10 +257,10 @@ const CreatorDashboard = () => {
                       initialValue=""
                       init={{
                         placeholder: "Write Your Post Body here.",
-                        paste_as_text: true,
+                        // paste_as_text: true,
                         browser_spellcheck: true,
                         contextmenu: true,
-                        height: 260,
+                        height: 300,
                         skin: 'snow',
                         // menubar: true,
                         plugins: 'link image code table lists advlist media hr emoticons autosave codesample fullscreen preview wordcount charmap',
@@ -297,8 +303,6 @@ const CreatorDashboard = () => {
                           { text: 'HTML/XML', value: 'markup' },
                           { text: 'JavaScript', value: 'javascript' },
                           { text: 'CSS', value: 'css' },
-                          { text: 'PHP', value: 'php' },
-                          { text: 'Ruby', value: 'ruby' },
                           { text: 'Python', value: 'python' },
                           { text: 'Java', value: 'java' },
                           { text: 'C', value: 'c' },
@@ -320,24 +324,28 @@ const CreatorDashboard = () => {
                   <div className="flex gap-3 pt-4">
                     <Button
                       onClick={handlePostUpdate}
-                      className="bg-red-400 hover:bg-red-400/90 text-white"
+                      className="text-white hover:text-gray-400 hover:cursor-pointer"
                     >
                       Create Post
                     </Button>
                     <Button
                       variant="outline"
                       onClick={() => setShowAddPostModal(false)}
-                      className="border-[#2A2C36] text-gray-400 hover:text-white"
+                      className="border-[#2A2C36] text-gray-400 hover:text-white hover:cursor-pointer"
                     >
                       Cancel
                     </Button>
                   </div>
                 </div>
               </CardContent>
-            </Card >
-          </div >
-        </div >
+            </Card>
+          </div>
+        </div>
+      )}
 
+      {/* Edit Existing Post Modal */}
+      {showEditPostModal && (
+        <EditPostComp postSlug={editablePostSlug} onClose={() => setShowEditPostModal(false)} />
       )}
 
       {/* Profile Edit Modal */}
@@ -507,8 +515,12 @@ const CreatorDashboard = () => {
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="text-gray-400 hover:text-white"
-                          onClick={() => window.location.href = `/dashboard/posts/${post.slug}/edit`}>
+                          className="text-gray-400 hover:text-white hover:cursor-pointer"
+                          onClick={() => {
+                            setEditablePostSlug(post.slug)
+                            setShowEditPostModal(true)
+                          }
+                          }>
                           <Edit size={16} />
                         </Button>
                       </div>
@@ -566,7 +578,7 @@ const CreatorDashboard = () => {
                               size="sm"
                               variant="ghost"
                               className="text-gray-400 hover:text-white hover:cursor-pointer"
-                              onClick={() => window.location.href = `/dashboard/posts/${post.slug}/edit`}>
+                              onClick={() => setShowEditPostModal(true)}>
                               <Edit size={16} />
                             </Button>
                             <Button size="sm" variant="ghost" className="text-red-400 hover:text-red-300 hover:cursor-pointer">

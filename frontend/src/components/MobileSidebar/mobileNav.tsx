@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
 import { Menu, X, Grid2X2, Search, Hash, LogIn, UserPlus, User } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { cn } from "@/lib/utils";
