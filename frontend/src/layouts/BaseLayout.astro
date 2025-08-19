@@ -2,6 +2,7 @@
 const { title = "Aarambh - by unravler media." } = Astro.props;
 // import "../styles/starwind.css";
 import "../styles/global.css";
+import 'prismjs/themes/prism-okaidia.css';
 // import "../index.css";
 ---
 
@@ -14,16 +15,109 @@ import "../styles/global.css";
     <title>{title}</title>
   </head>
   <body>
-    <!-- <div class="flex min-h-screen bg-[#0A0B0F] overflow-hidden" > -->
-      <!-- TODO: Add Main Sidebar component here -->
-      <!-- TODO: Add the mobile sidebar component here -->
-      <!-- <main class="flex-1 w-full md:ml-64 mt-14 md:mt-0 transition-all duration-300 overflow-hidden"> -->
-      <!--   <div class="container px-3 sm:px-4 md:px-4 lg:px-6 py-4 sm:py-6 mx-auto max-w-5xl lg:max-w-6xl xl:max-w-7xl w-full overflow-hidden min-w-0"> -->
-      <!--     <div class="fade-in-up"> -->
-            <slot />
-    <!--       </div> -->
-    <!--     </div> -->
-    <!--   </main> -->
-    <!-- </div> -->
+    <slot />
   </body>
+  <style is:global>
+  ::selection {
+    background-color: rgba(255, 62, 62, 0.2);
+  }
+  
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #090909;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #1A1A1A;
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #FF3E3E;
+  }
+
+  /* Code block styling */
+  pre[class*="language-"] {
+    background: #1a1a1a !important;
+    border: 1px solid #333;
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+    padding: 1rem;
+  }
+
+  code[class*="language-"] {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  :not(pre) > code {
+    background: #1a1a1a;
+    color: #FF3E3E;
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-size: 0.9em;
+    border: 1px solid #333;
+  }
+
+  .token.comment,
+  .token.prolog,
+  .token.doctype,
+  .token.cdata {
+    color: #666;
+  }
+
+  .token.punctuation {
+    color: #999;
+  }
+
+  .token.property,
+  .token.tag,
+  .token.boolean,
+  .token.number,
+  .token.constant,
+  .token.symbol {
+    color: #FF3E3E;
+  }
+
+  .token.selector,
+  .token.attr-name,
+  .token.string,
+  .token.char,
+  .token.builtin {
+    color: #7ee787;
+  }
+
+  .token.operator,
+  .token.entity,
+  .token.url,
+  .language-css .token.string,
+  .token.variable,
+  .token.inserted {
+    color: #79c0ff;
+  }
+
+  .token.atrule,
+  .token.attr-value,
+  .token.keyword {
+    color: #ff7b72;
+  }
+
+  .token.regex,
+  .token.important {
+    color: #ffa657;
+  }
+
+  .token.function {
+    color: #d2a8ff;
+  }
+
+  .token.deleted {
+    color: #ffa198;
+  }
+</style>
+
 </html>

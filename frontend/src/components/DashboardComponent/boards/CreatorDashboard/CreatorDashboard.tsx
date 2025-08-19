@@ -58,6 +58,8 @@ const CreatorDashboard = () => {
       console.log("Post Created:", postData);
       await processNewPost(postData);
       setShowAddPostModal(false);
+      // for reload the page to update posts from server
+      window.location.reload()
     } catch (err) {
       console.error(err);
     }
@@ -68,13 +70,6 @@ const CreatorDashboard = () => {
       [field]: value
     }));
   };
-
-  // useEffect(() => {
-  //   if (categories && categories.length > 0 && !selected) {
-  //     setSelected(categories[0]); // set default once categories arrive
-  //   }
-  // }, [categories, selected]);
-  //
 
   if (loading) {
     return <Layout>
@@ -263,13 +258,32 @@ const CreatorDashboard = () => {
                         plugins: [
                           'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
                           'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-                          'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+                          'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount', 'codesample'
                         ],
-                        toolbar: 'undo redo | blocks | ' +
+                        toolbar: 'undo redo | blocks | codesample | ' +
                           'bold italic forecolor | alignleft aligncenter ' +
                           'alignright alignjustify | bullist numlist outdent indent | ' +
                           'removeformat | help',
-                        content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+                        codesample_languages: [
+                          { text: 'HTML/XML', value: 'markup' },
+                          { text: 'JavaScript', value: 'javascript' },
+                          { text: 'CSS', value: 'css' },
+                          { text: 'PHP', value: 'php' },
+                          { text: 'Ruby', value: 'ruby' },
+                          { text: 'Python', value: 'python' },
+                          { text: 'Java', value: 'java' },
+                          { text: 'C', value: 'c' },
+                          { text: 'C#', value: 'csharp' },
+                          { text: 'C++', value: 'cpp' },
+                          { text: 'Go Lang', value: 'go' },
+                          { text: 'React JS', value: 'jsx' },
+                          { text: 'React TS', value: 'tsx' },
+                          { text: 'R', value: 'r' },
+                          { text: 'Protocol Buffers', value: 'protobuf' },
+                          { text: 'Powershell', value: 'powershell' },
+                          { text: 'GraphQL', value: 'graphql' },
+                          { text: 'Bash', value: 'bash' },
+                        ],
                       }}
                     />
                   </div>

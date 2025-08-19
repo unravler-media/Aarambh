@@ -9,6 +9,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/prism": "^3.3.0",
     "@astrojs/react": "4.3.0",
     "@astrojs/vercel": "^8.2.5",
     "@headlessui/react": "^2.2.7",
@@ -59,6 +60,7 @@
     "html-react-parser": "^5.2.6",
     "input-otp": "^1.2.4",
     "lucide-react": "0.536.0",
+    "prismjs": "^1.30.0",
     "react": "19.1.1",
     "react-dom": "19.1.1",
     "react-froala-wysiwyg": "^4.6.0",
