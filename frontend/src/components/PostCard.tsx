@@ -1,6 +1,7 @@
 import type { Post } from "../hooks/usePost";
 import { cn } from "@/lib/utils";
 import { Calendar } from "lucide-react";
+import { format } from "date-fns";
 
 interface PostCardProps {
   post: Post;
@@ -21,6 +22,12 @@ const PostCard = ({ post, className, variant = "default" }: PostCardProps) => {
       </svg>
     `)}`;
   };
+
+  const convertDate = (rawDateTime: string) => {
+    const date = new Date(rawDateTime);
+    const converted = format(date, "MMMM dd, yyyy HH:mm a")
+    return converted;
+  }
 
   return (
     <div className={cn("group block relative overflow-hidden rounded-xl card-hover bg-[#151619] hover:bg-[#1A1B22] h-full transition-all duration-300", className)}>
@@ -58,7 +65,7 @@ const PostCard = ({ post, className, variant = "default" }: PostCardProps) => {
           <div className="flex items-center text-xs text-gray-400">
             <div className="flex items-center">
               <Calendar size={12} className="mr-1" />
-              <span>{post.updated_at}</span>
+              <span>{convertDate(post.updated_at)}</span>
             </div>
           </div>
         </div>

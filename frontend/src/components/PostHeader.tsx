@@ -1,5 +1,5 @@
 import { Calendar, Clock } from "lucide-react";
-
+import { format } from "date-fns";
 interface PostHeaderProps {
   title: string;
   categoryName: string;
@@ -13,6 +13,12 @@ interface PostHeaderProps {
 }
 
 const PostHeader = ({ title, categoryName, shortContent, author, updated_at, readTime }: PostHeaderProps) => {
+  const convertDate = (rawDateTime: string) => {
+    const date = new Date(rawDateTime);
+    const converted = format(date, "MMMM dd, yyyy HH:mm a")
+    return converted;
+  }
+
   return (
     <>
       <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
@@ -52,7 +58,7 @@ const PostHeader = ({ title, categoryName, shortContent, author, updated_at, rea
         <div className="flex items-center text-gray-400 text-sm gap-4">
           <div className="flex items-center">
             <Calendar size={14} className="mr-1" />
-            <span>{updated_at}</span>
+            <span>{convertDate(updated_at)}</span>
           </div>
           <div className="flex items-center">
             <Clock size={14} className="mr-1" />

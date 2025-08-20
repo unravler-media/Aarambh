@@ -1,6 +1,6 @@
 import type { SearchPost } from "../hooks/usePost";
 import { cn } from "@/lib/utils";
-import { Calendar } from "lucide-react";
+
 
 interface SearchPostCardProps {
   post: SearchPost;
