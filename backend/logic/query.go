@@ -3,6 +3,7 @@ package logic
 import (
 	"backend/models"
 	"fmt"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -34,11 +35,11 @@ func QueryPosts(c *fiber.Ctx) error {
 	}
 
 	type QueryPosts struct {
-		UpdatedAt    string `json:"updated_at"`
-		PostTitle    string `json:"post_title"`
-		Slug         string `json:"slug"`
-		ShortContent string `json:"short_content"`
-		CoverImage   string `json:"cover_image"`
+		UpdatedAt    time.Time `json:"updated_at"`
+		PostTitle    string    `json:"post_title"`
+		Slug         string    `json:"slug"`
+		ShortContent string    `json:"short_content"`
+		CoverImage   string    `json:"cover_image"`
 		Author       AuthorResponse
 		Category     CategoryResponse
 	}

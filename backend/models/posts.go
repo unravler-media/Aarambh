@@ -12,20 +12,20 @@ import (
 )
 
 type Post struct {
-	ID           string   `gorm:"primaryKey"              json:"id"`
-	CreatedAt    string   `                               json:"created_at"`
-	UpdatedAt    string   `                               json:"updated_at"`
-	PostTitle    string   `gorm:"index"                   json:"post_title"    validate:"required,min=4"`
-	Slug         string   `gorm:"index"`
-	ShortContent string   `                               json:"short_content"`
-	Content      string   `                               json:"content"       validate:"required,min=128"`
-	CoverImage   string   `                               json:"cover_image"`
-	AuthorID     string   `                               json:"author_id"`
-	Author       Users    `gorm:"foreignKey:AuthorID"`
-	CategoryID   string   `                               json:"category_id"`
-	Category     Category `gorm:"foreignKey:CategoryID"`
-	ReadTime     string   `                               json:"read_time"`
-	IsFeatured   bool     `                               json:"is_featured"`
+	ID           string    `gorm:"primaryKey"              json:"id"`
+	CreatedAt    time.Time `                               json:"created_at"`
+	UpdatedAt    time.Time `                               json:"updated_at"`
+	PostTitle    string    `gorm:"index"                   json:"post_title"    validate:"required,min=4"`
+	Slug         string    `gorm:"index"`
+	ShortContent string    `                               json:"short_content"`
+	Content      string    `                               json:"content"       validate:"required,min=128"`
+	CoverImage   string    `                               json:"cover_image"`
+	AuthorID     string    `                               json:"author_id"`
+	Author       Users     `gorm:"foreignKey:AuthorID"`
+	CategoryID   string    `                               json:"category_id"`
+	Category     Category  `gorm:"foreignKey:CategoryID"`
+	ReadTime     string    `                               json:"read_time"`
+	IsFeatured   bool      `                               json:"is_featured"`
 	// Creating reverse relation to Comments to Preload in future
 	Comments   []Comment    `gorm:"foreignKey:PostID"`
 	PostLikes  []PostLike   `gorm:"foreignKey:PostID"`
@@ -37,7 +37,7 @@ type Post struct {
 // Creating Hooks for Post Model
 func (c *Post) BeforeCreate(tx *gorm.DB) (err error) {
 	// nanoid generation for ID of Post
-	nanoid_id, err := gonanoid.New()
+	nanoid_id, _ := gonanoid.New()
 	c.ID = nanoid_id
 	slug := strings.ToLower(c.PostTitle)
 	c.Slug = strings.ReplaceAll(slug, " ", "-")
@@ -48,17 +48,10 @@ func (c *Post) BeforeCreate(tx *gorm.DB) (err error) {
 		helpers.CalculateReadTime(c.Content),
 	)
 	c.ReadTime = readTime
-
-	current_time := time.Now()
-	c.CreatedAt = current_time.Format("Jan 2, 2006 at 3:04pm")
-	c.UpdatedAt = current_time.Format("Jan 2, 2006 at 3:04pm")
 	return nil
 }
 
 func (c *Post) BeforeUpdate(tx *gorm.DB) (err error) {
-	updatedTime := time.Now().Format("Jan 2, 2006 at 3:04pm")
-	c.UpdatedAt = updatedTime
-
 	readTime := fmt.Sprintf(
 		"Estimated read time: %d minute(s)",
 		helpers.CalculateReadTime(c.Content),
@@ -81,7 +74,7 @@ type PostLike struct {
 // Creating Hooks for PostLike Model
 func (c *PostLike) BeforeCreate(tx *gorm.DB) (err error) {
 	// nanoid generation for ID of Post
-	nanoid_id, err := gonanoid.New()
+	nanoid_id, _ := gonanoid.New()
 	c.ID = nanoid_id
 	return nil
 }
@@ -99,7 +92,7 @@ type PostView struct {
 // Creating Hooks for PostView Model
 func (c *PostView) BeforeCreate(tx *gorm.DB) (err error) {
 	// nanoid generation for ID of Post
-	nanoid_id, err := gonanoid.New()
+	nanoid_id, _ := gonanoid.New()
 	c.ID = nanoid_id
 	return nil
 }
@@ -117,7 +110,7 @@ type SavedPosts struct {
 // Creating Hooks for SavedPosts Model
 func (c *SavedPosts) BeforeCreate(tx *gorm.DB) (err error) {
 	// nanoid generation for ID of Post
-	nanoid_id, err := gonanoid.New()
+	nanoid_id, _ := gonanoid.New()
 	c.ID = nanoid_id
 	return nil
 }

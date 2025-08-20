@@ -3,6 +3,7 @@ package logic
 import (
 	"backend/models"
 	"fmt"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -20,7 +21,7 @@ type UserResponse struct {
 
 type postsResponse struct {
 	ID           string           `json:"id"`
-	UpdatedAt    string           `json:"updated_at"`
+	UpdatedAt    time.Time        `json:"updated_at"`
 	PostTitle    string           `json:"post_title"    gorm:"index" validate:"required,min=4"`
 	Slug         string           `json:"slug"`
 	CoverImage   string           `json:"cover_image"`
@@ -50,6 +51,7 @@ func FetchPosts(c *fiber.Ctx) error {
 		Preload("Author").
 		Preload("Category").
 		Select("id", "post_title", "slug", "cover_image", "read_time", "is_featured", "updated_at", "author_id", "category_id", "short_content").
+		Order("updated_at desc").
 		Find(&posts)
 
 	if query.Error != nil {
@@ -134,7 +136,7 @@ func FetchPost(c *fiber.Ctx) error {
 
 	type postResponse struct {
 		ID           string
-		UpdatedAt    string
+		UpdatedAt    time.Time
 		PostTitle    string
 		Slug         string
 		ShortContent string
