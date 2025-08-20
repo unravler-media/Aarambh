@@ -502,30 +502,41 @@ const CreatorDashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dashboard?.recent_posts.map((post) => (
-                    <div key={post.slug} className="flex items-center justify-between p-4 rounded-lg bg-[#0A0B0F] border border-[#2A2C36]">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-white font-medium truncate">{post.post_title}</p>
-                        <p className="text-sm text-gray-400">{post.views_count} views • {post.likes_count} likes • {post.comments_count} comments</p>
+                  {dashboard?.recent_posts && dashboard.recent_posts.length > 0 ? (
+                    dashboard.recent_posts.map((post) => (
+                      <div
+                        key={post.slug}
+                        className="flex items-center justify-between p-4 rounded-lg bg-[#0A0B0F] border border-[#2A2C36]"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="text-white font-medium truncate">{post.post_title}</p>
+                          <p className="text-sm text-gray-400">
+                            {post.views_count} views • {post.likes_count} likes • {post.comments_count} comments
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3 ml-4">
+                          <Badge variant={post.status === "published" ? "default" : "secondary"}>
+                            <p className="text-gray-400">{post.status}</p>
+                          </Badge>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="text-gray-400 hover:text-white hover:cursor-pointer"
+                            onClick={() => {
+                              setEditablePostSlug(post.slug);
+                              setShowEditPostModal(true);
+                            }}
+                          >
+                            <Edit size={16} />
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-3 ml-4">
-                        <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
-                          <p className='text-gray-400'>{post.status}</p>
-                        </Badge>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-gray-400 hover:text-white hover:cursor-pointer"
-                          onClick={() => {
-                            setEditablePostSlug(post.slug)
-                            setShowEditPostModal(true)
-                          }
-                          }>
-                          <Edit size={16} />
-                        </Button>
-                      </div>
+                    ))
+                  ) : (
+                    <div className="flex items-center justify-center p-4 rounded-lg bg-[#0A0B0F] border border-[#2A2C36]">
+                      <p className="text-gray-400 text-sm">No posts created yet</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -554,45 +565,58 @@ const CreatorDashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {dashboard?.recent_posts?.map((post) => (
-                      <TableRow key={post.slug} className="border-[#2A2C36]">
-                        <TableCell className="text-white">{post.post_title}</TableCell>
-                        <TableCell>
-                          <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
-                            <p className='text-gray-400'>{post.status}</p>
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-gray-400">{post.views_count}</TableCell>
-                        <TableCell className="text-gray-400">{post.likes_count}</TableCell>
-                        <TableCell className="text-gray-400">{post.comments_count}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-gray-400 hover:text-white hover:cursor-pointer"
-                              onClick={() => window.location.href = `/posts/${post.slug}`}>
-                              <Eye size={16} />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-gray-400 hover:text-white hover:cursor-pointer"
-                              onClick={() => setShowEditPostModal(true)}>
-                              <Edit size={16} />
-                            </Button>
-                            <Button size="sm" variant="ghost" className="text-red-400 hover:text-red-300 hover:cursor-pointer">
-                              <Trash2 size={16} />
-                            </Button>
-                          </div>
+                    {dashboard?.recent_posts && dashboard.recent_posts.length > 0 ? (
+                      dashboard.recent_posts.map((post) => (
+                        <TableRow key={post.slug} className="border-[#2A2C36]">
+                          <TableCell className="text-white">{post.post_title}</TableCell>
+                          <TableCell>
+                            <Badge variant={post.status === "published" ? "default" : "secondary"}>
+                              <p className="text-gray-400">{post.status}</p>
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-gray-400">{post.views_count}</TableCell>
+                          <TableCell className="text-gray-400">{post.likes_count}</TableCell>
+                          <TableCell className="text-gray-400">{post.comments_count}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-gray-400 hover:text-white hover:cursor-pointer"
+                                onClick={() => (window.location.href = `/posts/${post.slug}`)}
+                              >
+                                <Eye size={16} />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-gray-400 hover:text-white hover:cursor-pointer"
+                                onClick={() => setShowEditPostModal(true)}
+                              >
+                                <Edit size={16} />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-red-400 hover:text-red-300 hover:cursor-pointer"
+                              >
+                                <Trash2 size={16} />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow className="border-[#2A2C36]">
+                        <TableCell colSpan={6} className="text-center py-6 text-gray-400">
+                          No posts created yet
                         </TableCell>
                       </TableRow>
-                    ))}
+                    )}
                   </TableBody>
                 </Table>
               </div>
-            </CardContent>
-          </Card>
+            </CardContent>          </Card>
         )
       }
 
