@@ -2,7 +2,7 @@ import { Calendar, Clock } from "lucide-react";
 import { format } from "date-fns";
 interface PostHeaderProps {
   title: string;
-  categoryName: string;
+  categoryName: string | undefined;
   shortContent: string;
   author: {
     full_name: string;
@@ -21,12 +21,6 @@ const PostHeader = ({ title, categoryName, shortContent, author, updated_at, rea
 
   return (
     <>
-      <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
-        <span className="px-3 py-1 bg-[#151619] text-tech-red rounded-lg text-xs font-medium uppercase">
-          {categoryName}
-        </span>
-      </div>
-
       <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-white mb-4 sm:mb-6">
         {title}
       </h1>
@@ -34,6 +28,13 @@ const PostHeader = ({ title, categoryName, shortContent, author, updated_at, rea
       <p className="text-gray-300 text-sm sm:text-base mb-4 sm:mb-6 leading-relaxed">
         {shortContent}
       </p>
+
+      <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
+        <span className="text-accent px-3 py-1 bg-accent/10 rounded-full">
+          {categoryName}
+        </span>
+      </div>
+
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-t border-b border-[#252833] py-4 mb-6 sm:mb-8 gap-4">
         <div className="flex items-center">

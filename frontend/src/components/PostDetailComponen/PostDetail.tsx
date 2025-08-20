@@ -78,7 +78,7 @@ const Post = () => {
           <div className="p-3 sm:p-4 md:p-6 lg:p-8 w-full overflow-hidden">
             <PostHeader
               title={post.title}
-              categoryName="" // Category name will be handled differently with API
+              categoryName={post.category?.name}
               shortContent={post.short_content}
               author={post.author}
               updated_at={post.updated_at}
