@@ -130,6 +130,7 @@ func FetchPost(c *fiber.Ctx) error {
 	}
 	value := c.Get("Authorization", "false")
 	var has_liked bool
+	var has_saved bool
 
 	if value == "false" {
 		fmt.Println("No Auth passed.")
@@ -142,15 +143,26 @@ func FetchPost(c *fiber.Ctx) error {
 			fmt.Println("Unable to handle token: ", isError)
 		}
 
-		// fetch the logged in user based on the token.
-		var counter int64
-		db.Model(&models.PostLike{}).Where("post_id = ? AND liked_by_user = ?", post.ID, result).Count(&counter)
+		// fetch if the logged in user liked this post in past.
+		var likeCounter int64
+		db.Model(&models.PostLike{}).Where("post_id = ? AND liked_by_user = ?", post.ID, result).Count(&likeCounter)
 
-		if counter > 0 {
+		if likeCounter > 0 {
 			has_liked = true
 		} else {
 			has_liked = false
 		}
+
+		// fetch if the logged in user saved this post in past.
+		var saveCounter int64
+		db.Model(&models.SavedPosts{}).Where("saved_post_id = ? AND saved_by_user = ?", post.ID, result).Count(&saveCounter)
+
+		if saveCounter > 0 {
+			has_saved = true
+		} else {
+			has_saved = false
+		}
+
 	}
 
 	type commentsResponse struct {
@@ -172,6 +184,7 @@ func FetchPost(c *fiber.Ctx) error {
 		Category     categoryResponse
 		Comments     []commentsResponse
 		HasLiked     bool
+		HasSaved     bool
 	}
 
 	// Transform comments
@@ -200,6 +213,7 @@ func FetchPost(c *fiber.Ctx) error {
 		Content:      post.Content,
 		CoverImage:   post.CoverImage,
 		HasLiked:     has_liked,
+		HasSaved:     has_saved,
 		Author: UserResponse{
 			ID:       post.Author.ID,
 			Username: post.Author.Username,
