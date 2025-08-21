@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -23,12 +23,23 @@ const CreatorDashboard = () => {
 
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileData, setProfileData] = useState({
-    fullName: user?.name || '',
-    email: user?.email || '',
-    avatar: user?.avatar || '',
-    username: user?.username || '',
-    role: user?.role || '',
+    fullName: '',
+    email: '',
+    avatar: '',
+    username: '',
+    role: '',
   });
+
+  useEffect(() => {
+    setProfileData(prev => ({
+      ...prev,
+      fullName: user?.name || '',
+      email: user?.email || '',
+      avatar: user?.avatar || '',
+      username: user?.username || '',
+      role: user?.role || '',
+    }))
+  }, [user])
 
   const handleProfileUpdate = () => {
     // Handle profile update logic here

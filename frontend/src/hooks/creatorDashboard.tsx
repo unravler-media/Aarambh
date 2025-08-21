@@ -178,6 +178,7 @@ export const deletePost = async (post_slug: string) => {
       }
     }
 
+
     return await response.json();
   } catch (err) {
     throw err
