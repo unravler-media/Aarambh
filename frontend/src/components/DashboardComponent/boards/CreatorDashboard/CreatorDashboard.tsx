@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { FileText, TrendingUp, Eye, Edit, Trash2, Plus, User, X, ChevronDown, CheckIcon } from 'lucide-react';
-import { useDashboard, processNewPost } from '@/hooks/creatorDashboard';
+import { useDashboard, processNewPost, deletePost } from '@/hooks/creatorDashboard';
 import type { AddPostInterface } from '@/hooks/creatorDashboard';
 import Layout from '@/components/layout';
 import UserSats from '../userStats.tsx';
@@ -74,6 +74,15 @@ const CreatorDashboard = () => {
 
   const [showEditPostModal, setShowEditPostModal] = useState(false);
   const [editablePostSlug, setEditablePostSlug] = useState("");
+
+  const handlePostDelete = async (slug: string) => {
+    try {
+      await deletePost(slug);
+      window.location.reload()
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   if (loading) {
     return <Layout>
@@ -157,7 +166,7 @@ const CreatorDashboard = () => {
                       <h3 className="text-white font-medium">{user?.name}</h3>
                       <p className="text-gray-400">{user?.email} - {user?.role}</p>
                     </div>
-                  </div>
+                  // </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -579,6 +588,7 @@ const CreatorDashboard = () => {
                           <TableCell className="text-gray-400">{post.comments_count}</TableCell>
                           <TableCell>
                             <div className="flex gap-2">
+                              {/* This is the watch button to watch the post in action */}
                               <Button
                                 size="sm"
                                 variant="ghost"
@@ -587,6 +597,8 @@ const CreatorDashboard = () => {
                               >
                                 <Eye size={16} />
                               </Button>
+
+                              {/* This is the edit button to edit the post */}
                               <Button
                                 size="sm"
                                 variant="ghost"
@@ -595,10 +607,13 @@ const CreatorDashboard = () => {
                               >
                                 <Edit size={16} />
                               </Button>
+
+                              {/* Delete da post! lol */}
                               <Button
                                 size="sm"
                                 variant="ghost"
                                 className="text-red-400 hover:text-red-300 hover:cursor-pointer"
+                                onClick={() => handlePostDelete(post.slug)}
                               >
                                 <Trash2 size={16} />
                               </Button>

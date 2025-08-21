@@ -153,3 +153,33 @@ export const processPostEdit = async (data: AddPostInterface, slug: string) => {
     throw err;
   }
 };
+
+export const deletePost = async (post_slug: string) => {
+  try {
+    // Implement Post Delete Logic
+    const authToken = localStorage.getItem('authToken');
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.deletePost}/?post=${post_slug}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+      credentials: 'include',
+    })
+
+    if (!response.ok) {
+      if (response.status === 400) {
+        console.log("unauthorised token")
+        localStorage.removeItem('user');
+        localStorage.removeItem('authToken');
+        window.location.href = "/";
+      } else {
+        throw new Error(`Unable to delete the post: ${await response.text()}`);
+      }
+    }
+
+    return await response.json();
+  } catch (err) {
+    throw err
+  }
+}
