@@ -1,8 +1,10 @@
 package logic
 
 import (
+	"backend/helpers"
 	"backend/models"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -126,6 +128,24 @@ func FetchPost(c *fiber.Ctx) error {
 			"response": "Post not Found.",
 		})
 	}
+	// var has_liked int64
+	value := c.Get("Authorization", "false")
+
+	if value == "false" {
+		fmt.Println("No Auth passed.")
+	} else {
+		var token = strings.Replace(value, "Bearer", "", 1)
+
+		result, isError := helpers.ExtractUser(token)
+
+		if isError != nil {
+			fmt.Println("Unable to handle token: ", isError)
+		}
+		fmt.Println(result)
+
+	}
+
+	// db.Model(&models.PostLike{}).Where("post_id = ? AND liked_by_user = ?", post.Slug)
 
 	type commentsResponse struct {
 		ID          string
@@ -164,8 +184,7 @@ func FetchPost(c *fiber.Ctx) error {
 		})
 	}
 
-	var response postResponse
-	response = postResponse{
+	var response = postResponse{
 		ID:           post.ID,
 		UpdatedAt:    post.UpdatedAt,
 		PostTitle:    post.PostTitle,
