@@ -383,7 +383,7 @@ const CreatorDashboard = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowProfileModal(false)}
-                    className="text-gray-400 hover:text-white"
+                    className="text-gray-400 hover:text-white hover:cursor-pointer"
                   >
                     <X size={20} />
                   </Button>
@@ -436,14 +436,14 @@ const CreatorDashboard = () => {
                     <div className="flex gap-3 pt-4">
                       <Button
                         onClick={handleProfileUpdate}
-                        className="bg-red-400 hover:bg-red-400/90 text-white"
+                        className="bg-red-400 hover:bg-red-400/90 text-white hover:cursor-pointer"
                       >
                         Update Profile
                       </Button>
                       <Button
                         variant="outline"
                         onClick={() => setShowProfileModal(false)}
-                        className="border-[#2A2C36] text-gray-400 hover:text-white"
+                        className="border-[#2A2C36] text-gray-400 hover:text-white hover:cursor-pointer"
                       >
                         Cancel
                       </Button>
