@@ -1,13 +1,15 @@
 import { Share2, Bookmark, Heart } from "lucide-react";
+import { markPostBookmarked, markPostLiked } from "@/hooks/usePost";
 
 interface PostFooterProps {
   author: {
     full_name: string;
     avatar: string;
   };
+  post_slug: string;
 }
 
-const PostFooter = ({ author }: PostFooterProps) => {
+const PostFooter = ({ author, post_slug }: PostFooterProps) => {
   // Generate avatar fallback using first name initial
   const getAvatarFallback = (name: string) => {
     const initial = name.split(' ')[0]?.charAt(0)?.toUpperCase() || 'U';
@@ -42,12 +44,18 @@ const PostFooter = ({ author }: PostFooterProps) => {
 
       <div className="flex gap-2">
         {/* Liking Post Button */}
-        <button className="p-2 bg-[#151619] text-gray-400 hover:text-white rounded-full transition-colors">
+        <button
+          className="p-2 bg-[#151619] text-gray-400 hover:text-white hover:cursor-pointer rounded-full transition-colors"
+          onClick={() => markPostLiked(post_slug)}
+        >
           <Heart size={18} />
         </button>
 
         {/* Bookmark Post Button */}
-        <button className="p-2 bg-[#151619] text-gray-400 hover:text-white rounded-full transition-colors">
+        <button
+          className="p-2 bg-[#151619] text-gray-400 hover:text-white hover:cursor-pointer rounded-full transition-colors"
+          onClick={() => markPostBookmarked(post_slug)}
+        >
           <Bookmark size={18} />
         </button>
 

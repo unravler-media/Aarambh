@@ -8,15 +8,26 @@
 export const API_BASE_URL = "https://aarambh-server-qco5mrkowq-em.a.run.app";
 
 export const API_ENDPOINTS = {
+  // Extra's
   categories: '/api/category/',
-  posts: '/api/posts/',
-  post: '/api/posts/get/',
+
+  // POST Related CRUD Operations
   createPost: '/api/posts/create/',
   updatePost: '/api/posts/update/',
-  deletePost: '/api/posts/delete',
+  deletePost: '/api/posts/delete/',
+
+  // POST Related Extra's
+  posts: '/api/posts/',
+  post: '/api/posts/get/',
+
+  likePost: '/api/posts/like/',
+  savePost: '/api/posts/save/',
   readPost: '/api/posts/read/',
+
   createComment: '/api/comment/create/',
   searchPosts: '/api/query/',
+
+  // Dashboard Related
   memberDashboard: '/api/dashboard/member/',
   creatorDashboard: '/api/dashboard/creator/',
   adminDashboard: '/api/dashboard/admin/'

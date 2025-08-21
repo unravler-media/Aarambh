@@ -95,9 +95,9 @@ const Post = () => {
               readTime={post.readTime}
             />
 
-            <PostContent content={post?.content} />
+            <PostContent content={post.content} />
 
-            <PostFooter author={post.author} />
+            <PostFooter author={post.author} post_slug={post.slug} />
           </div>
         </article>
 

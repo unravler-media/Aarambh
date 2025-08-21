@@ -337,10 +337,90 @@ export const markPostRead = async (slug: string) => {
         } else if (response.status === 403) {
           return false;
         } else {
-          throw new Error(`Unable to create a new post: ${await response.text()}`);
+          throw new Error(`Unable to mark post as read: ${await response.text()}`);
         }
       }
-      console.log(await response.json());
+      console.log(await response.text());
+      return true
+    } else {
+      console.log("Anonymous User.");
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const markPostLiked = async (slug: string) => {
+  try {
+    // implement api call
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      const post_slug = decodeURIComponent(slug);
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.likePost}${post_slug}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        credentials: 'include',
+      })
+      if (!response.ok) {
+        if (response.status === 400) {
+          console.log("unauthorised token")
+          localStorage.removeItem('user');
+          localStorage.removeItem('authToken');
+          window.location.href = "/";
+        } else if (response.status === 404) {
+          console.log("Post Not Found with Slug: ", post_slug);
+          console.log("The error in question is: ", await response.text());
+          return false;
+        } else if (response.status === 403) {
+          return false;
+        } else {
+          throw new Error(`Unable to like post: ${await response.text()}`);
+        }
+      }
+      console.log(await response.text());
+      return true
+    } else {
+      console.log("Anonymous User.");
+    }
+  } catch (err) {
+    throw err;
+  }
+};
+
+export const markPostBookmarked = async (slug: string) => {
+  try {
+    // implement api call
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      const post_slug = decodeURIComponent(slug);
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.savePost}${post_slug}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        credentials: 'include',
+      })
+      if (!response.ok) {
+        if (response.status === 400) {
+          console.log("unauthorised token")
+          localStorage.removeItem('user');
+          localStorage.removeItem('authToken');
+          window.location.href = "/";
+        } else if (response.status === 404) {
+          console.log("Post Not Found with Slug: ", post_slug);
+          console.log("The error in question is: ", await response.text());
+          return false;
+        } else if (response.status === 403) {
+          return false;
+        } else {
+          throw new Error(`Unable to like post: ${await response.text()}`);
+        }
+      }
+      console.log(await response.text());
       return true
     } else {
       console.log("Anonymous User.");
