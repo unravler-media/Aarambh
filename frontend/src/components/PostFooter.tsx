@@ -1,4 +1,4 @@
-import { Share2, Bookmark } from "lucide-react";
+import { Share2, Bookmark, Heart } from "lucide-react";
 
 interface PostFooterProps {
   author: {
@@ -41,12 +41,24 @@ const PostFooter = ({ author }: PostFooterProps) => {
       </div>
 
       <div className="flex gap-2">
+        {/* Liking Post Button */}
         <button className="p-2 bg-[#151619] text-gray-400 hover:text-white rounded-full transition-colors">
-          <Share2 size={18} />
+          <Heart size={18} />
         </button>
+
+        {/* Bookmark Post Button */}
         <button className="p-2 bg-[#151619] text-gray-400 hover:text-white rounded-full transition-colors">
           <Bookmark size={18} />
         </button>
+
+        {/* Sharing Post Button */}
+        <button className="p-2 bg-[#151619] text-gray-400 hover:text-white rounded-full transition-colors">
+          <Share2 size={18} />
+        </button>
+
+
+
+
       </div>
     </div>
   );

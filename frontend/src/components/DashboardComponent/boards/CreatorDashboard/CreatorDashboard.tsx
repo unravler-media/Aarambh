@@ -272,7 +272,7 @@ const CreatorDashboard = () => {
                     <label className="text-gray-400 text-sm">Post Body</label>
                     <Editor
                       apiKey='dt775bgzqw3gx7h13waz8gh1361rghoujlwmdha0k0mr62yy'
-                      onInit={(evt, editor) => console.log("Editor is ready:", editor, evt)}
+                      // onInit={(evt, editor) => console.log("Editor is ready:", editor, evt)}
                       onEditorChange={(e) => handlePostInputChange('content', e)}
                       initialValue=""
                       init={{

@@ -1,14 +1,26 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import DOMPurify from 'dompurify';
-import prism from 'prismjs';
+import * as Prism from 'prismjs';
 
-// Import the language grammars you expect to use.
+// Prism CSS theme
+import "@/styles/prism-material-oceanic.css";
 // This ensures they are bundled and available for Prism on the client.
 import 'prismjs/components/prism-javascript';
 import 'prismjs/components/prism-css';
 import 'prismjs/components/prism-markup';
 import 'prismjs/components/prism-jsx';
-// Add any other languages you need
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-java';
+import 'prismjs/components/prism-cpp';
+import 'prismjs/components/prism-go';
+import 'prismjs/components/prism-csharp';
+import 'prismjs/components/prism-tsx';
+import 'prismjs/components/prism-r';
+import 'prismjs/components/prism-protobuf';
+import 'prismjs/components/prism-powershell';
+import 'prismjs/components/prism-graphql';
+import 'prismjs/components/prism-bash';
 
 interface PostContentProps {
   content: string;
@@ -22,11 +34,8 @@ const PostContent = ({ content }: PostContentProps) => {
 
   // 2. Use useEffect to run highlighting after render
   useEffect(() => {
-    if (contentRef.current) {
-      // 3. Tell Prism to highlight all code blocks within the ref'd element
-      prism.highlightAllUnder(contentRef.current);
-    }
-  }, [cleanHTML]); // 4. Re-run the effect if the HTML content changes
+    Prism.highlightAll();
+  }, []); // 4. Re-run the effect if the HTML content changes
 
   return (
     <div

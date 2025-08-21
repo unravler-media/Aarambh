@@ -18,7 +18,6 @@ type EditPostCompProps = {
 
 const EditPostComp = ({ onClose, postSlug }: EditPostCompProps) => {
   const { user } = useAuth();
-
   const { post, loading, error } = usePost(postSlug);
   const { categories } = useCategories();
   const [selected, setSelected] = useState<Category>();
@@ -220,7 +219,7 @@ const EditPostComp = ({ onClose, postSlug }: EditPostCompProps) => {
                   <label className="text-gray-400 text-sm">Post Body</label>
                   <Editor
                     apiKey='dt775bgzqw3gx7h13waz8gh1361rghoujlwmdha0k0mr62yy'
-                    onInit={(evt, editor) => console.log("Editor is ready:", editor, evt)}
+                    onInit={(evt, editor) => console.log("Editor is ready to edit the post:", editor, evt)}
                     onEditorChange={(e) => handleEditPostInputChange('content', e)}
                     initialValue={post?.content}
                     init={{

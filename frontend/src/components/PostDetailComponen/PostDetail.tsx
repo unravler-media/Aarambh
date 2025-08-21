@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Layout from "../layout.tsx";
-import { usePost } from "../../hooks/usePost.tsx";
+import { markPostRead, usePost } from "../../hooks/usePost.tsx";
 import { getPostsByCategory } from "../../data/posts.ts";
 import { ChevronLeft } from "lucide-react";
 import CommentSection from "../../components/CommentSection";
-import { getCommentsByPostId } from "../../data/comments";
+// import { getCommentsByPostId } from "../../data/comments";
 import PostHeader from "../../components/PostHeader";
 import PostContent from "../../components/PostContent";
 import RelatedPosts from "../../components/RelatedPosts";
@@ -18,7 +18,14 @@ const Post = () => {
   const slug = url.replace(/^\/posts\//, ''); // Extract slug
 
   const { post, loading, error } = usePost(slug);
-  const [relatedPosts, setRelatedPosts] = useState([]);
+  // const [relatedPosts, setRelatedPosts] = useState([]);
+  const readPost = async (slug: string) => {
+    try {
+      await markPostRead(slug);
+    } catch (err) {
+      throw err
+    }
+  };
 
   useEffect(() => {
     if (!slug) {
@@ -35,12 +42,15 @@ const Post = () => {
       return;
     }
 
-    if (post) {
-      const categoryPosts = getPostsByCategory(post.categoryId)
-        .filter(p => p.id !== post.id)
-        .slice(0, 3);
-      setRelatedPosts(categoryPosts);
-    }
+    // if (post) {
+    //   const categoryPosts = getPostsByCategory(post.categoryId)
+    //     .filter(p => p.id !== post.id)
+    //     .slice(0, 3);
+    //   setRelatedPosts(categoryPosts);
+    // }
+
+    // mark this post as read.
+    readPost(slug);
   }, [slug, error, post, navigate]);
 
   if (loading || !post) {
@@ -85,7 +95,7 @@ const Post = () => {
               readTime={post.readTime}
             />
 
-            <PostContent content={post.content} />
+            <PostContent content={post?.content} />
 
             <PostFooter author={post.author} />
           </div>
@@ -99,7 +109,7 @@ const Post = () => {
         </div>
 
         {/* More Articles Section */}
-        <RelatedPosts posts={relatedPosts} />
+        {/* <RelatedPosts posts={relatedPosts} /> */}
       </div>
     </Layout>
   );
