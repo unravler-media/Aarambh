@@ -40,8 +40,7 @@ func (c *Post) BeforeCreate(tx *gorm.DB) (err error) {
 	nanoid_id, _ := gonanoid.New()
 	c.ID = nanoid_id
 	slug := strings.ToLower(c.PostTitle)
-	c.Slug = strings.ReplaceAll(slug, " ", "-")
-
+	c.Slug = helpers.Slugify(slug)
 	// Calculate readTime of a Post
 	readTime := fmt.Sprintf(
 		"Estimated read time: %d minute(s)",

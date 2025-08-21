@@ -23,7 +23,8 @@ func CacheRequests(expiration time.Duration) fiber.Handler {
 			return c.Next()
 		}
 
-		if c.Method() == "POST" || c.Method() == "PUT" || c.Method() == "PATCH" {
+		if c.Method() == "POST" || c.Method() == "PUT" || c.Method() == "PATCH" ||
+			c.Method() == "DELETE" {
 			return c.Next()
 		}
 
