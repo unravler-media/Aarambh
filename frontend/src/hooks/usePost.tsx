@@ -334,6 +334,8 @@ export const markPostRead = async (slug: string) => {
           console.log("Post Not Found with Slug: ", post_slug);
           console.log("The error in question is: ", await response.text());
           return false;
+        } else if (response.status === 403) {
+          return false;
         } else {
           throw new Error(`Unable to create a new post: ${await response.text()}`);
         }
