@@ -128,8 +128,8 @@ func FetchPost(c *fiber.Ctx) error {
 			"response": "Post not Found.",
 		})
 	}
-	// var has_liked int64
 	value := c.Get("Authorization", "false")
+	var has_liked bool
 
 	if value == "false" {
 		fmt.Println("No Auth passed.")
@@ -141,11 +141,17 @@ func FetchPost(c *fiber.Ctx) error {
 		if isError != nil {
 			fmt.Println("Unable to handle token: ", isError)
 		}
-		fmt.Println(result)
 
+		// fetch the logged in user based on the token.
+		var counter int64
+		db.Model(&models.PostLike{}).Where("post_id = ? AND liked_by_user = ?", post.ID, result).Count(&counter)
+
+		if counter > 0 {
+			has_liked = true
+		} else {
+			has_liked = false
+		}
 	}
-
-	// db.Model(&models.PostLike{}).Where("post_id = ? AND liked_by_user = ?", post.Slug)
 
 	type commentsResponse struct {
 		ID          string
@@ -165,6 +171,7 @@ func FetchPost(c *fiber.Ctx) error {
 		Author       UserResponse
 		Category     categoryResponse
 		Comments     []commentsResponse
+		HasLiked     bool
 	}
 
 	// Transform comments
@@ -192,6 +199,7 @@ func FetchPost(c *fiber.Ctx) error {
 		ShortContent: post.ShortContent,
 		Content:      post.Content,
 		CoverImage:   post.CoverImage,
+		HasLiked:     has_liked,
 		Author: UserResponse{
 			ID:       post.Author.ID,
 			Username: post.Author.Username,
