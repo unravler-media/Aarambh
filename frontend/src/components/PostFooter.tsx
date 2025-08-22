@@ -1,25 +1,42 @@
 import { Share2, Bookmark, Heart } from "lucide-react";
 import { markPostBookmarked, markPostLiked } from "@/hooks/usePost";
+import type { Post } from "@/hooks/usePost";
+import { useEffect, useState } from "react";
 
 interface PostFooterProps {
   author: {
     full_name: string;
     avatar: string;
   };
-  post_slug: string;
+  post: Post
 }
 
-const PostFooter = ({ author, post_slug }: PostFooterProps) => {
-  // Generate avatar fallback using first name initial
-  const getAvatarFallback = (name: string) => {
-    const initial = name.split(' ')[0]?.charAt(0)?.toUpperCase() || 'U';
-    return `data:image/svg+xml;base64,${btoa(`
-      <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-        <rect width="32" height="32" fill="#151619"/>
-        <text x="16" y="20" text-anchor="middle" fill="#ffffff" font-family="Arial" font-size="14" font-weight="bold">${initial}</text>
-      </svg>
-    `)}`;
+const PostFooter = ({ author, post }: PostFooterProps) => {
+  const [hasLikedState, setHasLikedState] = useState(false);
+  const [hasSavedState, setHasSavedState] = useState(false);
+
+  const handleLikeMethod = async (slug: string) => {
+    const liked = await markPostLiked(slug);
+    if (liked) {
+      setHasLikedState(true);
+    }
   };
+  const handleSaveMethod = async (slug: string) => {
+    const saved = await markPostBookmarked(slug);
+    if (saved) {
+      setHasSavedState(true);
+    }
+  };
+
+  useEffect(() => {
+    if (post.hasLiked) {
+      setHasLikedState(true);
+    }
+
+    if (post.hasSaved) {
+      setHasSavedState(true);
+    }
+  }, [post])
 
   return (
     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-8 pt-6 border-t border-[#252833]">
@@ -44,31 +61,43 @@ const PostFooter = ({ author, post_slug }: PostFooterProps) => {
 
       <div className="flex gap-2">
         {/* Liking Post Button */}
-        <button
-          className="p-2 bg-[#151619] text-gray-400 hover:text-white hover:cursor-pointer rounded-full transition-colors"
-          onClick={() => markPostLiked(post_slug)}
-        >
-          <Heart size={18} />
-        </button>
+
+        {hasLikedState ? (
+          <button
+            className="p-2 bg-[#151619] text-red-500 hover:text-white hover:cursor-pointer rounded-full transition-colors"
+            onClick={() => console.log("Unliking the Post")}
+          >
+            <Heart fill="transparent" size={18} /> {/* Filled look */}
+          </button>
+        ) : (
+          <button
+            className="p-2 bg-[#151619] text-gray-400 hover:text-white hover:cursor-pointer rounded-full transition-colors"
+            onClick={() => handleLikeMethod(post.slug)}
+          >
+            <Heart size={18} /> {/* Outline look */}
+          </button>
+        )}
 
         {/* Bookmark Post Button */}
-        <button
-          className="p-2 bg-[#151619] text-gray-400 hover:text-white hover:cursor-pointer rounded-full transition-colors"
-          onClick={() => markPostBookmarked(post_slug)}
-        >
-          <Bookmark size={18} />
-        </button>
+        {hasSavedState ? (
+          <button
+            className="p-2 bg-[#151619] text-red-500 hover:text-white hover:cursor-pointer rounded-full transition-colors"
+            onClick={() => console.log("un-bookmarking the post")}>
+            <Bookmark fill="transparent" size={18} />
+          </button>
+        ) : (
+          <button
+            className="p-2 bg-[#151619] text-gray-400 hover:text-white hover:cursor-pointer rounded-full transition-colors"
+            onClick={() => handleSaveMethod(post.slug)}>
+            <Bookmark size={18} /></button>
+        )}
 
         {/* Sharing Post Button */}
         <button className="p-2 bg-[#151619] text-gray-400 hover:text-white rounded-full transition-colors">
           <Share2 size={18} />
         </button>
-
-
-
-
       </div>
-    </div>
+    </div >
   );
 };
 

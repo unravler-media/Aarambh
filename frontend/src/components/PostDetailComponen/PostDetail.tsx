@@ -97,7 +97,7 @@ const Post = () => {
 
             <PostContent content={post.content} />
 
-            <PostFooter author={post.author} post_slug={post.slug} />
+            <PostFooter author={post.author} post={post} />
           </div>
         </article>
 

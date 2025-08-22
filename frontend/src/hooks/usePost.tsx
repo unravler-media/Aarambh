@@ -50,6 +50,8 @@ export interface ApiPostDetail {
   ShortContent: string;
   Content: string;
   cover_image: string;
+  HasLiked: boolean;
+  HasSaved: boolean;
   Author: {
     id: string;
     username: string;
@@ -115,6 +117,8 @@ export interface Post {
   updated_at: string;
   readTime: number;
   isFeatured: boolean;
+  hasLiked: boolean;
+  hasSaved: boolean;
   comments?: Array<{
     id: string;
     author: {
@@ -139,7 +143,7 @@ const transformApiPost = (apiPost: ApiPost): Post => ({
   id: apiPost.id,
   title: apiPost.post_title,
   slug: apiPost.slug,
-  short_content: apiPost.short_content, // Not available in list API
+  short_content: apiPost.short_content,
   cover_image: apiPost.cover_image,
   author: {
     id: apiPost.author.id,
@@ -151,6 +155,10 @@ const transformApiPost = (apiPost: ApiPost): Post => ({
   updated_at: apiPost.updated_at,
   readTime: extractReadTime(apiPost.read_time),
   isFeatured: apiPost.is_featured,
+
+  // dummy to satisfy the interface
+  hasSaved: false,
+  hasLiked: false
 });
 
 const transformApiSearchPost = (apiPost: ApiSearchPost): SearchPost => ({
@@ -189,6 +197,8 @@ const transformApiPostDetail = (apiPost: ApiPostDetail): Post => ({
   updated_at: apiPost.UpdatedAt,
   readTime: 5, // Default read time for detail API
   isFeatured: false, // Not available in detail API
+  hasLiked: apiPost.HasLiked,
+  hasSaved: apiPost.HasSaved,
   comments: apiPost.Comments?.map(comment => ({
     id: comment.ID,
     author: {
