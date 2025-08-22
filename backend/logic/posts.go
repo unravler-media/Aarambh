@@ -1,10 +1,8 @@
 package logic
 
 import (
-	"backend/helpers"
 	"backend/models"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -128,42 +126,6 @@ func FetchPost(c *fiber.Ctx) error {
 			"response": "Post not Found.",
 		})
 	}
-	value := c.Get("Authorization", "false")
-	var has_liked bool
-	var has_saved bool
-
-	if value == "false" {
-		fmt.Println("No Auth passed.")
-	} else {
-		var token = strings.Replace(value, "Bearer", "", 1)
-
-		result, isError := helpers.ExtractUser(token)
-
-		if isError != nil {
-			fmt.Println("Unable to handle token: ", isError)
-		}
-
-		// fetch if the logged in user liked this post in past.
-		var likeCounter int64
-		db.Model(&models.PostLike{}).Where("post_id = ? AND liked_by_user = ?", post.ID, result).Count(&likeCounter)
-
-		if likeCounter > 0 {
-			has_liked = true
-		} else {
-			has_liked = false
-		}
-
-		// fetch if the logged in user saved this post in past.
-		var saveCounter int64
-		db.Model(&models.SavedPosts{}).Where("saved_post_id = ? AND saved_by_user = ?", post.ID, result).Count(&saveCounter)
-
-		if saveCounter > 0 {
-			has_saved = true
-		} else {
-			has_saved = false
-		}
-
-	}
 
 	type commentsResponse struct {
 		ID          string
@@ -183,8 +145,6 @@ func FetchPost(c *fiber.Ctx) error {
 		Author       UserResponse
 		Category     categoryResponse
 		Comments     []commentsResponse
-		HasLiked     bool
-		HasSaved     bool
 	}
 
 	// Transform comments
@@ -212,8 +172,6 @@ func FetchPost(c *fiber.Ctx) error {
 		ShortContent: post.ShortContent,
 		Content:      post.Content,
 		CoverImage:   post.CoverImage,
-		HasLiked:     has_liked,
-		HasSaved:     has_saved,
 		Author: UserResponse{
 			ID:       post.Author.ID,
 			Username: post.Author.Username,
@@ -227,6 +185,69 @@ func FetchPost(c *fiber.Ctx) error {
 			Slug: post.Category.Slug,
 		},
 		Comments: transformedComments,
+	}
+
+	return c.JSON(fiber.Map{
+		"response": response,
+	})
+}
+
+func FetchPostMeta(c *fiber.Ctx) error {
+	db, ok := c.Locals("db").(*gorm.DB)
+	if !ok {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "DB Fucked",
+		})
+	}
+
+	// extracting information from the token and decoding it and storing it inside the token var
+	session_user := c.Locals("session_user")
+	if session_user == nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "User not found in session.",
+		})
+	}
+
+	jwtLocale := c.Locals("session_user").(*jwt.Token)
+	token := jwtLocale.Claims.(jwt.MapClaims)
+	user_id := token["sub"].(string)
+
+	var has_liked bool
+	var has_saved bool
+
+	// fetch if the logged in user liked this post in past.
+	var likeCounter int64
+	post_id := c.Params("id")
+	db.Model(&models.PostLike{}).
+		Where("post_id = ? AND liked_by_user = ?", post_id, user_id).
+		Count(&likeCounter)
+
+	if likeCounter > 0 {
+		has_liked = true
+	} else {
+		has_liked = false
+	}
+
+	// fetch if the logged in user saved this post in past.
+	var saveCounter int64
+	db.Model(&models.SavedPosts{}).
+		Where("saved_post_id = ? AND saved_by_user = ?", post_id, user_id).
+		Count(&saveCounter)
+
+	if saveCounter > 0 {
+		has_saved = true
+	} else {
+		has_saved = false
+	}
+
+	type metaResponse struct {
+		HasLiked bool
+		HasSaved bool
+	}
+
+	var response = metaResponse{
+		HasLiked: has_liked,
+		HasSaved: has_saved,
 	}
 
 	return c.JSON(fiber.Map{

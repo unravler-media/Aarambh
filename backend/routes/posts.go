@@ -11,6 +11,7 @@ import (
 func PostRoutes(router fiber.Router) {
 	router.Get("/", logic.FetchPosts)
 	router.Get("get/", logic.FetchPost)
+	router.Post("get/:id/meta", middlewares.Protect(), logic.FetchPostMeta)
 
 	router.Post("create/", middlewares.Protect(), logic.CreatePost)
 
