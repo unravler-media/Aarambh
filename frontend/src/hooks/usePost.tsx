@@ -252,13 +252,31 @@ export const usePost = (slug: string) => {
     const fetchPost = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.post}?post=${slug}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch post');
+        const authToken = localStorage.getItem('authToken');
+        if (authToken) {
+          const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.post}?post=${slug}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${authToken}`,
+            },
+            credentials: 'include',
+          });
+          if (!response.ok) {
+            throw new Error('Failed to fetch post');
+          }
+          const data = await response.json();
+          const transformedPost = transformApiPostDetail(data.response);
+          setPost(transformedPost);
+        } else {
+          const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.post}?post=${slug}`);
+          if (!response.ok) {
+            throw new Error('Failed to fetch post');
+          }
+          const data = await response.json();
+          const transformedPost = transformApiPostDetail(data.response);
+          setPost(transformedPost);
         }
-        const data = await response.json();
-        const transformedPost = transformApiPostDetail(data.response);
-        setPost(transformedPost);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
