@@ -1,5 +1,5 @@
 import { Share2, Bookmark, Heart } from "lucide-react";
-import { markPostBookmarked, markPostLiked, markPostUnLiked, markPostUnBookmarked } from "@/hooks/usePost";
+import { markPostBookmarked, markPostLiked, markPostUnLiked, markPostUnBookmarked, postMeta } from "@/hooks/usePost";
 import type { Post } from "@/hooks/usePost";
 import { useEffect, useState } from "react";
 
@@ -52,27 +52,21 @@ const PostFooter = ({ author, post }: PostFooterProps) => {
     }
   };
 
-
-
-
   useEffect(() => {
-    console.log("Effect is in place")
-    // console.log()
-    if (post.hasLiked) {
-      console.log("Post is Liked")
-      setHasLikedState(true);
-    } else {
-      console.log("Post is unliked")
-      setHasLikedState(false);
+    const fetchMeta = async () => {
+      var data = await postMeta(post.id);
+      if (data?.HasLiked) {
+        setHasLikedState(true);
+      } else {
+        setHasLikedState(false);
+      }
+      if (data?.HasSaved) {
+        setHasSavedState(true);
+      } else {
+        setHasSavedState(false);
+      }
     }
-
-    if (post.hasSaved) {
-      console.log("Post is saved")
-      setHasSavedState(true);
-    } else {
-      console.log("Post is unsaved")
-      setHasSavedState(false);
-    }
+    fetchMeta();
   }, [])
 
   return (

@@ -130,6 +130,16 @@ export interface Post {
   }>;
 }
 
+export interface postMeta {
+  HasLiked: boolean;
+  HasSaved: boolean;
+}
+
+const serializePostMeta = (meta: postMeta): postMeta => ({
+  HasLiked: meta.HasLiked,
+  HasSaved: meta.HasSaved
+})
+
 const extractReadTime = (readTimeString?: string): number => {
   if (typeof readTimeString !== 'string') return 5; // fallback default
   const match = readTimeString.match(/(\d+)/);
@@ -233,6 +243,30 @@ export const usePosts = () => {
   return { posts, loading, error };
 };
 
+export const postMeta = async (post_id: string) => {
+  try {
+    const authToken = localStorage.getItem('authToken');
+    if (authToken) {
+      const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.post}${post_id}/meta`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        credentials: 'include',
+      })
+      const data = await response.json();
+      var serializeMeta = serializePostMeta(data.response);
+      return serializeMeta;
+    } else {
+      console.log("Anonymous User")
+      return;
+    }
+  } catch (err) {
+    throw err
+  }
+}
+
 export const usePost = (slug: string) => {
   const [post, setPost] = useState<Post>();
   const [loading, setLoading] = useState(true);
@@ -244,31 +278,13 @@ export const usePost = (slug: string) => {
     const fetchPost = async () => {
       try {
         setLoading(true);
-        const authToken = localStorage.getItem('authToken');
-        if (authToken) {
-          const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.post}?post=${slug}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${authToken}`,
-            },
-            credentials: 'include',
-          });
-          if (!response.ok) {
-            throw new Error('Failed to fetch post');
-          }
-          const data = await response.json();
-          const transformedPost = transformApiPostDetail(data.response);
-          setPost(transformedPost);
-        } else {
-          const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.post}?post=${slug}`);
-          if (!response.ok) {
-            throw new Error('Failed to fetch post');
-          }
-          const data = await response.json();
-          const transformedPost = transformApiPostDetail(data.response);
-          setPost(transformedPost);
+        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.post}?post=${slug}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch post');
         }
+        const data = await response.json();
+        const transformedPost = transformApiPostDetail(data.response);
+        setPost(transformedPost);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
