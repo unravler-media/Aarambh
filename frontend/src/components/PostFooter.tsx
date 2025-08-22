@@ -19,6 +19,8 @@ const PostFooter = ({ author, post }: PostFooterProps) => {
     const liked = await markPostLiked(slug);
     if (liked) {
       setHasLikedState(true);
+    } else {
+      setHasLikedState(false);
     }
   };
 
@@ -26,6 +28,8 @@ const PostFooter = ({ author, post }: PostFooterProps) => {
     const unliked = await markPostUnLiked(slug);
     if (unliked) {
       setHasLikedState(false);
+    } else {
+      setHasLikedState(true);
     }
   };
 
@@ -34,6 +38,8 @@ const PostFooter = ({ author, post }: PostFooterProps) => {
     const saved = await markPostBookmarked(slug);
     if (saved) {
       setHasSavedState(true);
+    } else {
+      setHasSavedState(false);
     }
   };
 
@@ -41,6 +47,8 @@ const PostFooter = ({ author, post }: PostFooterProps) => {
     const unsaved = await markPostUnBookmarked(slug);
     if (unsaved) {
       setHasSavedState(false);
+    } else {
+      setHasSavedState(true);
     }
   };
 
@@ -51,13 +59,19 @@ const PostFooter = ({ author, post }: PostFooterProps) => {
     console.log("Effect is in place")
     // console.log()
     if (post.hasLiked) {
-      console.log("Post is already Liked")
+      console.log("Post is Liked")
       setHasLikedState(true);
+    } else {
+      console.log("Post is unliked")
+      setHasLikedState(false);
     }
 
     if (post.hasSaved) {
-      console.log("Post is already saved")
+      console.log("Post is saved")
       setHasSavedState(true);
+    } else {
+      console.log("Post is unsaved")
+      setHasSavedState(false);
     }
   }, [])
 
