@@ -21,7 +21,11 @@ export const API_ENDPOINTS = {
   post: '/api/posts/get/',
 
   likePost: '/api/posts/like/',
+  unlikePost: '/api/posts/unlike/',
+
+
   savePost: '/api/posts/save/',
+  unsavePost: '/api/posts/unsave/',
   readPost: '/api/posts/read/',
 
   createComment: '/api/comment/create/',

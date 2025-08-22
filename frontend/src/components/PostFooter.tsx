@@ -1,5 +1,5 @@
 import { Share2, Bookmark, Heart } from "lucide-react";
-import { markPostBookmarked, markPostLiked } from "@/hooks/usePost";
+import { markPostBookmarked, markPostLiked, markPostUnLiked, markPostUnBookmarked } from "@/hooks/usePost";
 import type { Post } from "@/hooks/usePost";
 import { useEffect, useState } from "react";
 
@@ -21,6 +21,15 @@ const PostFooter = ({ author, post }: PostFooterProps) => {
       setHasLikedState(true);
     }
   };
+
+  const handleUnLikeMethod = async (slug: string) => {
+    const unliked = await markPostUnLiked(slug);
+    if (unliked) {
+      setHasLikedState(false);
+    }
+  };
+
+
   const handleSaveMethod = async (slug: string) => {
     const saved = await markPostBookmarked(slug);
     if (saved) {
@@ -28,15 +37,28 @@ const PostFooter = ({ author, post }: PostFooterProps) => {
     }
   };
 
+  const handleUnSaveMethod = async (slug: string) => {
+    const unsaved = await markPostUnBookmarked(slug);
+    if (unsaved) {
+      setHasSavedState(false);
+    }
+  };
+
+
+
+
   useEffect(() => {
+    console.log("Effect is in place")
     if (post.hasLiked) {
+      console.log("Post is already Liked")
       setHasLikedState(true);
     }
 
     if (post.hasSaved) {
+      console.log("Post is already saved")
       setHasSavedState(true);
     }
-  }, [post])
+  }, [])
 
   return (
     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-8 pt-6 border-t border-[#252833]">
@@ -65,7 +87,7 @@ const PostFooter = ({ author, post }: PostFooterProps) => {
         {hasLikedState ? (
           <button
             className="p-2 bg-[#151619] text-red-500 hover:text-white hover:cursor-pointer rounded-full transition-colors"
-            onClick={() => console.log("Unliking the Post")}
+            onClick={() => handleUnLikeMethod(post.slug)}
           >
             <Heart fill="transparent" size={18} /> {/* Filled look */}
           </button>
@@ -82,7 +104,7 @@ const PostFooter = ({ author, post }: PostFooterProps) => {
         {hasSavedState ? (
           <button
             className="p-2 bg-[#151619] text-red-500 hover:text-white hover:cursor-pointer rounded-full transition-colors"
-            onClick={() => console.log("un-bookmarking the post")}>
+            onClick={() => handleUnSaveMethod(post.slug)}>
             <Bookmark fill="transparent" size={18} />
           </button>
         ) : (
