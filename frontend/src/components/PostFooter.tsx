@@ -49,6 +49,7 @@ const PostFooter = ({ author, post }: PostFooterProps) => {
 
   useEffect(() => {
     console.log("Effect is in place")
+    // console.log()
     if (post.hasLiked) {
       console.log("Post is already Liked")
       setHasLikedState(true);
