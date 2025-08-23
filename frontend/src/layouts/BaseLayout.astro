@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import "prismjs/themes/prism-okaidia.css";
 import { title, shortDesc, canonical, image } from "../store/metaHeaders.ts";
+import MetaUpdater from "./metaSubscriber";
 ---
 
 <html lang="en">
@@ -39,59 +40,11 @@ import { title, shortDesc, canonical, image } from "../store/metaHeaders.ts";
 
     <!-- Theme Color (mobile browsers) -->
     <meta name="theme-color" content="#0A0B0F" />
-    <script is:inline type="module">
-      import {
-        title,
-        image,
-        shortDesc,
-        canonical,
-      } from "/src/store/metaHeaders.ts";
-
-      // helper to update meta tags
-      function setMeta(selector, attr, value) {
-        const el = document.querySelector(selector);
-        if (el) el.setAttribute(attr, value);
-      }
-
-      // Title
-      title.subscribe((value) => {
-        if (value) {
-          document.title = value;
-          setMeta('meta[property="og:title"]', "content", value);
-          setMeta('meta[name="twitter:title"]', "content", value);
-        }
-      });
-
-      // Description
-      shortDesc.subscribe((value) => {
-        if (value) {
-          setMeta('meta[name="description"]', "content", value);
-          setMeta('meta[property="og:description"]', "content", value);
-          setMeta('meta[name="twitter:description"]', "content", value);
-        }
-      });
-
-      // Canonical
-      canonical.subscribe((value) => {
-        if (value) {
-          setMeta('link[rel="canonical"]', "href", value);
-          setMeta('meta[property="og:url"]', "content", value);
-          setMeta('meta[name="twitter:url"]', "content", value);
-        }
-      });
-
-      // Image
-      image.subscribe((value) => {
-        if (value) {
-          setMeta('meta[property="og:image"]', "content", value);
-          setMeta('meta[name="twitter:image"]', "content", value);
-        }
-      });
-    </script></head
-  >
+  </head>
 
   <body>
     <slot />
+    <MetaUpdater client:load />
   </body>
   <style is:global>
     .body {
