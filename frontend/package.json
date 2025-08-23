@@ -15,6 +15,7 @@
     "@headlessui/react": "^2.2.7",
     "@hookform/resolvers": "5.2.1",
     "@lucide/astro": "^0.537.0",
+    "@nanostores/react": "^1.0.0",
     "@radix-ui/react-accordion": "1.2.11",
     "@radix-ui/react-alert-dialog": "1.1.14",
     "@radix-ui/react-aspect-ratio": "1.1.7",
@@ -60,6 +61,7 @@
     "html-react-parser": "^5.2.6",
     "input-otp": "^1.2.4",
     "lucide-react": "0.536.0",
+    "nanostores": "^1.0.1",
     "prism-themes": "^1.9.0",
     "prismjs": "^1.30.0",
     "react": "19.1.1",
@@ -80,6 +82,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/prismjs": "^1.26.5"
+    "@types/prismjs": "^1.26.5",
+    "prettier": "^3.6.2",
+    "prettier-plugin-astro": "^0.14.1"
   }
 }

@@ -2,15 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../layout.tsx";
 import { markPostRead, usePost } from "../../hooks/usePost.tsx";
-import { getPostsByCategory } from "../../data/posts.ts";
 import { ChevronLeft } from "lucide-react";
 import CommentSection from "../../components/CommentSection";
-// import { getCommentsByPostId } from "../../data/comments";
 import PostHeader from "../../components/PostHeader";
 import PostContent from "../../components/PostContent";
-import RelatedPosts from "../../components/RelatedPosts";
+// import RelatedPosts from "../../components/RelatedPosts";
 import PostSkeleton from "../../components/PostSkeleton";
 import PostFooter from "../../components/PostFooter.tsx";
+// import { useStore } from "@nanostores/react";
+import { title, shortDesc, canonical, image } from "@/store/metaHeaders.ts";
 
 const Post = () => {
   const navigate = useNavigate();
@@ -26,6 +26,12 @@ const Post = () => {
       throw err
     }
   };
+  // Setting the Post title as the Page's Title.
+  // using nanostores
+  title.set(post?.title);
+  shortDesc.set(post?.short_content);
+  canonical.set(window.location.href);
+  image.set(post?.cover_image);
 
   useEffect(() => {
     if (!slug) {
