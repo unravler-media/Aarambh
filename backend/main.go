@@ -36,6 +36,7 @@ func main() {
 			AppName:      "Project Aarambh",
 			JSONEncoder:  gojson.Marshal,
 			JSONDecoder:  gojson.Unmarshal,
+			BodyLimit:    6 * 1024 * 1024, // server will only accept requests of upto 6MB.
 		},
 	)
 
@@ -72,24 +73,6 @@ func main() {
 	helpers.WipeCacheGlobalHook(
 		database,
 	) // utilising Gorm global lifecycle hook to wipe redis clean.
-
-	// gonna use Redis as storage for caching.
-	// store := redis.New(redis.Config{
-	// 	URL:   os.Getenv("REDIS_URL"),
-	// 	Reset: false,
-	// })
-	//
-	// app.Use(cache.New(cache.Config{
-	// 	Next: func(c *fiber.Ctx) bool {
-	// 		return c.Query("noCache") == "true"
-	// 	},
-	// 	Expiration:   1 * time.Minute, // Cache Timeout set to 1 Minutes.
-	// 	CacheControl: true,
-	// 	Storage:      store,
-	// 	KeyGenerator: func(c *fiber.Ctx) string {
-	// 		return utils.CopyString(c.OriginalURL())
-	// 	},
-	// }))
 
 	// using Routes Grouping for a better DX (Developer Experience)
 	routes.ApiRoutes(app.Group("/api"))
