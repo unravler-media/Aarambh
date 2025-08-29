@@ -32,7 +32,7 @@ const PostCard = ({ post, className, variant = "default" }: PostCardProps) => {
   return (
     <div className={cn("group block relative overflow-hidden rounded-xl card-hover bg-[#151619] hover:bg-[#1A1B22] h-full transition-all duration-300", className)}>
       <div className="aspect-video w-full overflow-hidden relative">
-        <img src={post.cover_image} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+        <img rel="preload" loading="lazy" src={post.cover_image} alt={post.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
         <div className="absolute top-3 left-3">
           <div
             className="px-3 py-1.5 bg-black/60 backdrop-blur-sm text-xs font-medium uppercase text-red-400 rounded-lg hover:bg-black/70 transition-colors">
