@@ -18,5 +18,12 @@ EXPOSE 8000
 ENV turso_api=""
 ENV secretKey=""
 ENV REDIS_URL=""
+ENV R2Token=""
+ENV R2AccessID=""
+ENV R2AccessKey=""
+ENV R2EndPoint=""
+ENV R2AccountID=""
+ENV R2BucketName=""
+ENV R2PublicUrl=""
 
 ENTRYPOINT ["./aarambh-server"]
