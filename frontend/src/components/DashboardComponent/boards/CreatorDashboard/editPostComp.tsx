@@ -10,6 +10,7 @@ import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@h
 import { useCategories, type Category } from '@/hooks/useCategories.tsx';
 import { Editor } from '@tinymce/tinymce-react';
 import { usePost } from '@/hooks/usePost.tsx';
+import CoverImageUploader from './coverImageUploader.tsx';
 
 type EditPostCompProps = {
   onClose: () => void;
@@ -193,7 +194,7 @@ const EditPostComp = ({ onClose, postSlug }: EditPostCompProps) => {
                         className="w-5 h-5 accent-red-400"
                       />
                       </div> */ }
-
+                  {/*
                   <div className="space-y-1">
                     <label className="text-gray-400 text-sm">Cover Image</label>
                     <input
@@ -202,7 +203,9 @@ const EditPostComp = ({ onClose, postSlug }: EditPostCompProps) => {
                       onChange={(e) => handleEditPostInputChange('cover_image', e.target.value)}
                       className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 focus:outline-none"
                     />
-                  </div>
+                  </div> */}
+                  <CoverImageUploader value={post?.cover_image}
+                    onChange={(val) => handleEditPostInputChange("cover_image", val)} />
                   <div className="space-y-1">
                     <label className="text-gray-400 text-sm">Post Introduction</label>
                     <input
