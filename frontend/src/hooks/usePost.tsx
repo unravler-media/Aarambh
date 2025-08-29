@@ -255,6 +255,16 @@ export const postMeta = async (post_id: string) => {
         },
         credentials: 'include',
       })
+      if (!response.ok) {
+        if (response.status === 400) {
+          console.log("unauthorised token")
+          localStorage.removeItem('user');
+          localStorage.removeItem('authToken');
+          window.location.href = "/login";
+        } else {
+          throw new Error(`Unable to perform postMeta.`)
+        }
+      }
       const data = await response.json();
       var serializeMeta = serializePostMeta(data.response);
       return serializeMeta;
@@ -365,7 +375,7 @@ export const markPostRead = async (slug: string) => {
           console.log("unauthorised token")
           localStorage.removeItem('user');
           localStorage.removeItem('authToken');
-          window.location.href = "/";
+          window.location.href = "/login";
         } else if (response.status === 404) {
           console.log("Post Not Found with Slug: ", post_slug);
           console.log("The error in question is: ", await response.text());
@@ -405,7 +415,7 @@ export const markPostLiked = async (slug: string) => {
           console.log("unauthorised token")
           localStorage.removeItem('user');
           localStorage.removeItem('authToken');
-          window.location.href = "/";
+          window.location.href = "/login";
         } else if (response.status === 404) {
           console.log("Post Not Found with Slug: ", post_slug);
           console.log("The error in question is: ", await response.text());
@@ -445,7 +455,7 @@ export const markPostUnLiked = async (slug: string) => {
           console.log("unauthorised token")
           localStorage.removeItem('user');
           localStorage.removeItem('authToken');
-          window.location.href = "/";
+          window.location.href = "/login";
         } else if (response.status === 404) {
           console.log("Post Not Found with Slug: ", post_slug);
           console.log("The error in question is: ", await response.text());
@@ -485,7 +495,7 @@ export const markPostBookmarked = async (slug: string) => {
           console.log("unauthorised token")
           localStorage.removeItem('user');
           localStorage.removeItem('authToken');
-          window.location.href = "/";
+          window.location.href = "/login";
         } else if (response.status === 404) {
           console.log("Post Not Found with Slug: ", post_slug);
           console.log("The error in question is: ", await response.text());
@@ -525,7 +535,7 @@ export const markPostUnBookmarked = async (slug: string) => {
           console.log("unauthorised token")
           localStorage.removeItem('user');
           localStorage.removeItem('authToken');
-          window.location.href = "/";
+          window.location.href = "/login";
         } else if (response.status === 404) {
           console.log("Post Not Found with Slug: ", post_slug);
           console.log("The error in question is: ", await response.text());

@@ -62,7 +62,14 @@ export const useDashboard = () => {
           credentials: 'include',
         });
         if (!response.ok) {
-          throw new Error("Failed to fetch Dashboard.");
+          if (response.status === 400) {
+            console.log("unauthorised token")
+            localStorage.removeItem('user');
+            localStorage.removeItem('authToken');
+            window.location.href = "/login";
+          } else {
+            throw new Error("Failed to fetch Dashboard.");
+          }
         }
         const data = await response.json();
         const result = processDashboard(data);
@@ -106,7 +113,7 @@ export const processNewPost = async (data: AddPostInterface) => {
         console.log("unauthorised token")
         localStorage.removeItem('user');
         localStorage.removeItem('authToken');
-        window.location.href = "/";
+        window.location.href = "/login";
       } else {
         throw new Error(`Unable to create a new post: ${await response.text()}`);
       }
@@ -143,7 +150,7 @@ export const processPostEdit = async (data: AddPostInterface, slug: string) => {
         console.log("unauthorised token")
         localStorage.removeItem('user');
         localStorage.removeItem('authToken');
-        window.location.href = "/";
+        window.location.href = "/login";
       } else {
         throw new Error(`Unable to edit a new post: ${await response.text()}`);
       }
@@ -173,7 +180,7 @@ export const deletePost = async (post_slug: string) => {
         console.log("unauthorised token")
         localStorage.removeItem('user');
         localStorage.removeItem('authToken');
-        window.location.href = "/";
+        window.location.href = "/login";
       } else {
         throw new Error(`Unable to delete the post: ${await response.text()}`);
       }
@@ -207,7 +214,7 @@ export const UploadImage = async (encoded: string, contentName: string, contentT
         console.log("unauthorised token")
         localStorage.removeItem('user');
         localStorage.removeItem('authToken');
-        window.location.href = "/";
+        window.location.href = "/login";
       } else {
         throw new Error(`Unable to upload the image: ${await response.text()}`);
       }

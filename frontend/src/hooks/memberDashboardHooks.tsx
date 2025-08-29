@@ -101,7 +101,14 @@ export const useDashboard = () => {
           credentials: 'include',
         });
         if (!response.ok) {
-          throw new Error("Failed to fetch Dashboard.");
+          if (response.status === 400) {
+            console.log("unauthorised token")
+            localStorage.removeItem('user');
+            localStorage.removeItem('authToken');
+            window.location.href = "/login";
+          } else {
+            throw new Error("Failed to fetch Dashboard.");
+          }
         }
         const data = await response.json();
         const result = processDashboard(data);
