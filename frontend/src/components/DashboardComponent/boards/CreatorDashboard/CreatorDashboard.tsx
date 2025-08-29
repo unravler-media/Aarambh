@@ -9,10 +9,11 @@ import { useDashboard, processNewPost, deletePost } from '@/hooks/creatorDashboa
 import type { AddPostInterface } from '@/hooks/creatorDashboard';
 import Layout from '@/components/layout';
 import UserSats from '../userStats.tsx';
-import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
+import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
 import { useCategories, type Category } from '@/hooks/useCategories.tsx';
 import { Editor } from '@tinymce/tinymce-react';
 import EditPostComp from './editPostComp.tsx';
+import CoverImageUploader from './coverImageUploader.tsx';
 
 const CreatorDashboard = () => {
 
@@ -68,7 +69,9 @@ const CreatorDashboard = () => {
   const handlePostUpdate = async () => {
     try {
       console.log("Post Created:", postData);
-      await processNewPost(postData);
+      // await processNewPost(postData);
+
+      console.log(postData);
       setShowAddPostModal(false);
       // for reload the page to update posts from server
       window.location.reload()
@@ -177,7 +180,7 @@ const CreatorDashboard = () => {
                       <h3 className="text-white font-medium">{user?.name}</h3>
                       <p className="text-gray-400">{user?.email} - {user?.role}</p>
                     </div>
-                  // </div>
+                  </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -247,7 +250,7 @@ const CreatorDashboard = () => {
                       />
                       </div> */ }
 
-                    <div className="space-y-1">
+                    {/* <div className="space-y-1">
                       <label className="text-gray-400 text-sm">Cover Image</label>
                       <input
                         type="text"
@@ -255,18 +258,20 @@ const CreatorDashboard = () => {
                         onChange={(e) => handlePostInputChange('cover_image', e.target.value)}
                         className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 focus:outline-none"
                       />
-                    </div>
-                    <div className="space-y-1">
-                      <label className="text-gray-400 text-sm">Post Introduction</label>
-                      <input
-                        type="text"
-                        value={postData.short_content}
-                        onChange={(e) => handlePostInputChange('short_content', e.target.value)}
-                        className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 focus:outline-none"
-                      />
-                    </div>
-
+                    </div> */ }
                   </div>
+                  <div className="space-y-1">
+                    <label className="text-gray-400 text-sm">Post Introduction</label>
+                    <input
+                      type="text"
+                      value={postData.short_content}
+                      onChange={(e) => handlePostInputChange('short_content', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 focus:outline-none"
+                    />
+                  </div>
+
+                  <CoverImageUploader value={postData.cover_image}
+                    onChange={(val) => handlePostInputChange("cover_image", val)} />
 
                   <div className="space-y-1">
                     <label className="text-gray-400 text-sm">Post Body</label>
