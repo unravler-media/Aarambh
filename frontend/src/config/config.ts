@@ -34,5 +34,6 @@ export const API_ENDPOINTS = {
   // Dashboard Related
   memberDashboard: '/api/dashboard/member/',
   creatorDashboard: '/api/dashboard/creator/',
-  adminDashboard: '/api/dashboard/admin/'
+  adminDashboard: '/api/dashboard/admin/',
+  uploadImage: '/api/upload/image/',
 } as const;
