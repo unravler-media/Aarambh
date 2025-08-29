@@ -69,9 +69,8 @@ const CreatorDashboard = () => {
   const handlePostUpdate = async () => {
     try {
       console.log("Post Created:", postData);
-      // await processNewPost(postData);
+      await processNewPost(postData);
 
-      console.log(postData);
       setShowAddPostModal(false);
       // for reload the page to update posts from server
       window.location.reload()
