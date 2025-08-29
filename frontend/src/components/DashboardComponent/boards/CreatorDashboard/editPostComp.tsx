@@ -3,7 +3,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User, X, ChevronDown, CheckIcon } from 'lucide-react';
-import { processPostEdit } from '@/hooks/creatorDashboard';
+import { processPostEdit, UploadImage } from '@/hooks/creatorDashboard';
 import type { AddPostInterface } from '@/hooks/creatorDashboard';
 import Layout from '@/components/layout';
 import { Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react'
@@ -222,7 +222,7 @@ const EditPostComp = ({ onClose, postSlug }: EditPostCompProps) => {
                   <label className="text-gray-400 text-sm">Post Body</label>
                   <Editor
                     apiKey='dt775bgzqw3gx7h13waz8gh1361rghoujlwmdha0k0mr62yy'
-                    onInit={(evt, editor) => console.log("Editor is ready to edit the post:", editor, evt)}
+                    // onInit={(evt, editor) => console.log("Editor is ready to edit the post:", editor, evt)}
                     onEditorChange={(e) => handleEditPostInputChange('content', e)}
                     initialValue={post?.content}
                     init={{
@@ -232,6 +232,26 @@ const EditPostComp = ({ onClose, postSlug }: EditPostCompProps) => {
                       contextmenu: true,
                       height: 300,
                       skin: 'snow',
+                      images_upload_handler: async (blobInfo) => {
+                        try {
+                          // Convert blob to base64
+                          const base64 = blobInfo.base64();
+                          const fileName = blobInfo.filename();
+                          const fileType = blobInfo.blob().type;
+
+                          // Call your custom uploader
+                          const res = await UploadImage(base64, fileName, fileType);
+
+                          if (res?.response) {
+                            return res.response // ✅ insert uploaded image into editor
+                          } else {
+                            throw new Error("No URL returned from server");
+                          }
+                        } catch (err: any) {
+                          throw new Error("Image upload failed: " + err.message);
+                        }
+                      },
+
                       plugins: 'link image code table lists advlist media hr emoticons autosave codesample fullscreen preview wordcount charmap',
                       toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | link image | bullist numlist | codesample | fullscreen',
                       menubar: 'file edit view insert format tools table help',

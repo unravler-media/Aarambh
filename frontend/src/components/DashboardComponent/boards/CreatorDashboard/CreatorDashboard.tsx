@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { FileText, TrendingUp, Eye, Edit, Trash2, Plus, User, X, ChevronDown, CheckIcon } from 'lucide-react';
-import { useDashboard, processNewPost, deletePost } from '@/hooks/creatorDashboard';
+import { useDashboard, processNewPost, deletePost, UploadImage } from '@/hooks/creatorDashboard';
 import type { AddPostInterface } from '@/hooks/creatorDashboard';
 import Layout from '@/components/layout';
 import UserSats from '../userStats.tsx';
@@ -286,6 +286,25 @@ const CreatorDashboard = () => {
                         contextmenu: true,
                         height: 300,
                         skin: 'snow',
+                        images_upload_handler: async (blobInfo) => {
+                          try {
+                            // Convert blob to base64
+                            const base64 = blobInfo.base64();
+                            const fileName = blobInfo.filename();
+                            const fileType = blobInfo.blob().type;
+
+                            // Call your custom uploader
+                            const res = await UploadImage(base64, fileName, fileType);
+
+                            if (res?.response) {
+                              return res.response // ✅ insert uploaded image into editor
+                            } else {
+                              throw new Error("No URL returned from server");
+                            }
+                          } catch (err: any) {
+                            throw new Error("Image upload failed: " + err.message);
+                          }
+                        },
                         // menubar: true,
                         plugins: 'link image code table lists advlist media hr emoticons autosave codesample fullscreen preview wordcount charmap',
                         toolbar: 'undo redo | bold italic underline | alignleft aligncenter alignright alignjustify | link image | bullist numlist | codesample | fullscreen',
