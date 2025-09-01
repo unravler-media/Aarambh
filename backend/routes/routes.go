@@ -18,6 +18,7 @@ func ApiRoutes(router fiber.Router) {
 	PostRoutes(router.Group("posts/"))
 	CommentRoutes(router.Group("comment/"))
 	DashboardRoutes(router.Group("dashboard/"))
+	UserRoutes(router.Group("users/"))
 	router.Get("query/", logic.QueryPosts)
 	router.Post("upload/image/", logic.HandleImage)
 }
