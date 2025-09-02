@@ -39,9 +39,9 @@ func LoginHandler(c *fiber.Ctx) error {
 
 	// fetch if user exists
 	var user models.Users // create empty variable with type of our users struct from models
-	
+
 	// Gorm DB Query to check if the username in question exists.
-	
+
 	fetchUser := db.Where("username = ?", req.Username).First(&user)
 	// where: is the condition where we are matching existing users to query username.
 	// first: is the condition where we limit limits to 1 only.
@@ -79,31 +79,35 @@ func LoginHandler(c *fiber.Ctx) error {
 
 	// set JWT cookie from server side
 	cookie := fiber.Cookie{
-		Name: "jwt",
-		Value: token,
-		Expires: time.Now().Add(time.Hour * 24), // expires in 24 Hours
+		Name:     "jwt",
+		Value:    token,
+		Expires:  time.Now().Add(time.Hour * 24), // expires in 24 Hours
 		HTTPOnly: true,
-		Secure: true,
+		Secure:   true,
 	}
 	// setting the token to HTTP Only server side.
 	c.Cookie(&cookie)
 
 	type responseStruct struct {
-		Token string `json:"token"`
-		Id string `json:"id"`
+		Token    string `json:"token"`
+		Id       string `json:"id"`
 		Username string `json:"username"`
-		Avatar string `json:"avatar"`
-		Role string `json:"role"`
+		Avatar   string `json:"avatar"`
+		Role     string `json:"role"`
 		FullName string `json:"full_name"`
+		Bio      string `json:"bio"`
+		Email    string `json:"email"`
 	}
 
 	var responseFinal = responseStruct{
-		Id: user.ID,
-		Token: token,
+		Id:       user.ID,
+		Token:    token,
 		Username: user.Username,
-		Avatar: user.Avatar,
-		Role: user.Role,
+		Avatar:   user.Avatar,
+		Role:     user.Role,
 		FullName: user.FullName,
+		Bio:      user.Bio,
+		Email:    user.Email,
 	}
 
 	return c.Status(200).JSON(fiber.Map{
@@ -123,9 +127,9 @@ func RegisterHandler(c *fiber.Ctx) error {
 
 	// take input from the post request and put it into data var
 	type RequestParams struct {
-		Username string `json:"username" validate:"required,min=4"`
-		Password string `json:"password" validate:"required,min=4"`
-		Email string `json:"email" validate:"required"`
+		Username string `json:"username"  validate:"required,min=4"`
+		Password string `json:"password"  validate:"required,min=4"`
+		Email    string `json:"email"     validate:"required"`
 		FullName string `json:"full_name" validate:"required"`
 	}
 	var data = new(RequestParams)
@@ -144,7 +148,7 @@ func RegisterHandler(c *fiber.Ctx) error {
 			"response": "Failed to load validation",
 		})
 	}
-	
+
 	// do the validation of user instance
 	if err := validation.Struct(data); err != nil {
 		errorsList := make(map[string]string)
