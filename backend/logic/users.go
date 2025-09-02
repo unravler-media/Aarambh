@@ -2,6 +2,8 @@ package logic
 
 import (
 	"backend/models"
+	"bytes"
+	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -155,9 +157,127 @@ func GetUser(ctx *fiber.Ctx) error {
 }
 
 func EditUser(ctx *fiber.Ctx) error {
-	return nil
+	db := ctx.Locals("db").(*gorm.DB)
+
+	// Validate if the Request is from Admin or not.
+	session_user := ctx.Locals("session_user")
+	if session_user == nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "User not found in session.",
+		})
+	}
+
+	jwtLocale := ctx.Locals("session_user").(*jwt.Token)
+	token := jwtLocale.Claims.(jwt.MapClaims)
+
+	// created the post object now add the user id to it.
+	user_id := token["sub"].(string)
+	var userObject models.Users
+
+	db.First(&userObject, "id = ?", user_id)
+	fmt.Println("Role: ", userObject.Role)
+
+	// Explanation
+	// The unauthorized block runs only when:
+	// User is not an admin (`userObject.Role != "admin"`)
+	// AND username does not match the query username (`userObject.Username != ctx.Params("username")`)
+	// So if the user is admin, the first condition is false and the whole AND condition becomes false → authorized.
+	// If the user is not admin, the username must match, or else unauthorized
+
+	if userObject.Role != "admin" && userObject.Username != ctx.Params("username") {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"response": "Unauthorized.",
+		})
+	}
+
+	var user models.Users
+	query := db.First(&user, "username = ?", ctx.Params("username"))
+	if query.RowsAffected < 1 {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"response": "User not found.",
+		})
+	}
+
+	if query.Error != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Something Went Wrong.",
+		})
+	}
+
+	// Check if the forbidden field exists in the JSON
+	if bytes.Contains(ctx.Body(), []byte(`"Posts"`)) &&
+		bytes.Contains(ctx.Body(), []byte(`"posts"`)) {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Field 'posts' is not allowed in this request.",
+		})
+	}
+
+	if err := ctx.BodyParser(&user); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "Invalid Request information.",
+		})
+	}
+
+	saving := db.Save(&user)
+	if saving.Error != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Error Saving the Post.",
+		})
+	}
+
+	return ctx.JSON(fiber.Map{
+		"response": &user,
+	})
+
 }
 
 func DeleteUser(ctx *fiber.Ctx) error {
-	return nil
+	db := ctx.Locals("db").(*gorm.DB)
+
+	// Validate if the Request is from Admin or not.
+	session_user := ctx.Locals("session_user")
+	if session_user == nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"response": "User not found in session.",
+		})
+	}
+
+	jwtLocale := ctx.Locals("session_user").(*jwt.Token)
+	token := jwtLocale.Claims.(jwt.MapClaims)
+
+	// created the post object now add the user id to it.
+	user_id := token["sub"].(string)
+	var userObject models.Users
+
+	db.First(&userObject, "id = ?", user_id)
+	fmt.Println("Role: ", userObject.Role)
+
+	// Explanation
+	// The unauthorized block runs only when:
+	// User is not an admin (`userObject.Role != "admin"`)
+	// AND username does not match the query username (`userObject.Username != ctx.Params("username")`)
+	// So if the user is admin, the first condition is false and the whole AND condition becomes false → authorized.
+	// If the user is not admin, the username must match, or else unauthorized
+
+	if userObject.Role != "admin" && userObject.Username != ctx.Params("username") {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"response": "Unauthorized.",
+		})
+	}
+
+	var user models.Users
+	query := db.Delete(&user, "username = ?", ctx.Params("username"))
+	if query.RowsAffected < 1 {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"response": "User not found.",
+		})
+	}
+
+	if query.Error != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"response": "Something Went Wrong.",
+		})
+	}
+
+	return ctx.SendStatus(200)
 }
