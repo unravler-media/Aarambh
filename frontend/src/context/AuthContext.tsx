@@ -5,13 +5,14 @@ export type UserRole = 'admin' | 'creator' | 'member';
 
 export interface User {
   id: string;
-  name: string;
-  username: string;
-  email: string;
-  role: UserRole;
-  avatar?: string;
-  bio?: string;
-  joinedAt: string;
+  full_name: string;
+  Username: string;
+  Email: string;
+  Role: UserRole;
+  Avatar?: string;
+  Bio?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface AuthContextType {
@@ -70,12 +71,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Create user object from response
     const user: User = {
       id: responseData.id,
-      name: responseData.full_name,
-      username: responseData.username,
-      email,
-      role: responseData.role || 'member',
-      avatar: responseData.avatar,
-      joinedAt: new Date().toISOString(),
+      full_name: responseData.full_name,
+      Username: responseData.username,
+      Email: responseData.email || "",
+      Role: responseData.role || 'member',
+      Avatar: responseData.avatar,
+      updated_at: responseData.updated_at,
+      created_at: responseData.created_at,
+      Bio: responseData.bio || '',
     };
 
     setUser(user);

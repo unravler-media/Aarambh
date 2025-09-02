@@ -62,7 +62,8 @@ const EditPostComp = ({ onClose, postSlug }: EditPostCompProps) => {
     } catch (err) {
       console.error(err);
     }
-  }; const handleEditPostInputChange = (field: string, value: string) => {
+  };
+  const handleEditPostInputChange = (field: string, value: string) => {
     setEditPostData(prev => ({
       ...prev,
       [field]: value

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { API_BASE_URL, API_ENDPOINTS } from "@/config/config";
-import { json } from "react-router-dom";
 
 export interface AddPostInterface {
   post_title: string;
@@ -220,6 +219,40 @@ export const UploadImage = async (encoded: string, contentName: string, contentT
       }
     }
     return await response.json()
+  } catch (err) {
+    throw err;
+  }
+}
+
+export const SubmitUserModifications = async (userData: any) => {
+  try {
+    const authToken = localStorage.getItem("authToken");
+    const user = JSON.parse(localStorage.getItem("user"));
+    const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.editUser}${user['Username']}`, {
+      method: "PUT",
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`,
+      },
+      credentials: 'include',
+      body: JSON.stringify(userData)
+    })
+
+    if (!response.ok) {
+      if (response.status === 400) {
+        console.log("unauthorised token")
+        localStorage.removeItem('user');
+        localStorage.removeItem('authToken');
+        window.location.href = "/login";
+      } else {
+        throw new Error(`Unable to update the user: ${await response.text()}`);
+      }
+    }
+    var data = await response.json();
+    localStorage.removeItem("user")
+    localStorage.setItem("user", JSON.stringify(data['response']))
+    console.log("Response: ", data['response'])
+    return data['response']
   } catch (err) {
     throw err;
   }

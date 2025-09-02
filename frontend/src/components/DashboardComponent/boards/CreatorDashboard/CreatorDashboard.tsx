@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { FileText, TrendingUp, Eye, Edit, Trash2, Plus, User, X, ChevronDown, CheckIcon } from 'lucide-react';
-import { useDashboard, processNewPost, deletePost, UploadImage } from '@/hooks/creatorDashboard';
+import { useDashboard, processNewPost, deletePost, UploadImage, SubmitUserModifications } from '@/hooks/creatorDashboard';
 import type { AddPostInterface } from '@/hooks/creatorDashboard';
 import Layout from '@/components/layout';
 import UserSats from '../userStats.tsx';
@@ -14,6 +14,7 @@ import { useCategories, type Category } from '@/hooks/useCategories.tsx';
 import { Editor } from '@tinymce/tinymce-react';
 import EditPostComp from './editPostComp.tsx';
 import CoverImageUploader from './coverImageUploader.tsx';
+import { Camera } from 'lucide-react';
 
 const CreatorDashboard = () => {
 
@@ -24,27 +25,108 @@ const CreatorDashboard = () => {
 
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileData, setProfileData] = useState({
-    fullName: '',
-    email: '',
-    avatar: '',
-    username: '',
-    role: '',
+    full_name: '',
+    Email: '',
+    Avatar: '',
+    Username: '',
+    Role: '',
+    Bio: '',
   });
+
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file');
+      return;
+    }
+
+    // Validate file size (optional - adjust as needed, this is 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      alert('File size should be less than 5MB');
+      return;
+    }
+
+    try {
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          // e.target.result contains the full data URL like: "image/jpeg;base64,/9j/4AAQSkZJRgABAQEA..."
+          const dataURL = e.target.result;
+
+
+          // Or if your UploadImage function expects the full data URL, use:
+          // const base64String = dataURL;
+
+          console.log('Base64 string:', dataURL); // Debug log
+          console.log("FileName: ", file.name)
+
+          // Upload image using your function
+          const imageUrl = await UploadImage(dataURL, file.name, file.type);
+
+          // Update the profile data with the new image URL
+          handleInputChange('Avatar', imageUrl['response']);
+
+        } catch (error) {
+          console.error('Error uploading image:', error);
+          alert('Failed to upload image. Please try again.');
+        }
+      };
+
+      reader.onerror = (error) => {
+        console.error('Error reading file:', error);
+        alert('Failed to read file. Please try again.');
+      };
+
+      // Read the file as data URL
+      reader.readAsDataURL(file);
+
+    } catch (error) {
+      console.error('Error processing file:', error);
+      alert('Failed to process file. Please try again.');
+    }
+  };
+
 
   useEffect(() => {
     setProfileData(prev => ({
       ...prev,
-      fullName: user?.name || '',
-      email: user?.email || '',
-      avatar: user?.avatar || '',
-      username: user?.username || '',
-      role: user?.role || '',
+      full_name: user?.full_name || '',
+      Email: user?.Email || '',
+      Avatar: user?.Avatar || '',
+      Username: user?.Username || '',
+      Role: user?.Role || '',
+      Bio: user?.Bio || '',
     }))
   }, [user])
 
-  const handleProfileUpdate = () => {
+  const handleEditUserUpdate = async () => {
+    try {
+      // Filter out empty string fields
+      const filteredData = Object.fromEntries(
+        Object.entries(profileData).filter(([_, value]) => value !== "")
+      );
+
+      console.log("Filtered Post Edited:", filteredData);
+      await SubmitUserModifications(filteredData);
+
+      // reload to update posts from server
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+
+  const handleProfileUpdate = async () => {
     // Handle profile update logic here
     console.log('Profile updated:', profileData);
+    await handleEditUserUpdate()
     setShowProfileModal(false);
   };
 
@@ -127,7 +209,7 @@ const CreatorDashboard = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-white">Creator Dashboard</h1>
-          <p className="text-gray-400 mt-1">Welcome back, {user?.name}</p>
+          <p className="text-gray-400 mt-1">Welcome back, {user?.full_name}</p>
         </div>
         <div className="flex gap-3">
           <Button
@@ -176,8 +258,8 @@ const CreatorDashboard = () => {
                       <User size={32} className="text-white" />
                     </div>
                     <div>
-                      <h3 className="text-white font-medium">{user?.name}</h3>
-                      <p className="text-gray-400">{user?.email} - {user?.role}</p>
+                      <h3 className="text-white font-medium">{user?.full_name}</h3>
+                      <p className="text-gray-400">{user?.Email} - {user?.Role}</p>
                     </div>
                   </div>
 
@@ -414,13 +496,30 @@ const CreatorDashboard = () => {
                 <CardContent>
                   <div className="space-y-6">
                     <div className="flex items-center gap-6">
-                      <div className="w-20 h-20  rounded-full flex items-center justify-center">
-                        { /* TODO: add conditional in future if user has a profile show it otherwise show this */},
-                        <User size={32} className="text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-white font-medium">{user?.name}</h3>
-                        <p className="text-gray-400">{user?.email} - {user?.role}</p>
+                      <div className="relative">
+                        <div className="w-20 h-20 rounded-full flex items-center justify-center overflow-hidden bg-[#2A2C36]">
+                          {profileData.Avatar || user?.Avatar ? (
+                            <img
+                              src={profileData.Avatar || user?.Avatar}
+                              alt="Profile"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <User size={32} className="text-white" />
+                          )}
+                        </div>
+                        <label className="absolute bottom-0 right-0 w-6 h-6 bg-red-400 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-400/90 transition-colors">
+                          <Camera size={14} className="text-white" />
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>                      <div>
+                        <h3 className="text-white font-medium">{user?.full_name}</h3>
+                        <p className="text-gray-400">{user?.Email} - {user?.Role}</p>
                       </div>
                     </div>
 
@@ -429,8 +528,8 @@ const CreatorDashboard = () => {
                         <label className="text-gray-400 text-sm">Full Name</label>
                         <input
                           type="text"
-                          value={profileData.fullName}
-                          onChange={(e) => handleInputChange('fullName', e.target.value)}
+                          value={profileData.full_name}
+                          onChange={(e) => handleInputChange('full_name', e.target.value)}
                           className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 focus:outline-none"
                         />
                       </div>
@@ -439,7 +538,7 @@ const CreatorDashboard = () => {
                         <label className="text-gray-400 text-sm">Username</label>
                         <input
                           type="email"
-                          value={profileData.username}
+                          value={profileData.Username}
                           className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 cursor-not-allowed"
                           readOnly
                         />
@@ -449,11 +548,22 @@ const CreatorDashboard = () => {
                         <label className="text-gray-400 text-sm">Email</label>
                         <input
                           type="email"
-                          value={profileData.email}
+                          value={profileData.Email}
                           className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 cursor-not-allowed"
                           readOnly
                         />
                       </div>
+
+                      <div className="space-y-2">
+                        <label className="text-gray-400 text-sm">Bio</label>
+                        <input
+                          type="text"
+                          value={profileData.Bio}
+                          onChange={(e) => handleInputChange('Bio', e.target.value)}
+                          className="w-full px-3 py-2 bg-[#0A0B0F] border border-[#2A2C36] rounded-md text-white focus:border-red-400 focus:outline-none"
+                        />
+                      </div>
+
                     </div>
 
                     <div className="flex gap-3 pt-4">

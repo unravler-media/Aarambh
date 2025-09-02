@@ -20,7 +20,7 @@ const Dashboard = () => {
   }
 
   const renderDashboard = () => {
-    switch (user.role) {
+    switch (user.Role) {
       case 'admin':
         return <AdminDashboard />;
       case 'creator':
