@@ -34,7 +34,7 @@ const Sidebar = ({ categoriesData }: SidebarProps) => {
     <aside className="bg-[#090A0E] border-r border-[#1A1B22] w-64 min-h-screen hidden md:block fixed left-0 top-0 overflow-y-auto">
       <div className="p-6">
         <a href="/" onClick={e => { e.preventDefault(), window.location.href = "/" }} className="grid items-center mb-12 group">
-          <h1 className="text-2xl font-bold ml-3 text-white">Aikyam</h1>
+          <h1 className="text-2xl font-bold ml-3 text-white">Aikyum</h1>
           <p className="text-gray-400 text-sm ml-3 mt-1">The confluence of creation.</p>
         </a>
 

@@ -40,7 +40,7 @@ const MobileNav = ({ categoriesData }: MobileNavProps) => {
     <div className="md:hidden">
       <div className="fixed top-0 left-0 right-0 z-30 border-b border-[#1A1B22] px-4 py-4 flex justify-between items-center bg-[#090A0E]">
         <a href="/" className="grid items-center space-x-2">
-          <h1 className="text-xl font-bold text-white">Aikyam.</h1>
+          <h1 className="text-xl font-bold text-white">Aikyum.</h1>
           <p className="text-gray-400 text-sm mt-1">The confluence of creation.</p>
         </a>
 
