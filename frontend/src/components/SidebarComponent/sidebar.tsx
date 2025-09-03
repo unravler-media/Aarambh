@@ -3,6 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
+
 interface SidebarProps {
   categoriesData: {
     categories: any[];

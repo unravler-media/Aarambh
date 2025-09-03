@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import SidebarProvider from "../components/SidebarComponent/SidebarWithProvider.tsx";
 import MobileSidebarProvider from "./MobileSidebar/MobileNavWithProvider.tsx";
 import { useCategories } from "../hooks/useCategories";
+import Footer from "./FooterComponent.tsx";
 
 interface LayoutProps {
   children: ReactNode;
@@ -22,6 +23,7 @@ const Layout = ({ children }: LayoutProps) => {
             {children}
           </div>
         </div>
+        <Footer />
         {/* </ScrollArea> */}
       </main>
     </div>

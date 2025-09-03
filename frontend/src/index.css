@@ -46,10 +46,6 @@
 }
 
 @layer base {
-  * {
-    @apply border-border selection:bg-tech-red/20 selection:text-white;
-  }
-  
   body {
     @apply bg-[#0A0B0F] text-foreground antialiased;
   }
@@ -75,32 +71,37 @@
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-tech-red/90;
   }
-  
+
   /* Enhanced code block styling with better syntax highlighting */
   pre {
     @apply bg-gradient-to-br from-[#0D0E12] to-[#151619] border border-[#2A2C36] rounded-xl p-4 my-6 overflow-x-auto text-sm shadow-lg backdrop-blur-sm;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Consolas, monospace;
+    font-family:
+      "JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", Consolas,
+      monospace;
     line-height: 1.6;
     position: relative;
   }
 
   pre::before {
-    content: '';
+    content: "";
     @apply absolute inset-0 bg-gradient-to-r from-tech-red/5 to-transparent rounded-xl pointer-events-none;
   }
-  
+
   code {
     @apply bg-gradient-to-r from-[#151619] to-[#1A1B22] px-2 py-1 rounded-md text-gray-300 border border-[#2A2C36]/50;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', Consolas, monospace;
+    font-family:
+      "JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", Consolas,
+      monospace;
     font-size: 0.9em;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 
   /* Inline code in paragraphs */
-  p code, li code {
+  p code,
+  li code {
     @apply text-tech-red bg-[#151619] px-1.5 py-0.5 rounded border border-tech-red/20;
   }
-  
+
   blockquote {
     @apply border-l-4 border-tech-red pl-4 italic my-6 text-gray-400 bg-[#151619]/30 py-3 rounded-r-lg;
     position: relative;
@@ -133,24 +134,24 @@
   .sidebar-link.active {
     @apply bg-tech-red/10 text-tech-red;
   }
-  
+
   .glass-effect {
     @apply backdrop-blur-sm bg-[#151619]/80;
   }
-  
+
   .code-block {
     @apply bg-gradient-to-br from-[#0D0E12] to-[#151619] border border-[#2A2C36] rounded-xl p-4 font-mono text-sm shadow-lg;
   }
-  
+
   /* Enhanced UI utilities with kinetic effects */
   .hover-scale {
     @apply transition-all duration-300 hover:scale-[1.02] ease-out;
   }
-  
+
   .dark-card {
     @apply bg-[#151619] rounded-xl shadow-lg transition-all duration-300 hover:shadow-xl;
   }
-  
+
   .highlight-text {
     @apply text-tech-red font-medium;
   }
@@ -192,15 +193,19 @@
   @apply bg-transparent;
 }
 
-.hljs-keyword, .hljs-selector-tag, .hljs-built_in {
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in {
   @apply text-tech-red;
 }
 
-.hljs-string, .hljs-attr {
+.hljs-string,
+.hljs-attr {
   @apply text-green-400;
 }
 
-.hljs-number, .hljs-literal {
+.hljs-number,
+.hljs-literal {
   @apply text-blue-400;
 }
 
@@ -208,10 +213,12 @@
   @apply text-gray-500 italic;
 }
 
-.hljs-function, .hljs-title {
+.hljs-function,
+.hljs-title {
   @apply text-yellow-400;
 }
 
-.hljs-variable, .hljs-name {
+.hljs-variable,
+.hljs-name {
   @apply text-purple-400;
 }
