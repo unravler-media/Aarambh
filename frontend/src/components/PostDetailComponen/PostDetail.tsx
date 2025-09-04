@@ -71,7 +71,7 @@ const Post = () => {
 
   return (
     <Layout>
-      <div className="w-full max-w-none overflow-hidden">
+      <div className="mt-6 w-full max-w-none overflow-hidden">
         <div className="mb-6">
           <button
             onClick={() => navigate(-1)}
