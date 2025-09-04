@@ -15,7 +15,7 @@ interface PostHeaderProps {
 const PostHeader = ({ title, categoryName, shortContent, author, updated_at, readTime }: PostHeaderProps) => {
   const convertDate = (rawDateTime: string) => {
     const date = new Date(rawDateTime);
-    const converted = format(date, "MMMM dd, yyyy HH:mm a")
+    const converted = format(date, "MMMM dd, yyyy HH:mm")
     return converted;
   }
 

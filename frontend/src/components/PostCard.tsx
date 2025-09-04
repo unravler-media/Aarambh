@@ -25,7 +25,7 @@ const PostCard = ({ post, className, variant = "default" }: PostCardProps) => {
 
   const convertDate = (rawDateTime: string) => {
     const date = new Date(rawDateTime);
-    const converted = format(date, "MMMM dd, yyyy HH:mm a")
+    const converted = format(date, "MMMM dd, yyyy HH:mm")
     return converted;
   }
 
