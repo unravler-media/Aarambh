@@ -11,6 +11,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
+	"backend/common"
+
 	"github.com/go-playground/validator/v10"
 )
 
@@ -24,24 +26,16 @@ func LoginHandler(c *fiber.Ctx) error {
 	var req reqBody
 	// parse the request body
 	if err := c.BodyParser(&req); err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"response": "Invalid Information",
-		})
+		return common.InvalidRequest(c, "Invalid Request.")
 	}
 
 	// load db instance
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(500).JSON(fiber.Map{
-			"response": "DB Fucked!",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	// fetch if user exists
 	var user models.Users // create empty variable with type of our users struct from models
 
 	// Gorm DB Query to check if the username in question exists.
-
 	fetchUser := db.Where("username = ?", req.Username).First(&user)
 	// where: is the condition where we are matching existing users to query username.
 	// first: is the condition where we limit limits to 1 only.
@@ -49,18 +43,13 @@ func LoginHandler(c *fiber.Ctx) error {
 	// and since user var is already of struct users type we will output based on that.
 
 	if fetchUser.RowsAffected < 1 {
-		return c.Status(404).JSON(fiber.Map{
-			"response": "No users.",
-		})
+		return common.NotFound(c, "No Users.")
 	}
 
 	// if user exists then now we compare passwords
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		fmt.Println("Invalid Password: ", err)
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"response": "Incorrect Password",
-		})
+		return common.IncorrectPassword(c)
 	}
 
 	// if password compare was Successfull then generate JWT claim
@@ -68,13 +57,11 @@ func LoginHandler(c *fiber.Ctx) error {
 		"sub": string(user.ID),
 		"exp": time.Now().Add(time.Hour * 24).Unix(), // 24 Hours Validity
 	})
+
 	secretKey := os.Getenv("secretKey")
 	token, err := claims.SignedString([]byte(secretKey))
 	if err != nil {
-		fmt.Println("Error Generating token: ", err)
-		return c.Status(500).JSON(fiber.Map{
-			"response": "Error Creating Tokens",
-		})
+		return common.InternalServerError(c, "Unable to Create Tokens.")
 	}
 
 	// set JWT cookie from server side
@@ -110,20 +97,13 @@ func LoginHandler(c *fiber.Ctx) error {
 		Email:    user.Email,
 	}
 
-	return c.Status(200).JSON(fiber.Map{
-		"response": &responseFinal,
-	})
+	return common.Success(c, &responseFinal)
 }
 
 // here we do the register and this function handles: /api/auth/register/
 func RegisterHandler(c *fiber.Ctx) error {
 	// load the db
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(500).JSON(fiber.Map{
-			"response": "DB Fucked!",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	// take input from the post request and put it into data var
 	type RequestParams struct {
@@ -136,17 +116,13 @@ func RegisterHandler(c *fiber.Ctx) error {
 
 	// automatically parse the request and fill in the fields inside the provided struct refrence
 	if err := c.BodyParser(&data); err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"response": "Invalid Information Provided.",
-		})
+		return common.InvalidRequest(c, "Invalid Request.")
 	}
 
 	// valdiate the request body
 	validation, ok := c.Locals("validator").(*validator.Validate)
 	if !ok {
-		return c.Status(fiber.StatusFailedDependency).JSON(fiber.Map{
-			"response": "Failed to load validation",
-		})
+		return common.InternalServerError(c, "Failed to Validate.")
 	}
 
 	// do the validation of user instance
@@ -156,9 +132,7 @@ func RegisterHandler(c *fiber.Ctx) error {
 			errorsList[err.Field()] = fmt.Sprintf("Validation failed on tag '%s'", err.Tag())
 		}
 
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": errorsList, // 👈 show detailed field errors
-		})
+		return common.InvalidRequest(c, &errorsList)
 	}
 
 	// empty variable created with data of users from models.
@@ -168,17 +142,13 @@ func RegisterHandler(c *fiber.Ctx) error {
 	// so we can be sure that the username does not already exist.
 	// store the result to the user variable & limit the db query to one result.
 	if err := db.Where("username = ?", &data.Username).First(&user).Error; err != nil {
-		c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
-			"response": "User with that email already exists.",
-		})
+		return common.BadGateway(c, "User already exists.")
 	}
 
 	// So if User does not already exist. Now Hash the password and use it in our new user.
 	password_hash, err := bcrypt.GenerateFromPassword([]byte(data.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return c.Status(500).JSON(fiber.Map{
-			"response": "Failed to hash password",
-		})
+		return common.InternalServerError(c, "Bad Password.")
 	}
 
 	// Now we can create the user object
@@ -190,12 +160,8 @@ func RegisterHandler(c *fiber.Ctx) error {
 
 	// create a new user instance based on the created struct called newUser
 	if err := db.Create(&newUser).Error; err != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
-			"response": "Unable to Register a new user.",
-		})
+		return common.BadGateway(c, "Unable to Register New User.")
 	}
 
-	return c.Status(200).JSON(fiber.Map{
-		"response": "Registration Successfull.",
-	})
+	return common.Success(c, "Registration Successfull")
 }
