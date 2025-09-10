@@ -2,7 +2,8 @@ package logic
 
 import (
 	"backend/models"
-	"fmt"
+
+	"backend/common"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
@@ -12,13 +13,7 @@ import (
 // to handle url: GET /api/category/
 func FetchCategory(c *fiber.Ctx) error {
 	// Fetch all Categories
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		fmt.Println("DB Fucked!")
-		return c.Status(fiber.StatusServiceUnavailable).JSON(fiber.Map{
-			"response": "Something went Wrong.",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	type UserResponse struct {
 		ID       string `json:"id"`
@@ -57,20 +52,16 @@ func FetchCategory(c *fiber.Ctx) error {
 		return db.Preload("Author")
 	}).Select("id", "updated_at", "name", "slug", "description").Where("slug = ?", query_slug).First(&category)
 	if categories_fetch.RowsAffected < 1 {
-		return c.Status(404).JSON(fiber.Map{
-			"response": "No Categories Exist.",
-		})
+		return common.NotFound(c, "Category Does Not Exist.")
 	}
 
 	if categories_fetch.Error != nil {
-		fmt.Println("Error with Categories Fetch all Query: ", categories_fetch.Error)
-		return c.Status(500).JSON(fiber.Map{
-			"response": "Something went wrong.",
-		})
+		return common.InternalServerError(c, "Something Went Wrong.")
 	}
 
 	// Build response
 	var response CategoryResponse
+
 	// Map posts
 	var postsResp []PostsResponse
 	for _, post := range category.Posts {
@@ -100,19 +91,12 @@ func FetchCategory(c *fiber.Ctx) error {
 		Posts:       postsResp,
 	}
 
-	return c.JSON(fiber.Map{
-		"response": response,
-	})
+	return common.Success(c, &response)
 }
 
 func CreateCategory(c *fiber.Ctx) error {
 	// Create Single Category
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(500).JSON(fiber.Map{
-			"response": "DB Fucked",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	jwtLocale := c.Locals("session_user").(*jwt.Token)
 	token := jwtLocale.Claims.(jwt.MapClaims)
@@ -122,18 +106,14 @@ func CreateCategory(c *fiber.Ctx) error {
 
 	// auto parsing the request params and populating category var
 	if err := c.BodyParser(&category); err != nil {
-		return c.Status(fiber.StatusNotAcceptable).JSON(fiber.Map{
-			"response": "Invalid Request Parameters",
-		})
+		return common.InvalidRequest(c, "Invalid Request.")
 	}
 
 	// using the auto populated category to Create
 	// Add user id to category
 	category.UserID = token["sub"].(string) // assert string because token["sub"]
 	if creation := db.Create(&category); creation.Error != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Cannot Create the category",
-		})
+		return common.InvalidRequest(c, "Unable to Create Category.")
 	}
 
 	response := make(map[string]string)
@@ -143,19 +123,13 @@ func CreateCategory(c *fiber.Ctx) error {
 	response["desctiption"] = category.Description
 	response["user"] = category.UserID
 
-	return c.JSON(fiber.Map{
-		"response": &response,
-	})
+	return common.Success(c, &response)
 }
 
 func FetchCategories(c *fiber.Ctx) error {
 	// Fetch a Category
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked.",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
+
 	type result struct {
 		ID          string
 		Name        string
@@ -169,31 +143,19 @@ func FetchCategories(c *fiber.Ctx) error {
 		Find(&category)
 
 	if query_lookup.Error != nil {
-		fmt.Println("Error while Fetching Categories: ", query_lookup.Error)
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Something went wrong while Fetching Categories",
-		})
+		return common.BadGateway(c, "Cannot Fetch Categories.")
 	}
 
 	if query_lookup.RowsAffected < 1 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"response": "No Categories Found.",
-		})
+		return common.NotFound(c, "No Categories.")
 	}
 
-	return c.JSON(fiber.Map{
-		"response": category,
-	})
+	return common.Success(c, &category)
 }
 
 func UpdateCategory(c *fiber.Ctx) error {
 	// Update a Category
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	// get the user id from the JWT session
 	token := c.Locals("session_user").(*jwt.Token).Claims.(jwt.MapClaims)
@@ -203,39 +165,30 @@ func UpdateCategory(c *fiber.Ctx) error {
 	// fetch the category in question
 	var category models.Category
 	query := db.Find(&category, "id == ?", category_id)
+
 	if query.Error != nil {
-		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{
-			"response": "Cannot Query for this Category",
-		})
+		return common.BadGateway(c, "Cannot Handle Query.")
 	}
 
 	if query.RowsAffected < 1 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"response": "Category Not Found.",
-		})
+		return common.NotFound(c, "Category Does Not Exist.")
 	}
 
 	// check if the logged in user is the creator of that category
 	if user_id == category.UserID {
 		// empty means ignore if true
 	} else {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"response": "Unauthorized Operation.",
-		})
+		return common.UnauthorizedRequest(c, "Unauthorized.")
 	}
 
 	// if the above check is done and the user logged in is the creator then we can continue
 	if err := c.BodyParser(&category); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Invalid Information Provided.",
-		})
+		return common.InvalidRequest(c, "Invalid Information")
 	}
 
 	save_query := db.Save(&category)
 	if save_query.Error != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"responnse": "Error while updating category",
-		})
+		return common.InvalidRequest(c, "Cannot Update Category.")
 	}
 
 	response := make(map[string]string)
@@ -244,36 +197,24 @@ func UpdateCategory(c *fiber.Ctx) error {
 	response["slug"] = category.Slug
 	response["description"] = category.Description
 
-	return c.JSON(fiber.Map{
-		"response": response,
-	})
+	return common.Success(c, &response)
 }
 
 func DeleteCategory(c *fiber.Ctx) error {
 	// Delete a Category
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "DB Fucked",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	category_id := c.Query("category_id")
 	var category models.Category
+
 	query := db.Delete(&category, "id = ?", category_id)
 	if query.Error != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": query.Error,
-		})
+		return common.InvalidRequest(c, query.Error.Error())
 	}
 
 	if query.RowsAffected < 1 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"response": "No Category Exist.",
-		})
+		return common.NotFound(c, "Category Does Not Exist.")
 	}
 
-	return c.JSON(fiber.Map{
-		"response": "Category Deleted Succesfully.",
-	})
+	return common.Success(c, "Category Deleted.")
 }
