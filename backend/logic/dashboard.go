@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"backend/common"
 	"backend/models"
 	"strconv"
 	"time"
@@ -260,7 +261,7 @@ func CreatorDashboard(c *fiber.Ctx) error {
 		Limit(limit).
 		Offset(offset).
 		Scan(&recentPosts).Error; err != nil {
-		return c.Status(500).JSON(fiber.Map{"error": "Failed to get recent posts"})
+		return common.InternalServerError(c, "Cannot Fetch Recent Posts")
 	}
 
 	// Final transformed JSON
@@ -275,6 +276,7 @@ func CreatorDashboard(c *fiber.Ctx) error {
 	})
 }
 
+// TODO: Pending Implementation.
 func AdminDashboard(c *fiber.Ctx) error {
 	return nil
 }
