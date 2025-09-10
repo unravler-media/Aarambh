@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"backend/common"
 	"backend/models"
 	"fmt"
 	"time"
@@ -39,12 +40,7 @@ type categoryResponse struct {
 }
 
 func FetchPosts(c *fiber.Ctx) error {
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	var posts []models.Post
 	query := db.Debug().
@@ -55,19 +51,14 @@ func FetchPosts(c *fiber.Ctx) error {
 		Find(&posts)
 
 	if query.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Unable to query Database",
-		})
+		return common.InternalServerError(c, "Cannot query.")
 	}
 
 	if query.RowsAffected < 1 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"response": "No Posts Exists.",
-		})
+		return common.NotFound(c, "Post Does Not Exist.")
 	}
 
 	var response []postsResponse
-
 	for _, p := range posts {
 		response = append(response, postsResponse{
 			ID:           p.ID,
@@ -93,18 +84,11 @@ func FetchPosts(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(fiber.Map{
-		"response": response,
-	})
+	return common.Success(c, &response)
 }
 
 func FetchPost(c *fiber.Ctx) error {
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	post_slug := c.Query("post")
 
@@ -116,15 +100,11 @@ func FetchPost(c *fiber.Ctx) error {
 		Where("slug = ?", post_slug).
 		First(&post)
 	if query.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Cannot Get the Post.",
-		})
+		return common.InternalServerError(c, "Cannot Fetch Post")
 	}
 
 	if query.RowsAffected < 1 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"response": "Post not Found.",
-		})
+		return common.NotFound(c, "Post Does Not Exist.")
 	}
 
 	type commentsResponse struct {
@@ -187,25 +167,16 @@ func FetchPost(c *fiber.Ctx) error {
 		Comments: transformedComments,
 	}
 
-	return c.JSON(fiber.Map{
-		"response": response,
-	})
+	return common.Success(c, &response)
 }
 
 func FetchPostMeta(c *fiber.Ctx) error {
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	// extracting information from the token and decoding it and storing it inside the token var
 	session_user := c.Locals("session_user")
 	if session_user == nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "User not found in session.",
-		})
+		return common.InvalidRequest(c, "user does not exist.")
 	}
 
 	jwtLocale := c.Locals("session_user").(*jwt.Token)
@@ -250,26 +221,18 @@ func FetchPostMeta(c *fiber.Ctx) error {
 		HasSaved: has_saved,
 	}
 
-	return c.JSON(fiber.Map{
-		"response": response,
-	})
+	return common.Success(c, &response)
 }
 
 func CreatePost(c *fiber.Ctx) error {
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	// extracting information from the token and decoding it and storing it inside the token var
 	fmt.Println("Session User", c.Locals("session_user"))
 	session_user := c.Locals("session_user")
+
 	if session_user == nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "User not found in session.",
-		})
+		return common.InvalidRequest(c, "user does not exist.")
 	}
 
 	jwtLocale := c.Locals("session_user").(*jwt.Token)
@@ -279,9 +242,7 @@ func CreatePost(c *fiber.Ctx) error {
 	// prepare & parse the request parameters
 	var post models.Post
 	if err := c.BodyParser(&post); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Invalid Request Parameters",
-		})
+		return common.InvalidRequest(c, "Invalid Request")
 	}
 
 	// created the post object now add the user id to it.
@@ -290,9 +251,7 @@ func CreatePost(c *fiber.Ctx) error {
 
 	query := db.Create(&post)
 	if query.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Cannot Create Post.",
-		})
+		return common.InternalServerError(c, "Cannot Create Post.")
 	}
 
 	response := make(map[string]any)
@@ -308,24 +267,15 @@ func CreatePost(c *fiber.Ctx) error {
 	response["is_featured"] = post.IsFeatured
 	response["read_time"] = post.ReadTime
 
-	return c.JSON(fiber.Map{
-		"response": response,
-	})
+	return common.Success(c, &response)
 }
 
 func UpdatePost(c *fiber.Ctx) error {
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked.",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	user_session := c.Locals("session_user")
 	if user_session == nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Unable to process information.",
-		})
+		return common.InvalidRequest(c, "Invalid Information.")
 	}
 
 	jwtLocale := c.Locals("session_user").(*jwt.Token)
@@ -334,62 +284,42 @@ func UpdatePost(c *fiber.Ctx) error {
 
 	post_slug := c.Query("post") // pass in the post slug
 	if post_slug == "" {
-		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Post ID not provided.",
-		})
+		return common.InvalidRequest(c, "Post ID Invalid.")
 	}
 
 	var post models.Post
 	query := db.Where("slug = ?", post_slug).First(&post)
+
 	if query.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Unable to fetch request post.",
-		})
+		return common.InternalServerError(c, "Cannot Fetch Post")
 	}
 
 	if query.RowsAffected < 1 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"response": "Post Not Found.",
-		})
+		return common.NotFound(c, "Post not Found.")
 	}
 
 	if post.AuthorID != user_id {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"response": "Unauthrised Action.",
-		})
+		return common.UnauthorizedRequest(c, "Unauthrized")
 	}
 
 	if err := c.BodyParser(&post); err != nil {
-		c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Invalid Request information.",
-		})
+		return common.InvalidRequest(c, "Invalid Information")
 	}
 
 	saving_query := db.Save(&post)
 	if saving_query.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Error Saving the Post.",
-		})
+		return common.InternalServerError(c, "Cannot Save the Post.")
 	}
 
-	return c.JSON(fiber.Map{
-		"response": "Updated Post.",
-	})
+	return common.Success(c, "Updated Post.")
 }
 
 func DeletePost(c *fiber.Ctx) error {
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked.",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	user_session := c.Locals("session_user")
 	if user_session == nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Unable to Process information.",
-		})
+		return common.InvalidRequest(c, "Invalid Information")
 	}
 
 	jwtLocale := c.Locals("session_user").(*jwt.Token)
@@ -398,47 +328,32 @@ func DeletePost(c *fiber.Ctx) error {
 
 	post_slug := c.Query("post")
 	if post_slug == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Post Slug Not provided.",
-		})
+		return common.InvalidRequest(c, "invalid slug.")
 	}
 
 	var post models.Post
 	fetch_post := db.First(&post, "slug = ?", post_slug)
 
 	if fetch_post.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Unable to perform Query.",
-		})
+		return common.InternalServerError(c, "Cannot Fetch Post")
 	}
 
 	if post.AuthorID != user_id {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"response": "Unauthrised Action.",
-		})
+		return common.UnauthorizedRequest(c, "Unauthrized.")
 	}
 
 	db.Delete(&post)
 
-	return c.JSON(fiber.Map{
-		"response": "Post Deleted.",
-	})
+	return common.Success(c, "Post Deleted")
 }
 
 func LikePost(c *fiber.Ctx) error {
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked.",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	// Get user information from headers.
 	user_session := c.Locals("session_user")
 	if user_session == nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "User session unavailable.",
-		})
+		return common.InvalidRequest(c, "Invalid Request")
 	}
 
 	user := user_session.(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
@@ -449,15 +364,11 @@ func LikePost(c *fiber.Ctx) error {
 	fetch_post_query := db.First(&postHolder, "slug = ?", post_slug)
 
 	if fetch_post_query.RowsAffected < 1 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"response": "Post Not Found!",
-		})
+		return common.NotFound(c, "Post Does not Exist.")
 	}
 
 	if fetch_post_query.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Something went wrong while getting Post.",
-		})
+		return common.InternalServerError(c, "Cannot Fetch Post")
 	}
 
 	// Validate if the post in question is already liked by the user in question or not.
@@ -466,15 +377,11 @@ func LikePost(c *fiber.Ctx) error {
 		Find(&already_liked_post)
 
 	if already_liked.RowsAffected > 0 {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"response": "Already Liked!",
-		})
+		return common.Forbidden(c, "Already Liked!")
 	} // means post is liked by this user in past.
 
 	if already_liked.Error != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Cannot Validate.",
-		})
+		return common.InvalidRequest(c, "Cannot Validate Request.")
 	}
 
 	// if post exists create a new instance of PostLike and submit data into that struct
@@ -484,27 +391,19 @@ func LikePost(c *fiber.Ctx) error {
 
 	liking := db.Create(&likedPostInstance)
 	if liking.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Cannot Like the Post.",
-		})
+		return common.InternalServerError(c, "Cannot Like Post.")
 	}
+
 	return c.SendStatus(200)
 }
 
 func UnlikePost(c *fiber.Ctx) error {
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked.",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
 
 	// Get user information from headers.
 	user_session := c.Locals("session_user")
 	if user_session == nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "User session unavailable.",
-		})
+		return common.InvalidRequest(c, "Invalid Request")
 	}
 
 	user := user_session.(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
@@ -515,15 +414,11 @@ func UnlikePost(c *fiber.Ctx) error {
 	fetch_post_query := db.First(&postHolder, "slug = ?", post_slug)
 
 	if fetch_post_query.RowsAffected < 1 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"response": "Post Not Found!",
-		})
+		return common.NotFound(c, "Post Not Found.")
 	}
 
 	if fetch_post_query.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Something went wrong while getting Post.",
-		})
+		return common.InternalServerError(c, "Cannot Fetch Post")
 	}
 
 	// Validate if the post in question is already liked by the user in question or not.
@@ -534,52 +429,39 @@ func UnlikePost(c *fiber.Ctx) error {
 	if already_liked.RowsAffected > 0 {
 		deleteQeury := db.Delete(&already_liked_post)
 		if deleteQeury.Error != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"response": "Cannot UnLike the Post.",
-			})
+			return common.InvalidRequest(c, "Cannot unike the post")
 		}
 	} // means post is liked by this user in past.
 
 	if already_liked.Error != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Cannot Validate.",
-		})
+		return common.InvalidRequest(c, "Cannot Validate.")
 	}
 
 	return c.SendStatus(200)
 }
 
 func ReadPost(c *fiber.Ctx) error {
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked.",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
+
 	// Get user information from headers.
 	user_session := c.Locals("session_user")
 	if user_session == nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "User session unavailable.",
-		})
+		return common.InvalidRequest(c, "Invalid Request")
 	}
 
 	user := user_session.(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
+
 	// get the post from the slug
 	post_slug := c.Params("slug")
 	var postHolder models.Post
 	fetch_post_query := db.First(&postHolder, "slug = ?", post_slug)
 
 	if fetch_post_query.RowsAffected < 1 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"response": "Post Not Found!",
-		})
+		return common.NotFound(c, "Post Not Found.")
 	}
 
 	if fetch_post_query.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Something went wrong while getting Post.",
-		})
+		return common.InternalServerError(c, "Cannot Get Post")
 	}
 
 	// Validate if the post in question is already liked by the user in question or not.
@@ -588,15 +470,11 @@ func ReadPost(c *fiber.Ctx) error {
 		Find(&already_viewed_post)
 
 	if already_viewed.RowsAffected > 0 {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"response": "Already Viewed!",
-		})
+		return common.Forbidden(c, "Already Viewed!")
 	} // means post is liked by this user in past.
 
 	if already_viewed.Error != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Cannot Validate.",
-		})
+		return common.InvalidRequest(c, "Cannot Validate")
 	}
 
 	// if post exists create a new instance of PostLike and submit data into that struct
@@ -606,44 +484,33 @@ func ReadPost(c *fiber.Ctx) error {
 
 	viewing := db.Create(&ViewedPostInstance)
 	if viewing.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Cannot Like the Post.",
-		})
+		return common.InternalServerError(c, "Cannot Like the Post")
 	}
 	return c.SendStatus(200)
 }
 
 func SavePost(c *fiber.Ctx) error {
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked.",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
+
 	// Get user information from headers.
 	user_session := c.Locals("session_user")
 	if user_session == nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "User session unavailable.",
-		})
+		return common.InvalidRequest(c, "Invalid Request")
 	}
 
 	user := user_session.(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
+
 	// get the post from the slug
 	post_slug := c.Params("slug")
 	var postHolder models.Post
 	fetch_post_query := db.First(&postHolder, "slug = ?", post_slug)
 
 	if fetch_post_query.RowsAffected < 1 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"response": "Post Not Found!",
-		})
+		return common.NotFound(c, "Post Not Found")
 	}
 
 	if fetch_post_query.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Something went wrong while getting Post.",
-		})
+		return common.InternalServerError(c, "Cannot Get Post.")
 	}
 
 	// Validate if the post in question is already saved by the user in question or not.
@@ -652,15 +519,11 @@ func SavePost(c *fiber.Ctx) error {
 		Find(&already_saved_post)
 
 	if already_saved.RowsAffected > 0 {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"response": "Already Saved!",
-		})
+		return common.Forbidden(c, "Already Saved")
 	} // means post is liked by this user in past.
 
 	if already_saved.Error != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Cannot Validate.",
-		})
+		return common.InvalidRequest(c, "Cannot Validate")
 	}
 
 	// if post exists create a new instance of PostLike and submit data into that struct
@@ -670,44 +533,34 @@ func SavePost(c *fiber.Ctx) error {
 
 	viewing := db.Create(&SavedPostInstance)
 	if viewing.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Cannot Save the Post.",
-		})
+		return common.InternalServerError(c, "Cannot Save the Post.")
 	}
 	return c.SendStatus(200)
 }
 
 func UnSavePost(c *fiber.Ctx) error {
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked.",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
+
 	// Get user information from headers.
 	user_session := c.Locals("session_user")
+
 	if user_session == nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "User session unavailable.",
-		})
+		return common.InvalidRequest(c, "Invalid Request")
 	}
 
 	user := user_session.(*jwt.Token).Claims.(jwt.MapClaims)["sub"].(string)
+
 	// get the post from the slug
 	post_slug := c.Params("slug")
 	var postHolder models.Post
 	fetch_post_query := db.First(&postHolder, "slug = ?", post_slug)
 
 	if fetch_post_query.RowsAffected < 1 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"response": "Post Not Found!",
-		})
+		return common.NotFound(c, "Post Not Found")
 	}
 
 	if fetch_post_query.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Something went wrong while getting Post.",
-		})
+		return common.InternalServerError(c, "Cannot Fetch Post")
 	}
 
 	// Validate if the post in question is already saved by the user in question or not.
@@ -718,16 +571,12 @@ func UnSavePost(c *fiber.Ctx) error {
 	if already_saved.RowsAffected > 0 {
 		deleteQuery := db.Delete(&already_saved_post)
 		if deleteQuery.Error != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"response": "Cannot unbookmark the post",
-			})
+			return common.InvalidRequest(c, "Cannot UnBookmark the Post")
 		}
 	} // means post is saved by this user in past.
 
 	if already_saved.Error != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Cannot Validate.",
-		})
+		return common.InvalidRequest(c, "Cannot Validate")
 	}
 	return c.SendStatus(200)
 }

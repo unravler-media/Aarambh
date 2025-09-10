@@ -43,3 +43,10 @@ func BadGateway(ctx *fiber.Ctx, resp string) error {
 		"response": &resp,
 	})
 }
+
+func Forbidden(ctx *fiber.Ctx, resp string) error {
+	// this will return 403 - Forbidden
+	return ctx.Status(fiber.StatusForbidden).JSON(fiber.Map{
+		"response": &resp,
+	})
+}
