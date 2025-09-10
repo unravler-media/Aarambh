@@ -2,7 +2,7 @@ package common
 
 import "github.com/gofiber/fiber/v2"
 
-func InvalidRequest(ctx *fiber.Ctx, resp string) error {
+func InvalidRequest(ctx *fiber.Ctx, resp any) error {
 	// This will Return a status 400 - bad request
 	return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 		"response": &resp,
