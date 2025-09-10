@@ -43,7 +43,7 @@ func FetchPosts(c *fiber.Ctx) error {
 	db, _ := c.Locals("db").(*gorm.DB)
 
 	var posts []models.Post
-	query := db.Debug().
+	query := db.Debug().Scopes(common.Paginate(c)).
 		Preload("Author").
 		Preload("Category").
 		Select("id", "post_title", "slug", "cover_image", "read_time", "is_featured", "updated_at", "author_id", "category_id", "short_content").

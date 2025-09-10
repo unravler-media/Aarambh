@@ -39,20 +39,26 @@ func QueryPosts(c *fiber.Ctx) error {
 	}
 
 	var posts []models.Post
-	fetch_query := db.Debug().Preload("Author", func(db *gorm.DB) *gorm.DB {
-		return db.Select("id", "username", "full_name", "avatar").Distinct()
-	}).Preload("Category", func(db *gorm.DB) *gorm.DB {
-		return db.Select("id", "name", "slug").Distinct()
-	}).Select(
-		"id",
-		"updated_at",
-		"post_title",
-		"slug",
-		"short_content",
-		"cover_image",
-		"author_id",
-		"category_id",
-	).Where("slug LIKE ?", "%"+query+"%").Find(&posts)
+	fetch_query := db.Debug().
+		Scopes(common.Paginate(c)).
+		Preload("Author", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "username", "full_name", "avatar").Distinct()
+		}).
+		Preload("Category", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id", "name", "slug").Distinct()
+		}).
+		Select(
+			"id",
+			"updated_at",
+			"post_title",
+			"slug",
+			"short_content",
+			"cover_image",
+			"author_id",
+			"category_id",
+		).
+		Where("slug LIKE ?", "%"+query+"%").
+		Find(&posts)
 
 	if fetch_query.Error != nil {
 		return common.InternalServerError(c, "Unable to Fetch Query")
