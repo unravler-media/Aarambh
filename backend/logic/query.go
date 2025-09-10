@@ -1,8 +1,8 @@
 package logic
 
 import (
+	"backend/common"
 	"backend/models"
-	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -10,17 +10,11 @@ import (
 )
 
 func QueryPosts(c *fiber.Ctx) error {
-	db, ok := c.Locals("db").(*gorm.DB)
-	if !ok {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "DB Fucked.",
-		})
-	}
+	db, _ := c.Locals("db").(*gorm.DB)
+
 	query := c.Query("q", "none")
 	if query == "none" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"response": "Query not provided.",
-		})
+		return common.InvalidRequest(c, "Invalid Request")
 	}
 
 	type AuthorResponse struct {
@@ -61,16 +55,11 @@ func QueryPosts(c *fiber.Ctx) error {
 	).Where("slug LIKE ?", "%"+query+"%").Find(&posts)
 
 	if fetch_query.Error != nil {
-		fmt.Printf("ERror in Query: %v", fetch_query)
-		c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"response": "Unable to fetch Query.",
-		})
+		return common.InternalServerError(c, "Unable to Fetch Query")
 	}
 
 	if fetch_query.RowsAffected < 1 {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"response": "No Posts Found.",
-		})
+		return common.NotFound(c, "No Post Found")
 	}
 
 	var finalResponse []QueryPosts
@@ -92,7 +81,5 @@ func QueryPosts(c *fiber.Ctx) error {
 			},
 		})
 	}
-	return c.JSON(fiber.Map{
-		"response": &finalResponse,
-	})
+	return common.Success(c, &finalResponse)
 }
