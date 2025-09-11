@@ -214,7 +214,7 @@ const transformApiPostDetail = (apiPost: ApiPostDetail): Post => ({
   })) || [],
 });
 
-export const usePosts = () => {
+export const usePosts = (page: number | string | null, pageSize: number | string | null) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -223,7 +223,7 @@ export const usePosts = () => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.posts}`);
+        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.posts}?page=${page}&pagesize=${pageSize}`);
         if (!response.ok) {
           throw new Error('Failed to fetch posts');
         }
@@ -238,7 +238,7 @@ export const usePosts = () => {
     };
 
     fetchPosts();
-  }, []);
+  }, [page, pageSize]);
 
   return { posts, loading, error };
 };
@@ -308,7 +308,11 @@ export const usePost = (slug: string) => {
   return { post, loading, error };
 };
 
-export const usePostsSearch = (slug: string) => {
+export const usePostsSearch = (
+  slug: string,
+  page: string | number | null,
+  pagesize: string | number | null
+) => {
   const [searchResult, setPosts] = useState<Post[]>([]);
   const [searchLoading, setLoading] = useState(false);
   const [searchError, setError] = useState<string | null>(null);
@@ -323,24 +327,34 @@ export const usePostsSearch = (slug: string) => {
       const fetchSearchPosts = async () => {
         try {
           setLoading(true);
-          const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.searchPosts}?q=${slug}`);
+          const response = await fetch(
+            `${API_BASE_URL}${API_ENDPOINTS.searchPosts}?q=${slug}&page=${page}&pagesize=${pagesize}`
+          );
 
           if (!response.ok) {
             if (response.status === 404) {
               setPosts([]);
-              setError(null);
+              setError(JSON.stringify({ response: "Post Does Not Exist." }));
+              return;
             } else {
               throw new Error("Failed to fetch posts");
             }
           }
 
           const data = await response.json();
+
+          if (!data.response || !Array.isArray(data.response)) {
+            setPosts([]);
+            setError(JSON.stringify({ response: "Post Does Not Exist." }));
+            return;
+          }
+
           const transformedPosts = data.response.map(transformApiSearchPost);
           setPosts(transformedPosts);
           setError(null);
         } catch (err) {
-          console.log(err instanceof Error ? err.message : "An Error occurred");
-          setError(null);
+          console.error(err instanceof Error ? err.message : "An error occurred");
+          setError(JSON.stringify({ response: "Unexpected error" }));
           setPosts([]);
         } finally {
           setLoading(false);
@@ -348,14 +362,13 @@ export const usePostsSearch = (slug: string) => {
       };
 
       fetchSearchPosts();
-    }, 500); // 👈 800ms debounce delay
+    }, 500);
 
     return () => clearTimeout(delayDebounce);
-  }, [slug]);
+  }, [slug, page, pagesize]);
 
   return { searchResult, searchLoading, searchError };
 };
-
 export const markPostRead = async (slug: string) => {
   try {
     // implement api call
