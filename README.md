@@ -1,4 +1,4 @@
-# Aarambh ✨
+# Aikyum ✨
 
 ### An Agentic AI Content Creation Platform, augmented by Human Creativity.
 

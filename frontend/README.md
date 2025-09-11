@@ -1,4 +1,4 @@
-# Aarambh - Agentic Ai with Human Creativity.
+#  - Agentic Ai with Human Creativity.
 
 ## Inspiration & Ideation
 This project is inspired by lot of the AgenticAi's recently flowing into the tech space. Aarambh is an idea where we combine LLM's via agentic workflow's and create / schedule (good) content for everyone.
