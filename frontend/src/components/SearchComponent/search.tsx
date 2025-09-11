@@ -12,6 +12,8 @@ const Search = () => {
 
   const [allResults, setAllResults] = useState<any[]>([]);
   const [hasMore, setHasMore] = useState(true);
+  // Track whether initial results are loaded
+  const [initialLoaded, setInitialLoaded] = useState(false);
 
   const { searchResult, searchLoading, searchError } = usePostsSearch(
     submittedQuery,
@@ -27,40 +29,33 @@ const Search = () => {
     setPage(1);
     setAllResults([]);
     setHasMore(true);
+    setInitialLoaded(false); // 👈 reset this too
   }, [submittedQuery]);
 
   // Append results when new page arrives
   useEffect(() => {
+    console.log("triggered first use effect.")
     if (!searchLoading && searchResult && searchResult.length > 0) {
       setAllResults(prev => {
         const existingIds = new Set(prev.map(p => p.id ?? p.slug));
         const newPosts = searchResult.filter(p => !existingIds.has(p.id ?? p.slug));
         return [...prev, ...newPosts];
       });
+
+      if (page === 1) {
+        // 👇 mark that page 1 is done
+        setInitialLoaded(true);
+      }
     }
   }, [searchResult, searchLoading]);
 
-  // Stop infinite scroll on 404
   useEffect(() => {
-    if (searchError) {
-      try {
-        const parsed = JSON.parse(searchError);
-        if (parsed.response === "Post Does Not Exist.") {
-          setHasMore(false);
-          if (observerRef.current && loaderRef.current) {
-            observerRef.current.unobserve(loaderRef.current);
-            observerRef.current.disconnect();
-          }
-        }
-      } catch {
-        console.error("Unexpected search error:", searchError);
-      }
-    }
-  }, [searchError]);
+    console.log("initialLoaded changed:", initialLoaded);
+  }, [initialLoaded]);
 
   // Infinite scroll observer
   useEffect(() => {
-    if (!hasMore || searchLoading) return;
+    if (!hasMore || searchLoading || !initialLoaded) return;
 
     observerRef.current = new IntersectionObserver(
       entries => {
@@ -82,7 +77,36 @@ const Search = () => {
         observerRef.current.disconnect();
       }
     };
-  }, [hasMore, searchLoading]);
+  }, [hasMore, searchLoading, initialLoaded]);
+  // Stop infinite scroll on 404
+  useEffect(() => {
+    if (searchError) {
+      try {
+        const parsed = JSON.parse(searchError);
+        if (parsed.response === "Post Does Not Exist.") {
+          setHasMore(false);
+          if (observerRef.current && loaderRef.current) {
+            observerRef.current.unobserve(loaderRef.current);
+            observerRef.current.disconnect();
+          }
+        }
+      } catch {
+        console.error("Unexpected search error:", searchError);
+      }
+    }
+  }, [searchError]);
+
+  // useEffect(() => {
+  //   // handle the condition where we dont have any search results.
+  //   if (allResults.length < 1 && !searchLoading) {
+  //     setHasMore(false);
+  //     if (observerRef.current && loaderRef.current) {
+  //       observerRef.current.unobserve(loaderRef.current);
+  //       observerRef.current.disconnect();
+  //     }
+  //   }
+  // }, [searchLoading]);
+
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,7 +182,7 @@ const Search = () => {
           </div>
         )}
       </div>
-    </Layout>
+    </Layout >
   );
 };
 
