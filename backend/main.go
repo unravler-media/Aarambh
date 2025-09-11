@@ -32,8 +32,8 @@ func main() {
 	// using custom JSON Encoders & decoders for faster performance (useless in Go V1.25)
 	app := fiber.New(
 		fiber.Config{
-			ServerHeader: "Aikyum Server",
-			AppName:      "Project Aikyum",
+			ServerHeader: "Aikyum Public Nerfed Server",
+			AppName:      "Project Aikyum Nerfed",
 			JSONEncoder:  gojson.Marshal,
 			JSONDecoder:  gojson.Unmarshal,
 			BodyLimit:    6 * 1024 * 1024, // server will only accept requests of upto 6MB.
