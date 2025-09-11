@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
@@ -33,10 +32,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 // building the fiber application
 func handler() http.HandlerFunc {
 	// To Ensure loading of .env files. (dont need this in serverless environments)
-	err := godotenv.Load()
-	if err != nil {
-		fmt.Println("Something went wrong while importing ENV Variables.")
-	}
+	godotenv.Load()
 
 	// Initialise the Database Connection using a Custom Controller
 	database := databases.TursoConnecter()
