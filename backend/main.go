@@ -32,8 +32,8 @@ func main() {
 	// using custom JSON Encoders & decoders for faster performance (useless in Go V1.25)
 	app := fiber.New(
 		fiber.Config{
-			ServerHeader: "Aarambh Server",
-			AppName:      "Project Aarambh",
+			ServerHeader: "Aikyum Server",
+			AppName:      "Project Aikyum",
 			JSONEncoder:  gojson.Marshal,
 			JSONDecoder:  gojson.Unmarshal,
 			BodyLimit:    6 * 1024 * 1024, // server will only accept requests of upto 6MB.
@@ -43,7 +43,7 @@ func main() {
 	// CORS middleware
 	app.Use(cors.New(cors.Config{
 		AllowMethods:     "GET, POST, PUT, DELETE",
-		AllowOrigins:     "https://aikyum.vercel.app, http://127.0.0.1:3000, http://localhost:4321, https://aarambh.dpdns.org",
+		AllowOrigins:     "https://aikyum-one.vercel.app, http://127.0.0.1:3000, http://localhost:4321",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))
