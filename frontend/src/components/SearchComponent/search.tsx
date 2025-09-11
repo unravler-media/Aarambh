@@ -115,7 +115,7 @@ const Search = () => {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto mt-6">
         <h1 className="text-2xl md:text-3xl font-bold mb-8 text-white">
           Search Articles
         </h1>
