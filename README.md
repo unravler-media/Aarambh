@@ -1,25 +1,15 @@
 # Aikyum ✨
 
-### An Agentic AI Content Creation Platform, augmented by Human Creativity.
+### Nerfed Version of Aikyum. Limited to Blogging.
 
 [![Project Status: Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Made by Unravler Media](https://img.shields.io/badge/Made%20by-Unravler%20Media-ea384c.svg)](https://unrmedia.framer.media/)
-
-Aarambh is an innovative platform that merges the power of Large Language Models (LLMs) with sophisticated agentic workflows to automate the creation and scheduling of high-quality content. Inspired by the recent surge in Agentic AI, this project by **Unravler Media** is our bet on the future of autonomous content production systems.
-
-We are starting with web-readable content, where our AI agents will handle the entire lifecycle:
-1.  **🧠 Research:** Autonomously gather and synthesize information from various sources.
-2.  **📚 Learn:** Continuously improve its knowledge base and writing style.
-3.  **✍️ Write:** Generate well-structured, coherent, and engaging articles.
-4.  **🚀 Optimize:** Refine content for SEO and readability.
-
-While the AI handles the heavy lifting, we believe in the power of human creativity. Aarambh is also a platform for individuals to contribute their own content, from which our AI systems will learn and evolve.
 
 ---
 
 ## 🚀 Tech Stack
 
-Aarambh is a full-stack application built with a modern, performance-oriented technology stack.
+Aikyum is a full-stack application built with a modern, performance-oriented technology stack.
 
 | Area      | Technology                                                                                                  |
 | :-------- | :---------------------------------------------------------------------------------------------------------- |
@@ -173,7 +163,7 @@ To get a local copy up and running, follow these simple steps.
 
 1.  **Clone the repository:**
     ```sh
-    git clone https://github.com/your-username/aarambh.git
+    git clone https://github.com/unravler-media/aikyum-public.git
     cd aarambh
     ```
 
